@@ -362,7 +362,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
       logger.info("Attempting to join the distributed system through coordinator " + coord + " using address " + this.localAddress);
       int port = services.getHealthMonitor().getFailureDetectionPort();
       JoinRequestMessage req = new JoinRequestMessage(coord, this.localAddress, services.getAuthenticator().getCredentials(coord), port);
-      services.getMessenger().send(req);
+      services.getMessenger().send(req, state.view);
     }
 
     JoinResponseMessage response = null;
@@ -763,6 +763,14 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
     }
   }
 
+  private void sendJoinResponses(List<InternalDistributedMember> newMbrs, NetView newView) {
+    for (InternalDistributedMember mbr : newMbrs) {
+      JoinResponseMessage response = new JoinResponseMessage(mbr, newView);
+      services.getMessenger().send(response);
+    }
+  }
+
+
   boolean prepareView(NetView view, List<InternalDistributedMember> newMembers) throws InterruptedException {
     return sendView(view, newMembers, true, this.prepareProcessor);
   }
@@ -826,7 +834,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
     pendingRemovals.removeAll(view.getCrashedMembers());
     viewReplyProcessor.initialize(id, responders);
     viewReplyProcessor.processPendingRequests(pendingLeaves, pendingRemovals);
-    services.getMessenger().send(msg);
+    services.getMessenger().send(msg, view);
 
     // only wait for responses during preparation
     if (preparing) {
@@ -885,21 +893,21 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
         services.getMessenger().send(new ViewAckMessage(m.getSender(), this.preparedView));
       } else {
         this.preparedView = view;
-        ackView(m);
         if (viewContainsMyUnjoinedAddress) {
           installView(view); // this will notifyAll the joinResponse
         }
+        ackView(m);
       }
     } else { // !preparing
       if (isJoined && currentView != null && !view.contains(this.localAddress)) {
         logger.fatal("This member is no longer in the membership view.  My ID is {} and the new view is {}", localAddress, view);
         forceDisconnect("This node is no longer in the membership view");
       } else {
-        if (!m.isRebroadcast()) { // no need to ack a rebroadcast view
-          ackView(m);
-        }
         if (isJoined || viewContainsMyUnjoinedAddress) {
           installView(view);
+        }
+        if (!m.isRebroadcast()) { // no need to ack a rebroadcast view
+          ackView(m);
         }
       }
     }
@@ -912,7 +920,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
 
   private void ackView(InstallViewMessage m) {
     if (!playingDead && m.getView().contains(m.getView().getCreator())) {
-      services.getMessenger().send(new ViewAckMessage(m.getSender(), m.getView().getViewId(), m.isPreparing()));
+      services.getMessenger().send(new ViewAckMessage(m.getSender(), m.getView().getViewId(), m.isPreparing()), m.getView());
     }
   }
 
@@ -1892,6 +1900,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
         for (InternalDistributedMember newMember : newMembers) {
           newView.add(newMember);
           newView.setFailureDetectionPort(newMember, v.getFailureDetectionPort(newMember));
+          newView.setPublicKey(newMember, v.getPublicKey(newMember));
         }
 
         // use the new view as the initial view
@@ -2015,6 +2024,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
     void createAndSendView(List<DistributionMessage> requests) throws InterruptedException {
       List<InternalDistributedMember> joinReqs = new ArrayList<>(10);
       Map<InternalDistributedMember, Integer> joinPorts = new HashMap<>(10);
+      Map<InternalDistributedMember, Object> joinKeys = new HashMap<>(10);
       Set<InternalDistributedMember> leaveReqs = new HashSet<>(10);
       List<InternalDistributedMember> removalReqs = new ArrayList<>(10);
       List<String> removalReasons = new ArrayList<String>(10);
@@ -2048,6 +2058,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
           if (!joinReqs.contains(mbr)) {
             joinReqs.add(mbr);
             joinPorts.put(mbr, port);
+            joinKeys.put(mbr, jmsg.getPublicKey());
           }
           break;
         case LEAVE_REQUEST_MESSAGE:
@@ -2117,10 +2128,12 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
         for (InternalDistributedMember mbr : joinReqs) {
           if (mbrs.contains(mbr)) {
             newView.setFailureDetectionPort(mbr, joinPorts.get(mbr));
+            newView.setPublicKey(mbr, joinKeys.get(mbr));
           }
         }
         if (currentView != null) {
           newView.setFailureDetectionPorts(currentView);
+          newView.setPublicKeys(currentView);
         }
       }
 
@@ -2138,6 +2151,9 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
       if (isShutdown()) {
         return;
       }
+
+      sendJoinResponses(joinReqs, newView);
+
       // send removal messages before installing the view so we stop
       // getting messages from members that have been kicked out
       sendRemoveMessages(removalReqs, removalReasons, newView, oldIDs);
