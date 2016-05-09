@@ -19,15 +19,8 @@ package com.gemstone.gemfire.distributed.internal.membership;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.gemstone.gemfire.internal.logging.LogService;
 import org.apache.logging.log4j.Logger;
@@ -50,6 +43,8 @@ public class NetView implements DataSerializableFixedID {
 
   private int viewId;
   private List<InternalDistributedMember> members;
+  // TODO this should be a List
+  private Map<InternalDistributedMember, Object> publicKeys = new ConcurrentHashMap<>();
   private int[] failureDetectionPorts = new int[10];
   private Set<InternalDistributedMember> shutdownMembers;
   private Set<InternalDistributedMember> crashedMembers;
@@ -114,6 +109,7 @@ public class NetView implements DataSerializableFixedID {
     this.hashedMembers = new HashSet<InternalDistributedMember>(other.members);
     this.failureDetectionPorts = new int[other.failureDetectionPorts.length];
     System.arraycopy(other.failureDetectionPorts, 0, this.failureDetectionPorts, 0, other.failureDetectionPorts.length);
+    this.publicKeys = new HashMap<>(other.publicKeys);
     this.shutdownMembers = new HashSet<InternalDistributedMember>(other.shutdownMembers);
     this.crashedMembers = new HashSet<InternalDistributedMember>(other.crashedMembers);
   }
@@ -142,6 +138,19 @@ public class NetView implements DataSerializableFixedID {
     this.creator = creator;
   }
   
+  public Object getPublicKey(InternalDistributedMember mbr) {
+    return publicKeys.get(mbr);
+  }
+
+  public void setPublicKey(InternalDistributedMember mbr, Object key) {
+    publicKeys.put(mbr, key);
+  }
+
+  public void setPublicKeys(NetView otherView) {
+    this.publicKeys.putAll(otherView.publicKeys);
+  }
+
+
   public int[] getFailureDetectionPorts() {
     return this.failureDetectionPorts;
   }
@@ -153,7 +162,8 @@ public class NetView implements DataSerializableFixedID {
     }
     return failureDetectionPorts[idx];
   }
-  
+
+
   public void setFailureDetectionPort(InternalDistributedMember mbr, int port) {
     int idx = members.indexOf(mbr);
     if (idx < 0) {
@@ -575,6 +585,8 @@ public class NetView implements DataSerializableFixedID {
     InternalDataSerializer.writeSet(shutdownMembers, out);
     InternalDataSerializer.writeSet(crashedMembers, out);
     DataSerializer.writeIntArray(failureDetectionPorts, out);
+    // TODO expensive serialization
+    DataSerializer.writeObject(publicKeys, out);
   }
 
   @Override
@@ -586,6 +598,7 @@ public class NetView implements DataSerializableFixedID {
     shutdownMembers = InternalDataSerializer.readHashSet(in);
     crashedMembers = InternalDataSerializer.readHashSet(in);
     failureDetectionPorts = DataSerializer.readIntArray(in);
+    publicKeys = DataSerializer.readObject(in);
   }
 
   /** this will deserialize as an ArrayList */
