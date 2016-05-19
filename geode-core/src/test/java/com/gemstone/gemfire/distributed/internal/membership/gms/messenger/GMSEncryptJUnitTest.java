@@ -1,5 +1,6 @@
 package com.gemstone.gemfire.distributed.internal.membership.gms.messenger;
 import static org.mockito.Mockito.*;
+
 import com.gemstone.gemfire.distributed.internal.DistributionConfig;
 import com.gemstone.gemfire.distributed.internal.DistributionConfigImpl;
 import com.gemstone.gemfire.distributed.internal.DistributionManager;
@@ -8,6 +9,7 @@ import com.gemstone.gemfire.distributed.internal.membership.NetView;
 import com.gemstone.gemfire.distributed.internal.membership.gms.ServiceConfig;
 import com.gemstone.gemfire.distributed.internal.membership.gms.Services;
 import com.gemstone.gemfire.internal.admin.remote.RemoteTransportConfig;
+import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -16,9 +18,7 @@ import java.math.BigInteger;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -28,12 +28,12 @@ import java.util.Properties;
 import javax.crypto.KeyAgreement;
 import javax.crypto.Mac;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.DHParameterSpec;
 
 /**
  * Created by bschuchardt on 5/6/2016.
  */
+@Category(IntegrationTest.class)
 public class GMSEncryptJUnitTest {
 
   Services services;
