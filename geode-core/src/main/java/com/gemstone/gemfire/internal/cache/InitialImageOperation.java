@@ -51,7 +51,6 @@ import com.gemstone.gemfire.cache.Operation;
 import com.gemstone.gemfire.cache.RegionDestroyedException;
 import com.gemstone.gemfire.cache.query.internal.CqStateImpl;
 import com.gemstone.gemfire.cache.query.internal.DefaultQueryService;
-import com.gemstone.gemfire.cache.query.internal.IndexUpdater;
 import com.gemstone.gemfire.cache.query.internal.cq.CqService;
 import com.gemstone.gemfire.cache.query.internal.cq.InternalCqQuery;
 import com.gemstone.gemfire.cache.query.internal.cq.ServerCQ;
@@ -809,8 +808,6 @@ public class InitialImageOperation  {
       }
       final boolean keyRequiresRegionContext = this.region
           .keyRequiresRegionContext();
-      // get SQLF index manager for the case of recovery from disk
-      final IndexUpdater indexUpdater = this.region.getIndexUpdater();
       final ByteArrayDataInput in = new ByteArrayDataInput();
       for (int i = 0; i < entryCount; i++) {
         // stream is null-terminated
@@ -922,32 +919,6 @@ public class InitialImageOperation  {
                 //actually are equal, keep don't put the received
                 //entry into the cache (this avoids writing a record to disk)
                 if(entriesEqual) {
-                  // explicit SQLF index maintenance here since
-                  // it was not done during recovery from disk
-                  if (indexUpdater != null && !Token.isInvalidOrRemoved(tmpValue)) {
-                    boolean success = false;
-                    if (entry.isSerialized()) {
-                      tmpValue = CachedDeserializableFactory
-                          .create((byte[])tmpValue);
-                    }
-                    // dummy EntryEvent to pass for SQLF index maintenance
-                    @Released final EntryEventImpl ev = EntryEventImpl.create(this.region,
-                        Operation.CREATE, null, null, null, true, null, false, false);
-                    try {
-                    ev.setKeyInfo(this.region.getKeyInfo(entry.key,
-                        tmpValue, null));
-                    ev.setNewValue(tmpValue);
-                    try {
-                      indexUpdater.onEvent(this.region, ev, re);
-                      success = true;
-                    } finally {
-                      indexUpdater.postEvent(this.region, ev, re,
-                          success);
-                    }
-                    } finally {
-                      ev.release();
-                    }
-                  }
                   continue;
                 }
                 if (entry.isSerialized() && !Token.isInvalidOrRemoved(tmpValue)) {

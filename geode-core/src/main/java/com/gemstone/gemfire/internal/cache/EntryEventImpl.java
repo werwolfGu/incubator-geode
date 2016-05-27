@@ -41,7 +41,6 @@ import com.gemstone.gemfire.cache.SerializedCacheValue;
 import com.gemstone.gemfire.cache.TransactionId;
 import com.gemstone.gemfire.cache.query.IndexMaintenanceException;
 import com.gemstone.gemfire.cache.query.QueryException;
-import com.gemstone.gemfire.cache.query.internal.IndexUpdater;
 import com.gemstone.gemfire.cache.query.internal.index.IndexManager;
 import com.gemstone.gemfire.cache.query.internal.index.IndexProtocol;
 import com.gemstone.gemfire.cache.query.internal.index.IndexUtils;
@@ -1818,29 +1817,9 @@ public class EntryEventImpl
         }
       }
     }
-    final IndexUpdater indexUpdater = this.region.getIndexUpdater();
-    if (indexUpdater != null) {
-      final LocalRegion indexRegion;
-      if (owner != null) {
-        indexRegion = owner;
-      }
-      else {
-        indexRegion = this.region;
-      }
-      try {
-        indexUpdater.onEvent(indexRegion, this, reentry);
-        calledSetValue = true;
-        reentry.setValueWithTombstoneCheck(v, this); // already called prepareValueForCache
-        success = true;
-      } finally {
-        indexUpdater.postEvent(indexRegion, this, reentry, success);
-      }
-    }
-    else {
-      calledSetValue = true;
-      reentry.setValueWithTombstoneCheck(v, this); // already called prepareValueForCache
-      success = true;
-    }
+    calledSetValue = true;
+    reentry.setValueWithTombstoneCheck(v, this); // already called prepareValueForCache
+    success = true;
     } finally {
       if (!success && reentry instanceof OffHeapRegionEntry && v instanceof StoredObject) {
         OffHeapRegionEntryHelper.releaseEntry((OffHeapRegionEntry)reentry, (StoredObject)v);

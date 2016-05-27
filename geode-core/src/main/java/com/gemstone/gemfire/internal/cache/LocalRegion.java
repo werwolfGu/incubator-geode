@@ -131,7 +131,6 @@ import com.gemstone.gemfire.cache.query.TypeMismatchException;
 import com.gemstone.gemfire.cache.query.internal.DefaultQuery;
 import com.gemstone.gemfire.cache.query.internal.DefaultQueryService;
 import com.gemstone.gemfire.cache.query.internal.ExecutionContext;
-import com.gemstone.gemfire.cache.query.internal.IndexUpdater;
 import com.gemstone.gemfire.cache.query.internal.cq.CqService;
 import com.gemstone.gemfire.cache.query.internal.index.IndexCreationData;
 import com.gemstone.gemfire.cache.query.internal.index.IndexManager;
@@ -777,10 +776,6 @@ public class LocalRegion extends AbstractRegion
     }
   }
 
-  public IndexUpdater getIndexUpdater() {
-    return this.entries.getIndexUpdater();
-  }
-
   boolean isCacheClosing()
   {
     return this.cache.isClosed();
@@ -957,7 +952,6 @@ public class LocalRegion extends AbstractRegion
                 && internalRegionArgs.isUsedForPartitionedRegionBucket()) {
               final PartitionedRegion pr = internalRegionArgs
                   .getPartitionedRegion();
-              internalRegionArgs.setIndexUpdater(pr.getIndexUpdater());
               internalRegionArgs.setUserAttribute(pr.getUserAttribute());
               internalRegionArgs.setKeyRequiresRegionContext(pr
                   .keyRequiresRegionContext());
@@ -7949,20 +7943,14 @@ public class LocalRegion extends AbstractRegion
   }
   void cleanUpOnIncompleteOp(EntryEventImpl event,   RegionEntry re, 
       boolean eventRecorded, boolean updateStats, boolean isReplace) {
-    //TODO:Asif: This is incorrect implementation for replicated region in case of
-    //sql fabric, as sqlf index would already be  updated, if eventRecorded 
-    //flag is true.So if entry is being removed , 
-    //then the sqlfindex also needs to be corrected
-    IndexUpdater iu = this.getIndexUpdater(); // sqlf system
-    if(!eventRecorded || iu ==null || isReplace) {
-    //Ok to remove entry whether sqlfabric or gfe as index has not been modified yet by the operation
+    if(!eventRecorded || isReplace) {
+      //Ok to remove entry as index has not been modified yet by the operation
       this.entries.removeEntry(event.getKey(), re, updateStats) ;      
     }else {
-      // a sqlf system, with event recorded as true. we need to update index.
       //Use the current event to indicate destroy.should be ok
       Operation oldOp = event.getOperation();
       event.setOperation(Operation.DESTROY);
-      this.entries.removeEntry(event.getKey(), re, updateStats, event, this, iu);
+      this.entries.removeEntry(event.getKey(), re, updateStats, event, this);
       event.setOperation(oldOp);
     } 
     

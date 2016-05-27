@@ -167,7 +167,7 @@ public abstract class AbstractRegionEntry implements RegionEntry,
         // by the RegionMap. It is unclear why this code is needed. ARM destroy
         // does this also and we are now doing it as phase3 of the ARM destroy.
         removePhase2();
-        rgn.getRegionMap().removeEntry(event.getKey(), this, true, event, rgn, rgn.getIndexUpdater());
+        rgn.getRegionMap().removeEntry(event.getKey(), this, true, event, rgn);
       }
     }
   }
@@ -767,8 +767,7 @@ public abstract class AbstractRegionEntry implements RegionEntry,
       else {
         FilterProfile fp = region.getFilterProfile();
         // rdubey: Old value also required for SqlfIndexManager.
-        if (fp != null && ((fp.getCqCount() > 0) || expectedOldValue != null
-            || event.getRegion().getIndexUpdater() != null)) {
+        if (fp != null && ((fp.getCqCount() > 0) || expectedOldValue != null)) {
           //curValue = getValue(region); can cause deadlock will fault in the value
           // and will confuse LRU. rdubey.
           curValue = getValueOnDiskOrBuffer(region);

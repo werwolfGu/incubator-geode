@@ -52,7 +52,6 @@ import com.gemstone.gemfire.cache.RegionAttributes;
 import com.gemstone.gemfire.cache.RegionDestroyedException;
 import com.gemstone.gemfire.cache.TimeoutException;
 import com.gemstone.gemfire.cache.partition.PartitionListener;
-import com.gemstone.gemfire.cache.query.internal.IndexUpdater;
 import com.gemstone.gemfire.distributed.DistributedMember;
 import com.gemstone.gemfire.distributed.DistributedSystem;
 import com.gemstone.gemfire.distributed.internal.AtomicLongWithTerminalState;
@@ -1502,7 +1501,6 @@ implements Bucket
     .append("[path='").append(getFullPath())
     .append(";serial=").append(getSerialNumber())
     .append(";primary=").append(getBucketAdvisor().getProxyBucketRegion().isPrimary())
-    .append(";indexUpdater=").append(getIndexUpdater())
     .append("]")
     .toString();
   }
@@ -2230,10 +2228,6 @@ implements Bucket
   
 
   public void preDestroyBucket(int bucketId) {
-    final IndexUpdater indexUpdater = getIndexUpdater();
-    if (indexUpdater != null) {
-      indexUpdater.clearIndexes(this, bucketId);
-    }
   }
   @Override
   public void cleanupFailedInitialization()

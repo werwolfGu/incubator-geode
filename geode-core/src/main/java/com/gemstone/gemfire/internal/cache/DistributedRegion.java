@@ -68,7 +68,6 @@ import com.gemstone.gemfire.cache.execute.FunctionException;
 import com.gemstone.gemfire.cache.execute.ResultCollector;
 import com.gemstone.gemfire.cache.execute.ResultSender;
 import com.gemstone.gemfire.cache.persistence.PersistentReplicatesOfflineException;
-import com.gemstone.gemfire.cache.query.internal.IndexUpdater;
 import com.gemstone.gemfire.cache.wan.GatewaySender;
 import com.gemstone.gemfire.distributed.DistributedLockService;
 import com.gemstone.gemfire.distributed.DistributedMember;
@@ -1182,21 +1181,8 @@ public class DistributedRegion extends LocalRegion implements
       getLockService(); // create lock service eagerly now
     }
 
-    final IndexUpdater indexUpdater = getIndexUpdater();
-    boolean sqlfGIILockTaken = false;
-    // this try block is to release the SQLF GII lock in finally
-    // which should be done after bucket status will be set
-    // properly in LocalRegion#initialize()
-    try {
      try {
       try {
-        // take the GII lock to avoid missing entries while updating the
-        // index list for SQLFabric (#41330 and others)
-        if (indexUpdater != null) {
-          indexUpdater.lockForGII();
-          sqlfGIILockTaken = true;
-        }
-        
         PersistentMemberID persistentId = null;
         boolean recoverFromDisk = isRecoveryNeeded();
         DiskRegion dskRgn = getDiskRegion();
@@ -1240,11 +1226,6 @@ public class DistributedRegion extends LocalRegion implements
         this.eventTracker.setInitialized();
       }
      }
-    } finally {
-      if (sqlfGIILockTaken) {
-        indexUpdater.unlockForGII();
-      }
-    }
   }
 
   @Override
