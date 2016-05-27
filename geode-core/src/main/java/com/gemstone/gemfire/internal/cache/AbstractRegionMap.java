@@ -3100,8 +3100,6 @@ public abstract class AbstractRegionMap implements RegionMap {
                     }
                     re.setValueResultOfSearch(putOp.isNetSearch());
                     try {
-                      // Rahul: applies the delta and sets the new value in 
-                      // region entry (required for sqlfabric delta).
                       processAndGenerateTXVersionTag(owner, cbEvent, re, txEntryState);
                       {
                         re.setValue(owner, re.prepareValueForCache(owner, newValue, cbEvent, !putOp.isCreate()));
