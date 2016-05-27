@@ -86,18 +86,6 @@ public final class DiskWriteAttributesImpl implements DiskWriteAttributes
   public static final String SYNCHRONOUS_PROPERTY = "synchronous";
 
   /**
-   * The property used to specify the base directory for Sql Fabric persistence
-   * of Gateway Queues, Tables, Data Dictionary etc.
-   */
-  public static final String SYS_PERSISTENT_DIR = "sys-disk-dir";
-
-  /**
-   * The system property for {@link #SYS_PERSISTENT_DIR}.
-   */
-  public static final String SYS_PERSISTENT_DIR_PROP = "sqlfabric."
-      + SYS_PERSISTENT_DIR;
-
-  /**
    * Default disk directory size in megabytes
    * 
    * @since 5.1
@@ -510,12 +498,7 @@ public final class DiskWriteAttributesImpl implements DiskWriteAttributes
   }
 
   public static String generatePersistentDirName(String dirPath) {
-    String baseDir = System.getProperty(SYS_PERSISTENT_DIR_PROP);
-    if (baseDir == null) {
-    //Kishor : TODO : Removing old wan related code
-      //baseDir = GatewayQueueAttributes.DEFAULT_OVERFLOW_DIRECTORY;
-      baseDir = ".";
-    }
+    String baseDir = ".";
     if (dirPath != null) {
       File dirProvided = new File(dirPath);
       // Is the directory path absolute?
