@@ -136,7 +136,6 @@ public abstract class InternalDataSerializer extends DataSerializer implements D
    */
   private static final ConcurrentHashMap<String, DataSerializer> classesToSerializers = new ConcurrentHashMap<String, DataSerializer>();
   
-  // used by sqlFire
   public static ConcurrentHashMap<String, DataSerializer> getClassesToSerializers() {
     return classesToSerializers;
   }
@@ -2854,8 +2853,6 @@ public abstract class InternalDataSerializer extends DataSerializer implements D
       return DSFIDFactory.create(in.readInt(), in);
     case DS_NO_FIXED_ID:
       return readDataSerializableFixedID(in);
-    case SQLF_DVD_ARR:
-      return dvddeserializer.fromData(in);
     case NULL:
       return null;
     case NULL_STRING:
