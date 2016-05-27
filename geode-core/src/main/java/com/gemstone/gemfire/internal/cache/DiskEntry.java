@@ -833,9 +833,7 @@ public interface DiskEntry extends RegionEntry {
         // to the file using the off-heap memory with no extra copying.
         // So we give preference to getRawNewValue over getCachedSerializedNewValue
         Object rawValue = null;
-        if (!event.hasDelta()) {
-          // We don't do this for the delta case because getRawNewValue returns delta
-          // and we want to write the entire new value to disk.
+        {
           rawValue = event.getRawNewValue();
           if (wrapOffHeapReference(rawValue)) {
             return new OffHeapValueWrapper((StoredObject) rawValue);

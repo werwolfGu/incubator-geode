@@ -1685,15 +1685,8 @@ public class LocalRegion extends AbstractRegion
         event.setNewEventId(cache.getDistributedSystem());
       }
       Object oldValue = null;
-      // Sqlf changes begin
-      // see #40294.
-
-      // Rahul: this has to be an update.
-      // so executing it as an update.
-      boolean forceUpdateForDelta = event.hasDelta();
-      // Sqlf Changes end.
       if (basicPut(event, false, // ifNew
-          forceUpdateForDelta, // ifOld
+          false, // ifOld
           null, // expectedOldValue
           false // requireOldValue
       )) {

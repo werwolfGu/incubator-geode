@@ -100,7 +100,7 @@ public class UpdateOperation extends AbstractUpdateOperation
     m.event = ev;
     m.eventId = ev.getEventId();
     m.key = ev.getKey();
-    if (CachedDeserializableFactory.preferObject() || ev.hasDelta()) {
+    if (CachedDeserializableFactory.preferObject()) {
       m.deserializationPolicy = DESERIALIZATION_POLICY_EAGER;
     } else {
       m.deserializationPolicy = DESERIALIZATION_POLICY_LAZY;

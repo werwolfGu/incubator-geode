@@ -349,7 +349,7 @@ public final class PutMessage extends PartitionMessageWithDirectReply implements
     this.expectedOldValue = expectedOldValue;
     this.key = event.getKey();
     if (event.hasNewValue()) {
-      if (CachedDeserializableFactory.preferObject() || event.hasDelta()) {
+      if (CachedDeserializableFactory.preferObject()) {
         this.deserializationPolicy = DistributedCacheOperation.DESERIALIZATION_POLICY_EAGER;
       } else {
         this.deserializationPolicy = DistributedCacheOperation.DESERIALIZATION_POLICY_LAZY;

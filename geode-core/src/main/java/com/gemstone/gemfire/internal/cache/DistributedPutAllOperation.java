@@ -51,7 +51,6 @@ import com.gemstone.gemfire.internal.DataSerializableFixedID;
 import com.gemstone.gemfire.internal.InternalDataSerializer;
 import com.gemstone.gemfire.internal.Version;
 import com.gemstone.gemfire.internal.cache.FilterRoutingInfo.FilterInfo;
-import com.gemstone.gemfire.internal.cache.delta.Delta;
 import com.gemstone.gemfire.internal.cache.ha.ThreadIdentifier;
 import com.gemstone.gemfire.internal.cache.partitioned.PutAllPRMessage;
 import com.gemstone.gemfire.internal.cache.tier.sockets.ClientProxyMembershipID;
@@ -1342,11 +1341,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
         Object valueObj = null;
         Object v = entry.getValue();
         byte deserializationPolicy;
-        if (v instanceof Delta) {
-          deserializationPolicy = DESERIALIZATION_POLICY_EAGER;
-          valueObj = v;
-        }
-        else if (v instanceof CachedDeserializable) {
+        if (v instanceof CachedDeserializable) {
           deserializationPolicy = DESERIALIZATION_POLICY_LAZY;
           valueBytes = ((CachedDeserializable)v).getSerializedValue();
         }

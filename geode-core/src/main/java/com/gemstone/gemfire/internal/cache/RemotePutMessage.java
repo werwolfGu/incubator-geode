@@ -252,7 +252,7 @@ public final class RemotePutMessage extends RemoteOperationMessageWithDirectRepl
     event.setOriginRemote(useOriginRemote);
 
     if (event.hasNewValue()) {
-      if (CachedDeserializableFactory.preferObject() || event.hasDelta()) {
+      if (CachedDeserializableFactory.preferObject()) {
         this.deserializationPolicy = DistributedCacheOperation.DESERIALIZATION_POLICY_EAGER;
       } else {
         this.deserializationPolicy = DistributedCacheOperation.DESERIALIZATION_POLICY_LAZY;

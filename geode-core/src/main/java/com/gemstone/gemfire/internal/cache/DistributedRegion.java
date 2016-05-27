@@ -2512,11 +2512,7 @@ public class DistributedRegion extends LocalRegion implements
     }
     
     if (preferCD) {
-      if (event.hasDelta()) {
-        result = event.getNewValue();
-      } else {
         result = event.getRawNewValueAsHeapObject();
-      }    
     } else {
       result = event.getNewValue();     
     }

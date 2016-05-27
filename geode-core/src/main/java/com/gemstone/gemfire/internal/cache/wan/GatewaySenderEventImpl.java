@@ -947,9 +947,7 @@ public class GatewaySenderEventImpl implements
      */
     @Retained(OffHeapIdentifier.GATEWAY_SENDER_EVENT_IMPL_VALUE)
     StoredObject so = null;
-    if (event.hasDelta()) {
-      this.valueIsObject = 0x02;
-    } else {
+    {
       ReferenceCountHelper.setReferenceCountOwner(this);
       so = event.getOffHeapNewValue();
       ReferenceCountHelper.setReferenceCountOwner(null);      
@@ -969,7 +967,7 @@ public class GatewaySenderEventImpl implements
       // can share a reference to the off-heap value.
       this.value = event.getCachedSerializedNewValue();
     } else {
-      final Object newValue = event.getRawNewValue(shouldApplyDelta());
+      final Object newValue = event.getRawNewValue();
       assert !(newValue instanceof StoredObject); // since we already called getOffHeapNewValue() and it returned null
       if (newValue instanceof CachedDeserializable) {
         this.value = ((CachedDeserializable) newValue).getSerializedValue();

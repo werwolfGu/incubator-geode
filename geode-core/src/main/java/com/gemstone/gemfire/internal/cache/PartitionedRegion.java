@@ -2064,13 +2064,6 @@ public class PartitionedRegion extends LocalRegion implements
       if (targetNode == null) {
         try {
           bucketStorageAssigned=false;
-          // if this is a Delta update, then throw exception since the key doesn't
-          // exist if there is no bucket for it yet
-          if (event.hasDelta()) {
-            throw new EntryNotFoundException(LocalizedStrings.
-              PartitionedRegion_CANNOT_APPLY_A_DELTA_WITHOUT_EXISTING_ENTRY
-                .toLocalizedString());
-          }
           targetNode = createBucket(bucketId.intValue(), event.getNewValSizeForPR(),
               null);
         }
