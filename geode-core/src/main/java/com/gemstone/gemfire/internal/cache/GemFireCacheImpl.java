@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -520,18 +519,6 @@ public class GemFireCacheImpl implements InternalCache, ClientCache, HasCachePer
   private final Object clientMetaDatServiceLock = new Object();
 
   private volatile boolean isShutDownAll = false;
-
-  /**
-   * Set of members that are not yet ready. Currently used by SQLFabric during initial DDL replay to indicate that the
-   * member should not be chosen for primary buckets.
-   */
-  private final HashSet<InternalDistributedMember> unInitializedMembers = new HashSet<InternalDistributedMember>();
-
-  /**
-   * Set of {@link BucketAdvisor}s for this node that are pending for volunteer for primary due to uninitialized node
-   * (SQLFabric DDL replay in progress).
-   */
-  private final LinkedHashSet<BucketAdvisor> deferredVolunteerForPrimary = new LinkedHashSet<BucketAdvisor>();
 
   private final ResourceAdvisor resourceAdvisor;
   private final JmxManagerAdvisor jmxAdvisor;
@@ -5016,76 +5003,6 @@ public class GemFireCacheImpl implements InternalCache, ClientCache, HasCachePer
 
   public DistributedRegion getRegionInDestroy(String path) {
     return this.regionsInDestroy.get(path);
-  }
-
-  /**
-   * Mark a node as initialized or not initialized. Used by SQLFabric to avoid creation of buckets or routing of
-   * operations/functions on a node that is still in the DDL replay phase.
-   */
-  public boolean updateNodeStatus(InternalDistributedMember member, boolean initialized) {
-    HashSet<BucketAdvisor> advisors = null;
-    synchronized (this.unInitializedMembers) {
-      if (initialized) {
-        if (this.unInitializedMembers.remove(member)) {
-          if (member.equals(getMyId())) {
-            // don't invoke volunteerForPrimary() inside the lock since
-            // BucketAdvisor will also require the lock after locking itself
-            advisors = new HashSet<BucketAdvisor>(this.deferredVolunteerForPrimary);
-            this.deferredVolunteerForPrimary.clear();
-          }
-        } else {
-          return false;
-        }
-      } else {
-        return this.unInitializedMembers.add(member);
-      }
-    }
-    if (advisors != null) {
-      for (BucketAdvisor advisor : advisors) {
-        if (logger.isDebugEnabled()) {
-          logger.debug("Invoking volunteer for primary for deferred bucket " + "post SQLFabric DDL replay for BucketAdvisor: {}",  advisor);
-        }
-        advisor.volunteerForPrimary();
-      }
-    }
-    return true;
-  }
-
-  /**
-   * Return true if this node is still not initialized else false.
-   */
-  public boolean isUnInitializedMember(InternalDistributedMember member) {
-    synchronized (this.unInitializedMembers) {
-      return this.unInitializedMembers.contains(member);
-    }
-  }
-
-  /**
-   * Return false for volunteer primary if this node is not currently initialized. Also adds the {@link BucketAdvisor}
-   * to a list that will be replayed once this node is initialized.
-   */
-  public boolean doVolunteerForPrimary(BucketAdvisor advisor) {
-    synchronized (this.unInitializedMembers) {
-      if (!this.unInitializedMembers.contains(getMyId())) {
-        return true;
-      }
-      if (logger.isDebugEnabled()) {
-        logger.debug("Deferring volunteer for primary due to uninitialized " + "node (SQLFabric DDL replay) for BucketAdvisor: {}", advisor);
-      }
-      this.deferredVolunteerForPrimary.add(advisor);
-      return false;
-    }
-  }
-
-  /**
-   * Remove all the uninitialized members from the given collection.
-   */
-  public final void removeUnInitializedMembers(Collection<InternalDistributedMember> members) {
-    synchronized (this.unInitializedMembers) {
-      for (final InternalDistributedMember m : this.unInitializedMembers) {
-        members.remove(m);
-      }
-    }
   }
 
   public TombstoneService getTombstoneService() {

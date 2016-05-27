@@ -2300,13 +2300,7 @@ public class DistributedRegion extends LocalRegion implements
     }
     profile.serialNumber = getSerialNumber();
     profile.regionInitialized = this.isInitialized();
-    if (!this.isUsedForPartitionedRegionBucket()) {
-      profile.memberUnInitialized = getCache().isUnInitializedMember(
-          profile.getDistributedMember());
-    }
-    else {
-      profile.memberUnInitialized = false;
-    }
+    profile.memberUnInitialized = false;
     profile.persistentID = getPersistentID();
     if(getPersistenceAdvisor() != null) {
       profile.persistenceInitialized = getPersistenceAdvisor().isOnline();

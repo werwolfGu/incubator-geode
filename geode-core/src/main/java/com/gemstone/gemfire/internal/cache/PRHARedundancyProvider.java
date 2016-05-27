@@ -462,8 +462,6 @@ public class PRHARedundancyProvider
       this.prRegion.checkReadiness();
       Set<InternalDistributedMember> available = this.prRegion
           .getRegionAdvisor().adviseInitializedDataStore();
-      // remove uninitialized members for bucket creation
-      this.prRegion.getCache().removeUnInitializedMembers(available);
       InternalDistributedMember target = null;
       available.removeAll(attempted);
       for (InternalDistributedMember member : available) {
@@ -605,8 +603,6 @@ public class PRHARedundancyProvider
         // Always go back to the advisor, see if any fresh data stores are
           // present.
         Set<InternalDistributedMember> allStores = getAllStores(partitionName);
-        // remove nodes that are not fully initialized
-        this.prRegion.getCache().removeUnInitializedMembers(allStores);
 
         loggedInsufficentStores  = checkSufficientStores(allStores, 
             loggedInsufficentStores);
@@ -806,7 +802,6 @@ public class PRHARedundancyProvider
       //  the parent's in case of colocation) so it is now passed
       //InternalDistributedMember targetPrimary = getPreferredDataStore(
       //    acceptedMembers, Collections.<InternalDistributedMember> emptySet());
-      this.prRegion.getCache().removeUnInitializedMembers(acceptedMembers);
       targetPrimary = getPreferredDataStore(acceptedMembers, Collections
           .<InternalDistributedMember> emptySet());
     }
@@ -1608,9 +1603,6 @@ public class PRHARedundancyProvider
       return;
     }
     if (!PRHARedundancyProvider.this.prRegion.isDataStore()) {
-      return;
-    }
-    if (cache.isUnInitializedMember(cache.getMyId())) {
       return;
     }
     Runnable task = new RecoveryRunnable(this) {

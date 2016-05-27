@@ -1130,11 +1130,6 @@ public class BucketAdvisor extends CacheDistributionAdvisor  {
         // only one thread should be attempting to volunteer at one time
         return;
       }
-      // if member is still not initialized then don't volunteer for primary
-      final GemFireCacheImpl cache = (GemFireCacheImpl)getBucket().getCache();
-      if (!cache.doVolunteerForPrimary(this)) {
-        return;
-      }
       if (this.volunteeringDelegate == null) {
         this.volunteeringDelegate = new VolunteeringDelegate();
       }

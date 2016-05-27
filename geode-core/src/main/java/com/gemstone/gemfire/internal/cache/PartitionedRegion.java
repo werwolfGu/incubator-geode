@@ -1505,11 +1505,7 @@ public class PartitionedRegion extends LocalRegion implements
     boolean colocatedLockAcquired = false;
     try {
       boolean colocationComplete = false;
-      if (colocatedRegion != null && !prConfig.isColocationComplete() &&
-        // if the current node is marked uninitialized (SQLF DDL replay in
-        // progress) then colocation will definitely not be marked complete so
-        // avoid taking the expensive region lock
-          !getCache().isUnInitializedMember(getDistributionManager().getId())) {
+      if (colocatedRegion != null && !prConfig.isColocationComplete()) {
         colocatedLock = colocatedRegion.getRegionLock();
         colocatedLock.lock();
         colocatedLockAcquired = true;
@@ -1518,16 +1514,7 @@ public class PartitionedRegion extends LocalRegion implements
         if (parentConf.isColocationComplete()
             && parentConf.hasSameDataStoreMembers(prConfig)) {
           colocationComplete = true;
-          // check if all the nodes have been initialized (SQLF bug #42089)
-          for (Node node : nodes) {
-            if (getCache().isUnInitializedMember(node.getMemberId())) {
-              colocationComplete = false;
-              break;
-            }
-          }
-          if (colocationComplete) {
-            prConfig.setColocationComplete();
-          }
+          prConfig.setColocationComplete();
         }
       }
 
