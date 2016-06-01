@@ -344,7 +344,6 @@ public final class GetMessage extends PartitionMessageWithDirectReply
     // static values for valueType
     static final byte VALUE_IS_SERIALIZED_OBJECT = 0;
     static final byte VALUE_IS_BYTES = 1;
-    /** came from partial SQLF merge and reconciling with it but not used yet */
     //static final byte VALUE_IS_OBJECT = 2;
     static final byte VALUE_IS_INVALID = 3;
     static final byte VALUE_IS_TOMBSTONE = 4;
