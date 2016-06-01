@@ -587,7 +587,6 @@ public class LocalRegion extends AbstractRegion
     this.initializationLatchAfterGetInitialImage = new StoppableCountDownLatch(this.stopper, 1);
     this.afterRegionCreateEventLatch = new StoppableCountDownLatch(this.stopper, 1);
 
-    // set the user-attribute object upfront for SQLFabric
     if (internalRegionArgs.getUserAttribute() != null) {
       setUserAttribute(internalRegionArgs.getUserAttribute());
     }
@@ -1090,8 +1089,6 @@ public class LocalRegion extends AbstractRegion
       }
   }
 
-  // split into a separate newCreateEntryEvent since SQLFabric may need to
-  // manipulate event before doing the put (e.g. posDup flag)
   @Retained
   public final EntryEventImpl newCreateEntryEvent(Object key, Object value,
       Object aCallbackArgument) {
@@ -1150,8 +1147,6 @@ public class LocalRegion extends AbstractRegion
       }
   }
 
-  // split into a separate newDestroyEntryEvent since SQLFabric may need to
-  // manipulate event before doing the put (e.g. posDup flag)
   @Retained
   public final EntryEventImpl newDestroyEntryEvent(Object key,
       Object aCallbackArgument) {
@@ -1679,8 +1674,6 @@ public class LocalRegion extends AbstractRegion
       return handleNotAvailable(oldValue);
   }
 
-  // split into a separate newUpdateEntryEvent since SQLFabric may need to
-  // manipulate event before doing the put (e.g. posDup flag)
   @Retained
   public final EntryEventImpl newUpdateEntryEvent(Object key, Object value,
       Object aCallbackArgument) {
@@ -3646,8 +3639,6 @@ public class LocalRegion extends AbstractRegion
    * Returns the value of the entry with the given key as it is stored on disk.
    * While the value may be read from disk, it is <b>not </b> stored into the
    * entry in the VM. This method is intended for testing purposes only.
-   * DO NOT use in product code else it will break SQLFabric that has cases
-   * where routing object is not part of only the key.
    *
    * @throws EntryNotFoundException
    *           No entry with <code>key</code> exists
@@ -3686,8 +3677,7 @@ public class LocalRegion extends AbstractRegion
   /**
    * Get the serialized bytes from disk. This method only looks for the value on
    * the disk, ignoring heap data. This method is intended for testing purposes
-   * only. DO NOT use in product code else it will break SQLFabric that has
-   * cases where routing object is not part of only the key.
+   * only. 
    * 
    * @param key the object whose hashCode is used to find the value
    * @return either a byte array, a CacheDeserializable with the serialized value,
@@ -3742,9 +3732,6 @@ public class LocalRegion extends AbstractRegion
   /**
    * Does a get that attempts to not fault values in from disk or make the entry
    * the most recent in the LRU.
-   * 
-   * Originally implemented in WAN gateway code and moved here in the sqlfire
-   * "cheetah" branch.
    * @param adamant fault in and affect LRU as a last resort
    * @param allowTombstone also return Token.TOMBSTONE if the entry is deleted
    * @param serializedFormOkay if the serialized form can be returned
@@ -5136,9 +5123,6 @@ public class LocalRegion extends AbstractRegion
   
   /**
    * Get the best iterator for the region entries.
-   * 
-   * TODO there has been some work on this on the sqlfire branch that should
-   * be picked up here.
    */
   public Iterator<RegionEntry> getBestIterator(boolean includeValues) {
     if(this instanceof DistributedRegion) {
@@ -5462,12 +5446,6 @@ public class LocalRegion extends AbstractRegion
         callbackArg = new GatewaySenderEventCallbackArgument(callbackArg);
       }
     }
-    //Asif: Modified the call to this constructor by passing the new value obtained from remote site
-    //instead of null .
-    //The need for this arose, because creation of EntryEvent, makes call to PartitionResolver,
-    //to get Hash. If the partitioning column is different from primary key, 
-    //the resolver for Sqlfabric is not able to obtain the hash object used for creation of KeyInfo  
-     
     @Released final EntryEventImpl event = EntryEventImpl.create(this, Operation.CREATE, key,
        value, callbackArg,  false /* origin remote */, client.getDistributedMember(),
         true /* generateCallbacks */,
@@ -5487,9 +5465,6 @@ public class LocalRegion extends AbstractRegion
     }
 
     // Set the new value to the input byte[] if it isn't null
-    /// For SqlFabric, if the new value happens to be an serialized object, then 
-    //it needs to be converted into VMCachedDeserializable , or serializable delta 
-    // as the case may be
     if (value != null) {
       // If the byte[] represents an object, then store it serialized
       // in a CachedDeserializable; otherwise store it directly as a byte[]
@@ -6131,12 +6106,6 @@ public class LocalRegion extends AbstractRegion
     long lastModifiedTime = event.getEventTime(lastModified);
     updateStatsForPut(entry, lastModifiedTime, lruRecentUse);
     if (!isProxy()) {
-      //if (this.isUsedForPartitionedRegionBucket) {
-      //  if (this.sqlfIndexManager != null) {
-      //    this.sqlfIndexManager.onEvent(this, event, entry);
-      //  }
-      //}
-
       if (!clearConflict && this.indexManager != null) {
         try {
           if (!entry.isInvalid()) {
@@ -6407,7 +6376,6 @@ public class LocalRegion extends AbstractRegion
          }
        }
        isDup = this.eventTracker.hasSeenEvent(event);
-       // don't clobber existing posDup flag e.g. set from SQLFabric client
        if (isDup) {
          event.setPossibleDuplicate(true);
          if (this.concurrencyChecksEnabled && event.getVersionTag() == null) {
@@ -10592,8 +10560,6 @@ public class LocalRegion extends AbstractRegion
   }
 
 
-  // split into a separate newPutAllOperation since SQLFabric may need to
-  // manipulate event before doing the put (e.g. posDup flag)
   public final DistributedPutAllOperation newPutAllOperation(Map<?, ?> map, Object callbackArg) {
     if (map == null) {
       throw new NullPointerException(LocalizedStrings
