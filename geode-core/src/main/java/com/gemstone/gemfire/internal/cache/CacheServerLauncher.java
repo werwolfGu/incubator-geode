@@ -371,7 +371,7 @@ public class CacheServerLauncher  {
     }
 
     // -J-Djava.awt.headless=true has been added for Mac platform where it
-    // causes an icon to appear for sqlf launched procs
+    // causes an icon to appear launched procs
     // TODO: check which library/GemFire code causes awt to be touched
     vmArgs.add("-Djava.awt.headless=true");
 
