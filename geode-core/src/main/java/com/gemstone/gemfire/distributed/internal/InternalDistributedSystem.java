@@ -2711,7 +2711,6 @@ public class InternalDistributedSystem
 
         DM newDM = this.reconnectDS.getDistributionManager();
         if (newDM instanceof DistributionManager) {
-          // sqlfire will have already replayed DDL and recovered.
           // Admin systems don't carry a cache, but for others we can now create
           // a cache
           if (((DistributionManager)newDM).getDMType() != DistributionManager.ADMIN_ONLY_DM_TYPE) {
