@@ -240,27 +240,6 @@ public interface DiskEntry extends RegionEntry {
         }
       }
     }
-      
-    /**
-     * Returns false if the entry is INVALID (or LOCAL_INVALID). Determines this
-     * without faulting in the value from disk.
-     * 
-     * @since 3.2.1
-     */
-    /* TODO prpersist - Do we need this method? It was added by the sqlf merge
-    static boolean isValid(DiskEntry entry, DiskRegion dr) {
-      synchronized (entry) {
-        if (entry.isRecovered()) {
-          // We have a recovered entry whose value is still on disk.
-          // So take a peek at it without faulting it in.
-          //long id = entry.getDiskId().getKeyId();
-          //entry.getDiskId().setKeyId(-id);
-          byte bits = dr.getBits(entry.getDiskId());
-          //TODO Asif:Check if resetting is needed
-          return !EntryBits.isInvalid(bits) && !EntryBits.isLocalInvalid(bits);
-        }
-      }
-    }*/
 
     static boolean isOverflowedToDisk(DiskEntry de, DiskRegion dr, DistributedRegion.DiskPosition dp,RegionEntryContext context) {
       Object v = null;
@@ -1171,11 +1150,6 @@ public interface DiskEntry extends RegionEntry {
       boolean lruFaultedIn = false;
       boolean done = false;
       try {
-      //Asif: If the entry is instance of LRU then DidkRegion cannot be null.
-      //Since SqlFabric is accessing this method direcly & it passes the owning region,
-      //if the region happens to be persistent PR type, the owning region passed is PR,
-      // but it will have DiskRegion as null. SqlFabric takes care of passing owning region
-      // as BucketRegion in case of Overflow type entry. This is fix for Bug # 41804
       if ( entry instanceof LRUEntry && !dr.isSync() ) {
         synchronized (entry) {
           DiskId did = entry.getDiskId();
@@ -1344,10 +1318,8 @@ public interface DiskEntry extends RegionEntry {
      * Sets the value in the entry.
      * This is only called by the faultIn code once it has determined that
      * the value is no longer in memory.
-     * return the result will only be off-heap if the value is a sqlf ByteSource. Otherwise result will be on-heap.
      * Caller must have "entry" synced.
      */
-    @Retained
     private static Object readValueFromDisk(DiskEntry entry, DiskRecoveryStore region) {
 
       DiskRegionView dr = region.getDiskRegionView();
@@ -1360,16 +1332,8 @@ public interface DiskEntry extends RegionEntry {
       synchronized (did) {
         Object value = getValueFromDisk(dr, did, null);
         if (value == null) return null;
-        @Unretained Object preparedValue = setValueOnFaultIn(value, did, entry, dr, region);
-        // For Sqlfire we want to return the offheap representation.
-        // So we need to retain it for the caller to release.
-        /*if (preparedValue instanceof ByteSource) {
-          // This is the only case in which we return a retained off-heap ref.
-          ((ByteSource)preparedValue).retain();
-          return preparedValue;
-        } else */{
-          return value;
-        }
+        setValueOnFaultIn(value, did, entry, dr, region);
+        return value;
       }
       } finally {
         dr.releaseReadLock();
@@ -1417,16 +1381,7 @@ public interface DiskEntry extends RegionEntry {
 
     static Object readRawValue(byte[] valueBytes, Version version,
         ByteArrayDataInput in) {
-      /*
-      final StaticSystemCallbacks sysCb;
-      if (version != null && (sysCb = GemFireCacheImpl.FactoryStatics
-          .systemCallbacks) != null) {
-        // may need to change serialized shape for SQLFire
-        return sysCb.fromVersion(valueBytes, false, version, in);
-      }
-      else */ {
-        return valueBytes;
-      }
+      return valueBytes;
     }
 
     public static void incrementBucketStats(Object owner,
@@ -1473,12 +1428,6 @@ public interface DiskEntry extends RegionEntry {
         ((LRUEntry)entry).setDelayedDiskId(region);
         did = entry.getDiskId();
       }
-      
-      // Notify the SQLFire IndexManager if present
-     /* final IndexUpdater indexUpdater = region.getIndexUpdater();
-      if(indexUpdater != null && dr.isSync()) {
-        indexUpdater.onOverflowToDisk(entry);
-      }*/
       
       int change = 0;
       boolean scheduledAsyncHere = false;
