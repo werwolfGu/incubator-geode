@@ -85,13 +85,6 @@ public interface DiskEntry extends RegionEntry {
    * @param context
    */
   public void handleValueOverflow(RegionEntryContext context);
-  
-  /**
-   * In some cases we need to do something just after we unset the value
-   * from a DiskEntry that has been moved (i.e. overflowed) to disk.
-   * @param context
-   */
-  public void afterValueOverflow(RegionEntryContext context);
 
   /**
    * Returns true if the DiskEntry value is equal to {@link Token#DESTROYED}, {@link Token#REMOVED_PHASE1}, or {@link Token#REMOVED_PHASE2}.
@@ -967,13 +960,8 @@ public interface DiskEntry extends RegionEntry {
           // Second, do the stats done for the current recovered value
           if (re.getRecoveredKeyId() < 0) {
             if (!entry.isValueNull()) {
-              try {
-                entry.handleValueOverflow(region);
-                entry.setValueWithContext(region, null); // fixes bug 41119
-              }finally {
-                entry.afterValueOverflow(region);
-              }
-              
+              entry.handleValueOverflow(region);
+              entry.setValueWithContext(region, null); // fixes bug 41119
             }
             dr.incNumOverflowOnDisk(1L);
             dr.incNumOverflowBytesOnDisk(did.getValueLength());
@@ -1132,12 +1120,8 @@ public interface DiskEntry extends RegionEntry {
               false));
         } else {
           if (!oldValueWasNull) {
-            try {
-              entry.handleValueOverflow(context);
-              entry.setValueWithContext(context,null); // fixes bug 41119
-            }finally {
-              entry.afterValueOverflow(context);
-            }
+            entry.handleValueOverflow(context);
+            entry.setValueWithContext(context,null); // fixes bug 41119
           }
         }
         if (entry instanceof LRUEntry) {
@@ -1559,13 +1543,8 @@ public interface DiskEntry extends RegionEntry {
           // do the stats when it is actually written to disk
         } else {
           region.updateSizeOnEvict(entry.getKey(), oldSize);
-          //did.setValueSerializedSize(byteSizeOnDisk);
-          try {
-            entry.handleValueOverflow(region);
-            entry.setValueWithContext(region,null);
-          }finally {
-            entry.afterValueOverflow(region);
-          }
+          entry.handleValueOverflow(region);
+          entry.setValueWithContext(region,null);
           movedValueToDisk = true;
           change = ((LRUClockNode)entry).updateEntrySize(ccHelper);
         }
@@ -1646,12 +1625,8 @@ public interface DiskEntry extends RegionEntry {
                 dr.incNumOverflowBytesOnDisk(did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      did.getValueLength());
-                try {
-                  entry.handleValueOverflow(region);
-                  entry.setValueWithContext(region,null);
-                }finally {
-                  entry.afterValueOverflow(region);
-                }
+                entry.handleValueOverflow(region);
+                entry.setValueWithContext(region,null);
               }
               
               //See if we the entry we wrote to disk has the same tag
@@ -1767,12 +1742,8 @@ public interface DiskEntry extends RegionEntry {
                 dr.incNumOverflowBytesOnDisk(did.getValueLength());
                 incrementBucketStats(region, 0/*InVM*/, 0/*OnDisk*/,
                                      did.getValueLength());
-                try {
-                 entry.handleValueOverflow(region);
-                 entry.setValueWithContext(region,null);
-                }finally {
-                  entry.afterValueOverflow(region);
-                }
+                entry.handleValueOverflow(region);
+                entry.setValueWithContext(region,null);
               }
             } catch (RegionClearedException ignore) {
               // no need to do the op since it was clobbered by a region clear

@@ -7088,8 +7088,6 @@ public final class Oplog implements CompactableOplog, Flushable {
     public void handleValueOverflow(RegionEntryContext context) {throw new IllegalStateException();}
 
     @Override
-    public void afterValueOverflow(RegionEntryContext context) {throw new IllegalStateException();}
-    @Override
     public Object prepareValueForCache(RegionEntryContext r, Object val, boolean isEntryUpdate) { throw new IllegalStateException("Should never be called");  }
 
     @Override
