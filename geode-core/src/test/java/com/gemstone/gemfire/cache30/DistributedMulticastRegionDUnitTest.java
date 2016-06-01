@@ -256,6 +256,7 @@ public class DistributedMulticastRegionDUnitTest extends CacheTestCase {
     p.put(DistributionConfig.MCAST_TTL_NAME, mcastttl);
     p.put(DistributionConfig.LOCATORS_NAME, "localhost[" + locatorPort +"]");
     p.put(DistributionConfig.LOG_LEVEL_NAME, "info");
+    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
     return p;
   } 
   
@@ -288,6 +289,7 @@ public class DistributedMulticastRegionDUnitTest extends CacheTestCase {
         locatorProps.setProperty(DistributionConfig.MCAST_PORT_NAME, mcastport);
         locatorProps.setProperty(DistributionConfig.MCAST_TTL_NAME, mcastttl);
         locatorProps.setProperty(DistributionConfig.LOG_LEVEL_NAME, "info");
+        locatorProps.setProperty(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
         //locatorProps.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "true");
         try {
           final InternalLocator locator = (InternalLocator) Locator.startLocatorAndDS(locatorPort, null, null,

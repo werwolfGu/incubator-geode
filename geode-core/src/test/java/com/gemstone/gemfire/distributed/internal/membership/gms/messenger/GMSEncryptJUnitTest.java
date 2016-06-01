@@ -158,7 +158,7 @@ public class GMSEncryptJUnitTest {
     initMocks();
 
     GMSEncrypt gmsEncrypt1 = new GMSEncrypt(services, mockMembers[1]); // this will be the sender
-    gmsEncrypt1.addClusterKey();
+    gmsEncrypt1.initClusterSecretKey();
     // establish the public keys for the sender and receiver
     netView.setPublicKey(mockMembers[1], gmsEncrypt1.getPublicKeyBytes());
     
@@ -182,7 +182,7 @@ public class GMSEncryptJUnitTest {
     initMocks();
 
     GMSEncrypt gmsEncrypt1 = new GMSEncrypt(services, mockMembers[1]); // this will be the sender
-    gmsEncrypt1.addClusterKey();
+    gmsEncrypt1.initClusterSecretKey();
     GMSEncrypt gmsEncrypt2 = new GMSEncrypt(services, mockMembers[2]); // this will be the sender
     
     // establish the public keys for the sender and receiver
@@ -191,7 +191,7 @@ public class GMSEncryptJUnitTest {
     
     gmsEncrypt1.installView(netView, mockMembers[1]);
     
-    byte[] secretBytes = gmsEncrypt1.getSecretBytes();
+    byte[] secretBytes = gmsEncrypt1.getClusterSecretKey();
     gmsEncrypt2.addClusterKey(secretBytes);
     
     gmsEncrypt2.installView(netView, mockMembers[1]);

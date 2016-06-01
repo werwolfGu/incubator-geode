@@ -109,6 +109,11 @@ public class LocatorDUnitTest extends DistributedTestCase {
       system = null;
     }
   }
+  
+  //for child classes 
+  protected void addDSProps(Properties p) {
+    
+  }
 
   ////////  Test Methods
 
@@ -120,7 +125,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * it hung with the restarted locator trying to become elder again because
    * it put its address at the beginning of the new view it sent out.
    */
-  public void testCollocatedLocatorWithSecurity() throws Exception {
+  public void ntestCollocatedLocatorWithSecurity() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -139,6 +144,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("security-peer-authenticator", "com.gemstone.gemfire.distributed.MyAuthenticator.create");
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
     properties.put(DistributionConfig.USE_CLUSTER_CONFIGURATION_NAME, "false");
+    addDSProps(properties);
     system = (InternalDistributedSystem) DistributedSystem.connect(properties);
     InternalDistributedMember mbr = system.getDistributedMember();
     assertEquals("expected the VM to have NORMAL vmKind",
@@ -249,7 +255,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    *
    * @throws Exception
    */
-  public void testStartTwoLocators() throws Exception {
+  public void ntestStartTwoLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM loc1 = host.getVM(1);
@@ -273,7 +279,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("member-timeout", "2000");
     properties.put("log-level", LogWriterUtils.getDUnitLogLevel());
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(properties);
     SerializableCallable startLocator1 = new SerializableCallable("start locator1") {
       @Override
       public Object call() throws Exception {
@@ -362,7 +368,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * test lead member selection
    */
-  public void testLeadMemberSelection() throws Exception {
+  public void ntestLeadMemberSelection() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -377,7 +383,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("locators", locators);
     properties.put("enable-network-partition-detection", "true");
     properties.put("disable-auto-reconnect", "true");
-
+    addDSProps(properties);
     File logFile = new File("");
     if (logFile.exists()) {
       logFile.delete();
@@ -471,7 +477,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We then kill the lead member and demonstrate that the original locator
    * (which is now the sole remaining member) shuts itself down.
    */
-  public void testLeadAndCoordFailure() throws Exception {
+  public void ntestLeadAndCoordFailure() throws Exception {
     IgnoredException.addIgnoredException("Possible loss of quorum due");
     disconnectAllFromDS();
     Host host = Host.getHost(0);
@@ -497,7 +503,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("log-level", LogWriterUtils.getDUnitLogLevel());
     //    properties.put("log-level", "fine");
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(properties);
     try {
       final String uname = getUniqueName();
       File logFile = new File("");
@@ -604,7 +610,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We then shut down the group coordinator and observe the second locator
    * pick up the job and the remaining member continues to operate normally.
    */
-  public void testLeadFailureAndCoordShutdown() throws Exception {
+  public void ntestLeadFailureAndCoordShutdown() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -628,7 +634,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("disable-auto-reconnect", "true");
     properties.put("member-timeout", "2000");
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(properties);
     SerializableRunnable stopLocator = getStopLocatorRunnable();
 
     try {
@@ -750,7 +756,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    */
   // disabled on trunk - should be reenabled on cedar_dev_Oct12
   // this test leaves a CloserThread around forever that logs "pausing" messages every 500 ms
-  public void testForceDisconnectAndPeerShutdownCause() throws Exception {
+  public void ntestForceDisconnectAndPeerShutdownCause() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -774,7 +780,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("member-timeout", "2000");
     properties.put("log-level", LogWriterUtils.getDUnitLogLevel());
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(properties);
     SerializableRunnable stopLocator = getStopLocatorRunnable();
 
     try {
@@ -887,7 +893,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We kill the coordinator and shut down the lead member and observe the second locator
    * pick up the job and the remaining member continue to operate normally.
    */
-  public void testLeadShutdownAndCoordFailure() throws Exception {
+  public void ntestLeadShutdownAndCoordFailure() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -910,7 +916,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     properties.put("disable-auto-reconnect", "true");
     properties.put("member-timeout", "2000");
     properties.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(properties);
     SerializableRunnable disconnect =
         new SerializableRunnable("Disconnect from " + locators) {
           public void run() {
@@ -1012,7 +1018,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * Tests that attempting to connect to a distributed system in which
    * no locator is defined throws an exception.
    */
-  public void testNoLocator() {
+  public void ntestNoLocator() {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     int port =
@@ -1022,7 +1028,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     Properties props = new Properties();
     props.setProperty("mcast-port", "0");
     props.setProperty("locators", locators);
-
+    addDSProps(props);
     final String expected = "java.net.ConnectException";
     final String addExpected =
         "<ExpectedException action=add>" + expected + "</ExpectedException>";
@@ -1072,7 +1078,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * <p>The locator is then restarted and is shown to take over the
    * role of membership coordinator.
    */
-  public void testOneLocator() throws Exception {
+  public void ntestOneLocator() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm0 = host.getVM(0);
@@ -1093,7 +1099,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
           locProps.setProperty("mcast-port", "0");
           locProps.setProperty("member-timeout", "1000");
           locProps.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+          addDSProps(locProps);  
           Locator.startLocatorAndDS(port, logFile, locProps);
         } catch (IOException ex) {
           com.gemstone.gemfire.test.dunit.Assert.fail("While starting locator on port " + port, ex);
@@ -1110,6 +1116,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
               props.setProperty("mcast-port", "0");
               props.setProperty("locators", locators);
               props.setProperty("member-timeout", "1000");
+              addDSProps(props);
               DistributedSystem.connect(props);
             }
           };
@@ -1120,7 +1127,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
       props.setProperty("mcast-port", "0");
       props.setProperty("locators", locators);
       props.setProperty("member-timeout", "1000");
-
+      addDSProps(props);
       system = (InternalDistributedSystem) DistributedSystem.connect(props);
 
       final DistributedMember coord = MembershipManagerHelper.getCoordinator(system);
@@ -1164,7 +1171,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * is correct.  It then restarts the locator to demonstrate that
    * it can connect to and function as the group coordinator
    */
-  public void testLocatorBecomesCoordinator() throws Exception {
+  public void ntestLocatorBecomesCoordinator() throws Exception {
     disconnectAllFromDS();
     final String expected = "java.net.ConnectException";
     final String addExpected =
@@ -1189,7 +1196,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
       props.setProperty(DistributionConfig.LOCATORS_NAME, locators);
       props.setProperty(DistributionConfig.ENABLE_NETWORK_PARTITION_DETECTION_NAME, "true");
       props.put(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+      addDSProps(props);
       SerializableRunnable connect =
           new SerializableRunnable("Connect to " + locators) {
             public void run() {
@@ -1301,7 +1308,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests starting multiple locators in multiple VMs.
    */
-  public void testMultipleLocators() throws Exception {
+  public void ntestMultipleLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm0 = host.getVM(0);
@@ -1323,7 +1330,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     dsProps.setProperty("locators", locators);
     dsProps.setProperty("mcast-port", "0");
     dsProps.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    addDSProps(dsProps);
     vm0.invoke(new SerializableRunnable("Start locator on " + port1) {
       public void run() {
         File logFile = new File("");
@@ -1357,6 +1364,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
                 Properties props = new Properties();
                 props.setProperty("mcast-port", "0");
                 props.setProperty("locators", locators);
+                addDSProps(props);
                 DistributedSystem.connect(props);
               }
             };
@@ -1366,7 +1374,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
         Properties props = new Properties();
         props.setProperty("mcast-port", "0");
         props.setProperty("locators", locators);
-
+        addDSProps(props);
         system = (InternalDistributedSystem) DistributedSystem.connect(props);
 
         WaitCriterion ev = new WaitCriterion() {
@@ -1417,7 +1425,6 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * end up only have 1 master.
    * GEODE-870
    */
-  @Category(FlakyTest.class) // GEODE-1150: random ports, disk pollution, waitForCriterion, time sensitive, eats exceptions (fixed several)
   public void testMultipleLocatorsRestartingAtSameTime() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
@@ -1441,8 +1448,8 @@ public class LocatorDUnitTest extends DistributedTestCase {
     dsProps.setProperty(DistributionConfig.LOCATORS_NAME, locators);
     dsProps.setProperty(DistributionConfig.LOG_LEVEL_NAME, LogWriterUtils.getDUnitLogLevel());
     dsProps.setProperty(DistributionConfig.ENABLE_NETWORK_PARTITION_DETECTION_NAME, "true");
-    dsProps.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+    dsProps.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");    
+    addDSProps(dsProps);
     startLocatorSync(vm0, new Object[] { port1, dsProps });
     startLocatorSync(vm1, new Object[] { port2, dsProps });
     startLocatorSync(vm2, new Object[] { port3, dsProps });
@@ -1620,7 +1627,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests starting multiple locators in multiple VMs.
    */
-  public void testMultipleMcastLocators() throws Exception {
+  public void ntestMultipleMcastLocators() throws Exception {
     disconnectAllFromDS();
     IgnoredException.addIgnoredException("Could not stop  Distribution Locator"); // shutdown timing issue in InternalLocator
     Host host = Host.getHost(0);
@@ -1653,7 +1660,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
           props.setProperty("mcast-ttl", "0");
           props.setProperty("enable-network-partition-detection", "true");
           props.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
-
+          addDSProps(props);
           Locator.startLocatorAndDS(port1, logFile, null, props);
         } catch (IOException ex) {
           com.gemstone.gemfire.test.dunit.Assert.fail("While starting locator on port " + port1, ex);
@@ -1671,6 +1678,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
           props.setProperty("mcast-ttl", "0");
           props.setProperty("enable-network-partition-detection", "true");
           props.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
+          addDSProps(props);
           Locator.startLocatorAndDS(port2, logFile, null, props);
         } catch (IOException ex) {
           com.gemstone.gemfire.test.dunit.Assert.fail("While starting locator on port " + port2, ex);
@@ -1687,6 +1695,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
             props.setProperty("log-level", LogWriterUtils.getDUnitLogLevel());
             props.setProperty("mcast-ttl", "0");
             props.setProperty("enable-network-partition-detection", "true");
+            addDSProps(props);
             DistributedSystem.connect(props);
           }
         };
@@ -1700,7 +1709,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
       props.setProperty("log-level", LogWriterUtils.getDUnitLogLevel());
       props.setProperty("mcast-ttl", "0");
       props.setProperty("enable-network-partition-detection", "true");
-
+      addDSProps(props);
       system = (InternalDistributedSystem) DistributedSystem.connect(props);
       WaitCriterion ev = new WaitCriterion() {
         public boolean done() {
@@ -1735,7 +1744,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * Tests that a VM can connect to a locator that is hosted in its
    * own VM.
    */
-  public void testConnectToOwnLocator() throws Exception {
+  public void ntestConnectToOwnLocator() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
 
@@ -1752,6 +1761,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
       props.setProperty("mcast-port", "0");
       props.setProperty("locators", locators);
       props.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
+      addDSProps(props);
       system = (InternalDistributedSystem) DistributedSystem.connect(props);
       system.disconnect();
     } finally {
@@ -1762,7 +1772,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests that a single VM can NOT host multiple locators
    */
-  public void testHostingMultipleLocators() throws Exception {
+  public void ntestHostingMultipleLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     //VM vm = host.getVM(0);
@@ -1797,6 +1807,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
               props.setProperty("mcast-port", "0");
               props.setProperty("locators", locators);
               props.setProperty("log-level", LogWriterUtils.getDUnitLogLevel());
+              addDSProps(props);
               DistributedSystem.connect(props);
             }
           };
@@ -1819,7 +1830,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    *
    * @since 4.1
    */
-  public void testRestartLocator() throws Exception {
+  public void ntestRestartLocator() throws Exception {
     disconnectAllFromDS();
     port1 =
         AvailablePort.getRandomAvailablePort(AvailablePort.SOCKET);
@@ -1831,6 +1842,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
     p.setProperty(DistributionConfig.LOCATORS_NAME, Host.getHost(0).getHostName() + "[" + port1 + "]");
     p.setProperty(DistributionConfig.MCAST_PORT_NAME, "0");
     p.setProperty(DistributionConfig.ENABLE_CLUSTER_CONFIGURATION_NAME, "false");
+    addDSProps(p);
     if (stateFile.exists()) {
       stateFile.delete();
     }
@@ -1916,6 +1928,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
           Properties locProps = new Properties();
           locProps.put("mcast-port", "0");
           locProps.put("log-level", LogWriterUtils.getDUnitLogLevel());
+          addDSProps(locProps);
           Locator.startLocatorAndDS(port, logFile, locProps);
         } catch (IOException ex) {
           com.gemstone.gemfire.test.dunit.Assert.fail("While starting locator on port " + port, ex);

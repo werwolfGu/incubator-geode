@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -69,6 +70,9 @@ import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.Healt
 import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.JoinLeave;
 import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.Manager;
 import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.MessageHandler;
+import com.gemstone.gemfire.distributed.internal.membership.gms.locator.FindCoordinatorRequest;
+import com.gemstone.gemfire.distributed.internal.membership.gms.locator.FindCoordinatorResponse;
+import com.gemstone.gemfire.distributed.internal.membership.gms.messages.InstallViewMessage;
 import com.gemstone.gemfire.distributed.internal.membership.gms.messages.JoinRequestMessage;
 import com.gemstone.gemfire.distributed.internal.membership.gms.messages.JoinResponseMessage;
 import com.gemstone.gemfire.distributed.internal.membership.gms.messages.LeaveRequestMessage;
@@ -96,10 +100,14 @@ public class JGroupsMessengerJUnitTest {
   private InterceptUDP interceptor;
   private long statsId = 123;
 
+  private void initMocks(boolean enableMcast) throws Exception {
+    initMocks(enableMcast, new Properties());
+  }
+  
   /**
    * Create stub and mock objects
    */
-  private void initMocks(boolean enableMcast) throws Exception {
+  private void initMocks(boolean enableMcast, Properties addProp) throws Exception {
     if (messenger != null) {
       messenger.stop();
       messenger = null;
@@ -112,6 +120,7 @@ public class JGroupsMessengerJUnitTest {
     nonDefault.put(DistributionConfig.LOG_LEVEL_NAME, "fine");
     nonDefault.put(DistributionConfig.LOCATORS_NAME, "localhost[10344]");
     nonDefault.put(DistributionConfig.ACK_WAIT_THRESHOLD_NAME, "1");
+    nonDefault.putAll(addProp);
     DistributionConfigImpl config = new DistributionConfigImpl(nonDefault);
     RemoteTransportConfig tconfig = new RemoteTransportConfig(config,
         DistributionManager.NORMAL_DM_TYPE);
@@ -134,12 +143,16 @@ public class JGroupsMessengerJUnitTest {
     when(services.getHealthMonitor()).thenReturn(healthMonitor);
     when(services.getManager()).thenReturn(manager);
     when(services.getJoinLeave()).thenReturn(joinLeave);
+    
     DM dm = mock(DM.class);
     InternalDistributedSystem system = InternalDistributedSystem.newInstanceForTesting(dm, nonDefault);
     when(services.getStatistics()).thenReturn(new DistributionStats(system, statsId));
     
     messenger = new JGroupsMessenger();
     messenger.init(services);
+    
+    //if I do this earlier then test this return messenger as null
+    when(services.getMessenger()).thenReturn(messenger);
     
     String jgroupsConfig = messenger.getJGroupsStackConfig();
     int startIdx = jgroupsConfig.indexOf("<com");
@@ -429,15 +442,15 @@ public class JGroupsMessengerJUnitTest {
     when(joinLeave.getView()).thenReturn(v);
 
     InternalDistributedMember sender = createAddress(8888);
-    JoinRequestMessage msg = new JoinRequestMessage(messenger.localAddress, sender, null, -1);
+    JoinRequestMessage msg = new JoinRequestMessage(messenger.localAddress, sender, null, -1, 0);
     
-    Message jmsg = messenger.createJGMessage(msg, messenger.jgAddress, null, Version.CURRENT_ORDINAL);
+    Message jmsg = messenger.createJGMessage(msg, messenger.jgAddress, Version.CURRENT_ORDINAL);
     interceptor.up(new Event(Event.MSG, jmsg));
     
     verify(mh, times(1)).processMessage(any(JoinRequestMessage.class));
     
     LeaveRequestMessage lmsg = new LeaveRequestMessage(messenger.localAddress, sender, "testing");
-    jmsg = messenger.createJGMessage(lmsg, messenger.jgAddress, null, Version.CURRENT_ORDINAL);
+    jmsg = messenger.createJGMessage(lmsg, messenger.jgAddress, Version.CURRENT_ORDINAL);
     interceptor.up(new Event(Event.MSG, jmsg));
     
     verify(manager).processMessage(any(LeaveRequestMessage.class));
@@ -469,7 +482,7 @@ public class JGroupsMessengerJUnitTest {
     NetView v = new NetView(sender);
     when(joinLeave.getView()).thenReturn(v);
     messenger.installView(v);
-    JoinRequestMessage msg = new JoinRequestMessage(messenger.localAddress, sender, null, -1);
+    JoinRequestMessage msg = new JoinRequestMessage(messenger.localAddress, sender, null, -1, 0);
     if (mcastMsg) {
       msg.setMulticast(true);
     }
@@ -481,7 +494,7 @@ public class JGroupsMessengerJUnitTest {
         sentMessages == 1);
 
     // send a big message and expect fragmentation
-    msg = new JoinRequestMessage(messenger.localAddress, sender, new byte[(int)(services.getConfig().getDistributionConfig().getUdpFragmentSize()*(1.5))], -1);
+    msg = new JoinRequestMessage(messenger.localAddress, sender, new byte[(int)(services.getConfig().getDistributionConfig().getUdpFragmentSize()*(1.5))], -1, 0);
 
     // configure an incoming message handler for JoinRequestMessage
     final DistributionMessage[] messageReceived = new DistributionMessage[1];
@@ -697,7 +710,7 @@ public class JGroupsMessengerJUnitTest {
     NetView view = new NetView(mbr);
     
     // the digest should be set in an outgoing join response
-    JoinResponseMessage joinResponse = new JoinResponseMessage(mbr, view);
+    JoinResponseMessage joinResponse = new JoinResponseMessage(mbr, view, 0);
     messenger.filterOutgoingMessage(joinResponse);
     assertNotNull(joinResponse.getMessengerData());
     
@@ -709,7 +722,7 @@ public class JGroupsMessengerJUnitTest {
     assertNull(joinResponse.getMessengerData());
     
     // the digest shouldn't be set in an outgoing rejection message
-    joinResponse = new JoinResponseMessage("you can't join my distributed system.  nyah nyah nyah!");
+    joinResponse = new JoinResponseMessage("you can't join my distributed system.  nyah nyah nyah!", 0);
     messenger.filterOutgoingMessage(joinResponse);
     assertNull(joinResponse.getMessengerData());
     
@@ -805,7 +818,7 @@ public class JGroupsMessengerJUnitTest {
       dmsg.setRecipients(recipients);
   
       // a message is ignored during manager shutdown
-      msg = messenger.createJGMessage(dmsg, new JGAddress(other), null, Version.CURRENT_ORDINAL);
+      msg = messenger.createJGMessage(dmsg, new JGAddress(other), Version.CURRENT_ORDINAL);
       when(manager.shutdownInProgress()).thenReturn(Boolean.TRUE);
       receiver.receive(msg);
       verify(manager, never()).processMessage(isA(DistributionMessage.class));
@@ -894,6 +907,174 @@ public class JGroupsMessengerJUnitTest {
     // this shouldln't succeed because there's no-one to respond
     assertFalse(result);
     assertFalse(AvailablePort.isPortAvailable(services.getConfig().getDistributionConfig().getMcastPort(), AvailablePort.MULTICAST));
+  }
+  
+  private NetView createView(InternalDistributedMember otherMbr) {
+    InternalDistributedMember sender = messenger.getMemberID();
+    List<InternalDistributedMember> mbrs = new ArrayList<>();
+    mbrs.add(sender);
+    mbrs.add(otherMbr);
+    NetView v = new NetView(sender, 1, mbrs);
+    return v;
+  }
+  
+  @Test
+  public void testEncryptedFindCoordinatorRequest() throws Exception{
+    InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
+    
+    Properties p = new Properties();    
+    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    initMocks(false, p);
+    
+    NetView v = createView(otherMbr);
+    
+    GMSEncrypt otherMbrEncrptor = new GMSEncrypt(services);
+    
+    messenger.setPublicKey(otherMbrEncrptor.getPublicKeyBytes(), otherMbr);
+    messenger.initClusterKey();
+    
+    FindCoordinatorRequest gfmsg = new FindCoordinatorRequest(messenger.getMemberID(), new ArrayList<InternalDistributedMember>(2), 1, messenger.getPublickey(messenger.getMemberID()), 1);
+    Set<InternalDistributedMember> recipients = new HashSet<>();
+    recipients.add(otherMbr);
+    gfmsg.setRecipients(recipients);
+    
+    short version = Version.CURRENT_ORDINAL;
+    
+    HeapDataOutputStream out = new HeapDataOutputStream(Version.CURRENT);
+    
+    messenger.writeEncryptedMessage(gfmsg, version, out);
+    
+    byte[] requestBytes = out.toByteArray();
+    
+    DataInputStream dis = new DataInputStream(new ByteArrayInputStream(requestBytes));
+    
+    DistributionMessage distributionMessage = messenger.readEncryptedMessage(dis, version, otherMbrEncrptor);
+    
+    assertEquals(gfmsg, distributionMessage);
+  }
+  
+  @Test
+  public void testEncryptedFindCoordinatorResponse() throws Exception{
+    InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
+    
+    Properties p = new Properties();    
+    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    initMocks(false, p);
+    
+    NetView v = createView(otherMbr);
+    
+    GMSEncrypt otherMbrEncrptor = new GMSEncrypt(services);
+    otherMbrEncrptor.setPublicKey(messenger.getPublickey(messenger.getMemberID()), messenger.getMemberID());
+    
+    messenger.setPublicKey(otherMbrEncrptor.getPublicKeyBytes(), otherMbr);
+    messenger.initClusterKey();
+    
+    FindCoordinatorResponse gfmsg = new FindCoordinatorResponse(messenger.getMemberID(), messenger.getMemberID(),  messenger.getClusterSecretKey(), 1);
+    Set<InternalDistributedMember> recipients = new HashSet<>();
+    recipients.add(otherMbr);
+    gfmsg.setRecipients(recipients);
+    
+    short version = Version.CURRENT_ORDINAL;
+    
+    HeapDataOutputStream out = new HeapDataOutputStream(Version.CURRENT);
+    
+    messenger.writeEncryptedMessage(gfmsg, version, out);
+    
+    byte[] requestBytes = out.toByteArray();
+    
+    DataInputStream dis = new DataInputStream(new ByteArrayInputStream(requestBytes));
+    
+    messenger.addRequestId(1, messenger.getMemberID());
+    
+    DistributionMessage distributionMessage = messenger.readEncryptedMessage(dis, version, otherMbrEncrptor);
+    
+    assertEquals(gfmsg, distributionMessage);
+  }
+  
+  @Test
+  public void testEncryptedJoinRequest() throws Exception{
+    InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
+    
+    Properties p = new Properties();    
+    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    initMocks(false, p);
+    
+    NetView v = createView(otherMbr);
+    
+    GMSEncrypt otherMbrEncrptor = new GMSEncrypt(services);
+    
+    messenger.setPublicKey(otherMbrEncrptor.getPublicKeyBytes(), otherMbr);
+    messenger.initClusterKey();
+    
+    JoinRequestMessage gfmsg = new JoinRequestMessage(otherMbr, messenger.getMemberID(), null, 9789, 1);
+    
+    short version = Version.CURRENT_ORDINAL;
+    
+    HeapDataOutputStream out = new HeapDataOutputStream(Version.CURRENT);
+    
+    messenger.writeEncryptedMessage(gfmsg, version, out);
+    
+    byte[] requestBytes = out.toByteArray();
+    
+    DataInputStream dis = new DataInputStream(new ByteArrayInputStream(requestBytes));
+    
+    DistributionMessage distributionMessage = messenger.readEncryptedMessage(dis, version, otherMbrEncrptor);
+    
+    assertEquals(gfmsg, distributionMessage);
+  }
+  
+  @Test
+  public void testEncryptedJoinResponse() throws Exception{
+    InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
+    
+    Properties p = new Properties();    
+    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    initMocks(false, p);
+    
+    NetView v = createView(otherMbr);
+    
+    GMSEncrypt otherMbrEncrptor = new GMSEncrypt(services);
+    otherMbrEncrptor.setPublicKey(messenger.getPublickey(messenger.getMemberID()), messenger.getMemberID());
+    
+    messenger.setPublicKey(otherMbrEncrptor.getPublicKeyBytes(), otherMbr);
+    messenger.initClusterKey();
+    
+    JoinResponseMessage gfmsg = new JoinResponseMessage(otherMbr, messenger.getClusterSecretKey(), 1);
+    
+    short version = Version.CURRENT_ORDINAL;
+    
+    HeapDataOutputStream out = new HeapDataOutputStream(Version.CURRENT);
+    
+    messenger.writeEncryptedMessage(gfmsg, version, out);
+    
+    byte[] requestBytes = out.toByteArray();
+    
+    DataInputStream dis = new DataInputStream(new ByteArrayInputStream(requestBytes));
+    
+    messenger.addRequestId(1, messenger.getMemberID());
+    
+    DistributionMessage gfMessageAtOtherMbr = messenger.readEncryptedMessage(dis, version, otherMbrEncrptor);
+    
+    assertEquals(gfmsg, gfMessageAtOtherMbr);
+    
+    //lets send view as well..
+    
+    InstallViewMessage installViewMessage = new InstallViewMessage(v, null, true);
+    
+    out = new HeapDataOutputStream(Version.CURRENT);
+    
+    messenger.writeEncryptedMessage(installViewMessage, version, out);
+    
+    requestBytes = out.toByteArray();
+    
+    otherMbrEncrptor.addClusterKey(((JoinResponseMessage)gfMessageAtOtherMbr).getSecretPk());
+    
+    dis = new DataInputStream(new ByteArrayInputStream(requestBytes));
+    
+    gfMessageAtOtherMbr = messenger.readEncryptedMessage(dis, version, otherMbrEncrptor);
+    
+    assertEquals(installViewMessage, gfMessageAtOtherMbr);
+    
   }
   
   /**
