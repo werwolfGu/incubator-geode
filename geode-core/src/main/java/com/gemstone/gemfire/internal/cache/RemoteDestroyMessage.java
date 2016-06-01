@@ -465,8 +465,6 @@ public class RemoteDestroyMessage extends RemoteOperationMessageWithDirectReply 
     if (this.hasOldValue){
       //out.writeBoolean(this.hasOldValue);
       // below boolean is not strictly required, but this is for compatibility
-      // with SQLFire code which writes as byte here to indicate whether
-      // oldValue is an object, serialized object or byte[]
       in.readByte();
       setOldValBytes(DataSerializer.readByteArray(in));
     }
