@@ -3925,12 +3925,10 @@ public class DistributedRegion extends LocalRegion implements
   /**
    * Used to bootstrap txState.
    * @param key
-   * @return  distributedRegions,
-   * member with parimary bucket for partitionedRegions
+   * @return member with primary bucket for partitionedRegions
    */
   @Override
   public DistributedMember getOwnerForKey(KeyInfo key) {
-    //Asif: fix for  sqlfabric bug 42266
     assert !this.isInternalRegion() || this.isMetaRegionWithTransactions();
     if (!this.getAttributes().getDataPolicy().withStorage()
         || (this.concurrencyChecksEnabled && this.getAttributes()
