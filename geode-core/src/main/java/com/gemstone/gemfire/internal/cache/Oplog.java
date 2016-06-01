@@ -1916,7 +1916,6 @@ public final class Oplog implements CompactableOplog, Flushable {
     CountingDataInputStream dis = null;
     try {
       final LocalRegion currentRegion = LocalRegion.getInitializingRegion();
-      final boolean keyRequiresRegionContext = currentRegion != null ? currentRegion.keyRequiresRegionContext() : false;
       final Version version = getProductVersionIfOld();
       final ByteArrayDataInput in = new ByteArrayDataInput();
       final HeapDataOutputStream hdos = new HeapDataOutputStream(Version.CURRENT);
@@ -1958,7 +1957,7 @@ public final class Oplog implements CompactableOplog, Flushable {
           }
             break;
           case OPLOG_NEW_ENTRY_0ID:
-            readNewEntry(dis, opCode, deletedIds, recoverValues, currentRegion, keyRequiresRegionContext, version, in, hdos);
+            readNewEntry(dis, opCode, deletedIds, recoverValues, currentRegion, version, in, hdos);
             recordCount++;
             break;
           case OPLOG_MOD_ENTRY_1ID:
@@ -1969,7 +1968,7 @@ public final class Oplog implements CompactableOplog, Flushable {
           case OPLOG_MOD_ENTRY_6ID:
           case OPLOG_MOD_ENTRY_7ID:
           case OPLOG_MOD_ENTRY_8ID:
-            readModifyEntry(dis, opCode, deletedIds, recoverValues, currentRegion, keyRequiresRegionContext, version, in, hdos);
+            readModifyEntry(dis, opCode, deletedIds, recoverValues, currentRegion, version, in, hdos);
             recordCount++;
             break;
           case OPLOG_MOD_ENTRY_WITH_KEY_1ID:
@@ -1980,7 +1979,7 @@ public final class Oplog implements CompactableOplog, Flushable {
           case OPLOG_MOD_ENTRY_WITH_KEY_6ID:
           case OPLOG_MOD_ENTRY_WITH_KEY_7ID:
           case OPLOG_MOD_ENTRY_WITH_KEY_8ID:
-            readModifyEntryWithKey(dis, opCode, deletedIds, recoverValues, currentRegion, keyRequiresRegionContext, version, in,
+            readModifyEntryWithKey(dis, opCode, deletedIds, recoverValues, currentRegion, version, in,
                 hdos);
             recordCount++;
             break;
@@ -2463,7 +2462,7 @@ public final class Oplog implements CompactableOplog, Flushable {
    * @throws IOException
    */
   private void readNewEntry(CountingDataInputStream dis, byte opcode, OplogEntryIdSet deletedIds, boolean recoverValue,
-      final LocalRegion currentRegion, boolean keyRequiresRegionContext, Version version, ByteArrayDataInput in,
+      final LocalRegion currentRegion, Version version, ByteArrayDataInput in,
       HeapDataOutputStream hdos) throws IOException {
     final boolean isPersistRecoveryDebugEnabled = logger.isTraceEnabled(LogMarker.PERSIST_RECOVERY);
     
@@ -2602,9 +2601,6 @@ public final class Oplog implements CompactableOplog, Flushable {
           }
         } else {
           Object key = deserializeKey(keyBytes, version, in);
-          if (keyRequiresRegionContext) {
-            ((KeyWithRegionContext) key).setRegionContext(currentRegion);
-          }
           {
             Object oldValue = getRecoveryMap().put(oplogKeyId, key);
             if (oldValue != null) {
@@ -2654,7 +2650,7 @@ public final class Oplog implements CompactableOplog, Flushable {
    * @throws IOException
    */
   private void readModifyEntry(CountingDataInputStream dis, byte opcode, OplogEntryIdSet deletedIds, boolean recoverValue,
-      LocalRegion currentRegion, boolean keyRequiresRegionContext, Version version, ByteArrayDataInput in, HeapDataOutputStream hdos)
+      LocalRegion currentRegion, Version version, ByteArrayDataInput in, HeapDataOutputStream hdos)
       throws IOException {
     final boolean isPersistRecoveryDebugEnabled = logger.isTraceEnabled(LogMarker.PERSIST_RECOVERY);
     
@@ -2760,9 +2756,6 @@ public final class Oplog implements CompactableOplog, Flushable {
         byte[] keyBytes = (byte[]) skippedKeyBytes.get(oplogKeyId);
         if (keyBytes != null) {
           key = deserializeKey(keyBytes, version, in);
-          if (keyRequiresRegionContext) {
-            ((KeyWithRegionContext) key).setRegionContext(currentRegion);
-          }
         }
       }
       if (isPersistRecoveryDebugEnabled) {
@@ -2878,7 +2871,7 @@ public final class Oplog implements CompactableOplog, Flushable {
    * @throws IOException
    */
   private void readModifyEntryWithKey(CountingDataInputStream dis, byte opcode, OplogEntryIdSet deletedIds, boolean recoverValue,
-      final LocalRegion currentRegion, final boolean keyRequiresRegionContext, Version version, ByteArrayDataInput in,
+      final LocalRegion currentRegion, Version version, ByteArrayDataInput in,
       HeapDataOutputStream hdos) throws IOException {
     long oplogOffset = -1;
 
@@ -3015,9 +3008,6 @@ public final class Oplog implements CompactableOplog, Flushable {
         }
       } else {
         Object key = deserializeKey(keyBytes, version, in);
-        if (keyRequiresRegionContext) {
-          ((KeyWithRegionContext) key).setRegionContext(currentRegion);
-        }
         Object oldValue = getRecoveryMap().put(oplogKeyId, key);
         if (oldValue != null) {
           throw new AssertionError(LocalizedStrings.Oplog_DUPLICATE_CREATE.toLocalizedString(oplogKeyId));

@@ -535,26 +535,6 @@ public class LocalRegion extends AbstractRegion
     return initializingRegion.get();
   }
 
-  /**
-   * Return true if the keys of this region implement
-   * {@link KeyWithRegionContext} that require region specific context
-   * initialization after deserialization or recovery from disk.
-   * 
-   * Currently used by SQLFabric for the optimized
-   * <code>CompactCompositeRegionKey</code> that points to the raw row bytes and
-   * so requires a handle to table schema for interpretation of those bytes.
-   */
-  public boolean keyRequiresRegionContext() {
-    return this.keyRequiresRegionContext;
-  }
-
-  /**
-   * Set the {@link #keyRequiresRegionContext} flag to given value.
-   */
-  public final void setKeyRequiresRegionContext(boolean v) {
-    this.keyRequiresRegionContext = v;
-  }
-
   public CancelCriterion getCancelCriterion() {
     return this.stopper;
   }
@@ -611,7 +591,6 @@ public class LocalRegion extends AbstractRegion
     if (internalRegionArgs.getUserAttribute() != null) {
       setUserAttribute(internalRegionArgs.getUserAttribute());
     }
-    setKeyRequiresRegionContext(internalRegionArgs.keyRequiresRegionContext());
     initializingRegion.set(this);
 
     if (internalRegionArgs.getCachePerfStatsHolder() != null) {
@@ -953,8 +932,6 @@ public class LocalRegion extends AbstractRegion
               final PartitionedRegion pr = internalRegionArgs
                   .getPartitionedRegion();
               internalRegionArgs.setUserAttribute(pr.getUserAttribute());
-              internalRegionArgs.setKeyRequiresRegionContext(pr
-                  .keyRequiresRegionContext());
               if (pr.isShadowPR()) {
                 newRegion = new BucketRegionQueue(subregionName, regionAttributes,
                   this, this.cache, internalRegionArgs);

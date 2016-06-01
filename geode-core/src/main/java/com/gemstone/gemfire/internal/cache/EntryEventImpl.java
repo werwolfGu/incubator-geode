@@ -1458,11 +1458,7 @@ public class EntryEventImpl
   public final void setSerializedNewValue(byte[] serializedValue) {
     Object newVal = null;
     if (serializedValue != null) {
-      if (CachedDeserializableFactory.preferObject()) {
-        newVal = deserialize(serializedValue);
-      } else {
-        newVal = CachedDeserializableFactory.create(serializedValue);
-      }
+      newVal = CachedDeserializableFactory.create(serializedValue);
     }
     this.newValueBytes = serializedValue;
     basicSetNewValue(newVal);
@@ -1472,10 +1468,7 @@ public class EntryEventImpl
   public void setSerializedOldValue(byte[] serializedOldValue){
     this.oldValueBytes = serializedOldValue;
     final Object ov;
-    if (CachedDeserializableFactory.preferObject()) {
-      ov = deserialize(serializedOldValue);
-    }
-    else if (serializedOldValue != null) {
+    if (serializedOldValue != null) {
       ov = CachedDeserializableFactory.create(serializedOldValue);
     }
     else {

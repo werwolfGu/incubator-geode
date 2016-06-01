@@ -515,10 +515,6 @@ public class GatewaySenderEventImpl implements
    *  //OFFHEAP TODO: Optimize callers by returning a reference to the off heap value
    */
   public Object getValue() {
-    if (CachedDeserializableFactory.preferObject()) {
-      // sqlf does not use CacheDeserializable wrappers
-      return getDeserializedValue();
-    }
     Object rawValue = this.value;
     if (rawValue == null) {
       rawValue = this.substituteValue;
@@ -534,9 +530,6 @@ public class GatewaySenderEventImpl implements
     }
     if (valueIsObject == 0x00) {
       //if the value is a byte array, just return it
-      return rawValue;
-    } else if (CachedDeserializableFactory.preferObject()) {
-      // sqlf does not use CacheDeserializable wrappers
       return rawValue;
     } else if (rawValue instanceof byte[]) {
       return CachedDeserializableFactory.create((byte[]) rawValue);

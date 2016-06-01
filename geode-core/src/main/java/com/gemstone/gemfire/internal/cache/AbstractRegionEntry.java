@@ -308,10 +308,6 @@ public abstract class AbstractRegionEntry implements RegionEntry,
       }
     }
 
-    final boolean isEagerDeserialize = dst.isEagerDeserialize();
-    if (isEagerDeserialize) {
-      dst.clearEagerDeserialize();
-    }
     dst.setLastModified(mgr, getLastModified()); // fix for bug 31059
     if (v == Token.INVALID) {
       dst.setInvalid();
@@ -324,17 +320,11 @@ public abstract class AbstractRegionEntry implements RegionEntry,
     }
     else if (v instanceof CachedDeserializable) {
       // don't serialize here if it is not already serialized
-//      if(v instanceof ByteSource && CachedDeserializableFactory.preferObject()) {
-//        // For SQLFire we prefer eager deserialized
-//        dst.setEagerDeserialize();         
-//      }
       CachedDeserializable cd = (CachedDeserializable) v;
       if (!cd.isSerialized()) {
         dst.value = cd.getDeserializedForReading();
       } else {
-        /*if (v instanceof ByteSource && CachedDeserializableFactory.preferObject()) {
-          dst.value = v;
-        } else */ {
+        {
           Object tmp = cd.getValue();
           if (tmp instanceof byte[]) {
             byte[] bb = (byte[]) tmp;
@@ -369,11 +359,7 @@ public abstract class AbstractRegionEntry implements RegionEntry,
           return false;
         }
       }
-    if (CachedDeserializableFactory.preferObject()) {
-      dst.value = preparedValue;
-      dst.setEagerDeserialize();
-    }
-    else {
+    {
       try {
         HeapDataOutputStream hdos = new HeapDataOutputStream(Version.CURRENT);
         BlobHelper.serializeTo(preparedValue, hdos);

@@ -365,10 +365,6 @@ public interface DiskEntry extends RegionEntry {
           dr.releaseReadLock();
         }
       }
-      final boolean isEagerDeserialize = entry.isEagerDeserialize();
-      if (isEagerDeserialize) {
-        entry.clearEagerDeserialize();
-      }
       if (Token.isRemovedFromDisk(v)) {
         // fix for bug 31757
         return false;
@@ -379,28 +375,13 @@ public interface DiskEntry extends RegionEntry {
             entry.setSerialized(false);
             entry.value = cd.getDeserializedForReading();
             
-            //For SQLFire we prefer eager deserialized
-//            if(v instanceof ByteSource) {
-//              entry.setEagerDeserialize();
-//            }
           } else {
             // don't serialize here if it is not already serialized
             
             Object tmp = cd.getValue();
-          //For SQLFire we prefer eager deserialized
-//            if(v instanceof ByteSource) {
-//              entry.setEagerDeserialize();
-//            }
             if (tmp instanceof byte[]) {
               byte[] bb = (byte[])tmp;
               entry.value = bb;
-              entry.setSerialized(true);
-            }
-            else if (isEagerDeserialize && tmp instanceof byte[][]) {
-              // optimize for byte[][] since it will need to be eagerly deserialized
-              // for SQLFabric
-              entry.value = tmp;
-              entry.setEagerDeserialize();
               entry.setSerialized(true);
             }
             else {
@@ -430,12 +411,6 @@ public interface DiskEntry extends RegionEntry {
         entry.value = v;
         entry.setSerialized(false);
       }
-      else if (isEagerDeserialize && v instanceof byte[][]) {
-        // optimize for byte[][] since it will need to be eagerly deserialized
-        // for SQLFabric
-        entry.value = v;
-        entry.setEagerDeserialize();
-      }
       else if (v == Token.INVALID) {
         entry.setInvalid();
       }
@@ -453,11 +428,7 @@ public interface DiskEntry extends RegionEntry {
             return false;
           }
         }
-      if (CachedDeserializableFactory.preferObject()) {
-        entry.value = preparedValue;
-        entry.setEagerDeserialize();
-      }
-      else {
+      {
         try {
           HeapDataOutputStream hdos = new HeapDataOutputStream(Version.CURRENT);
           BlobHelper.serializeTo(preparedValue, hdos);

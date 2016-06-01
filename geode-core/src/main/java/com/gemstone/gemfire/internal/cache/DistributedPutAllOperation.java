@@ -415,8 +415,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
      * {@link PutAllPRMessage#toData(DataOutput)} <br>
      * {@link RemotePutAllMessage#toData(DataOutput)} <br>
      */
-    public final void toData(final DataOutput out, 
-        final boolean requiresRegionContext) throws IOException {
+    public final void toData(final DataOutput out) throws IOException {
       Object key = this.key;
       final Object v = this.value;
       DataSerializer.writeObject(key, out);
@@ -1131,11 +1130,9 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
      * @param rgn
      *          the region the entry is put in
      */
-    public void doEntryPut(PutAllEntryData entry, DistributedRegion rgn,
-        boolean requiresRegionContext, boolean isPutDML) {
+    public void doEntryPut(PutAllEntryData entry, DistributedRegion rgn, boolean isPutDML) {
       @Released EntryEventImpl ev = PutAllMessage.createEntryEvent(entry, getSender(), 
-          this.context, rgn,
-          requiresRegionContext, this.possibleDuplicate,
+          this.context, rgn, this.possibleDuplicate,
           this.needsRouting, this.callbackArg, true, skipCallbacks);
       ev.setPutDML(isPutDML);
       // we don't need to set old value here, because the msg is from remote. local old value will get from next step
@@ -1157,7 +1154,6 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
      * @param sender
      * @param context
      * @param rgn
-     * @param requiresRegionContext
      * @param possibleDuplicate
      * @param needsRouting
      * @param callbackArg
@@ -1166,13 +1162,10 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
     @Retained
     public static EntryEventImpl createEntryEvent(PutAllEntryData entry,
         InternalDistributedMember sender, ClientProxyMembershipID context,
-        DistributedRegion rgn, boolean requiresRegionContext, 
+        DistributedRegion rgn,
         boolean possibleDuplicate, boolean needsRouting, Object callbackArg,
         boolean originRemote, boolean skipCallbacks) {
       final Object key = entry.getKey();
-      if (requiresRegionContext) {
-        ((KeyWithRegionContext)key).setRegionContext(rgn);
-      }
       EventID evId = entry.getEventID();
       @Retained EntryEventImpl ev = EntryEventImpl.create(rgn, entry.getOp(),
           key, null/* value */, callbackArg,
@@ -1224,14 +1217,13 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
       
       rgn.syncBulkOp(new Runnable() {
         public void run() {
-          final boolean requiresRegionContext = rgn.keyRequiresRegionContext();
           final boolean isDebugEnabled = logger.isDebugEnabled();
           for (int i = 0; i < putAllDataSize; ++i) {
             if (isDebugEnabled) {
               logger.debug("putAll processing {} with {} sender={}", putAllData[i], putAllData[i].versionTag, sender);
             }
             putAllData[i].setSender(sender);
-            doEntryPut(putAllData[i], rgn, requiresRegionContext,  isPutDML);
+            doEntryPut(putAllData[i], rgn,  isPutDML);
           }
         }
       }, ev.getEventId());
@@ -1282,10 +1274,6 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
         EntryVersionsList versionTags = new EntryVersionsList(putAllDataSize);
 
         boolean hasTags = false;
-        // get the "keyRequiresRegionContext" flag from first element assuming
-        // all key objects to be uniform
-        final boolean requiresRegionContext =
-          (this.putAllData[0].key instanceof KeyWithRegionContext);
         for (int i = 0; i < this.putAllDataSize; i++) {
           if (!hasTags && putAllData[i].versionTag != null) {
             hasTags = true;
@@ -1293,7 +1281,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
           VersionTag<?> tag = putAllData[i].versionTag;
           versionTags.add(tag);
           putAllData[i].versionTag = null;
-          this.putAllData[i].toData(out, requiresRegionContext);
+          this.putAllData[i].toData(out);
           this.putAllData[i].versionTag = tag;
         }
 

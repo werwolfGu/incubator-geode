@@ -54,7 +54,6 @@ public final class InternalRegionArguments
   private DiskRegion diskRegion;
   private PartitionedRegion partitionedRegion;
   private TestCallable testCallable;
-  private boolean keyRequiresRegionContext;
 
   private AbstractGatewaySender parallelGatewaySender;
   private AbstractGatewaySender serialGatewaySender;
@@ -225,15 +224,6 @@ public final class InternalRegionArguments
 
   public TestCallable getTestCallable() {
     return this.testCallable;
-  }
-
-  public boolean keyRequiresRegionContext() {
-    return this.keyRequiresRegionContext;
-  }
-
-  public InternalRegionArguments setKeyRequiresRegionContext(boolean v) {
-    this.keyRequiresRegionContext = v;
-    return this;
   }
 
   public InternalRegionArguments setUserAttribute(Object userAttr) {

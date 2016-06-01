@@ -279,10 +279,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
       EntryVersionsList versionTags = new EntryVersionsList(putAllDataCount);
 
       boolean hasTags = false;
-      // get the "keyRequiresRegionContext" flag from first element assuming
-      // all key objects to be uniform
-      final boolean requiresRegionContext =
-        (this.putAllData[0].key instanceof KeyWithRegionContext);
       for (int i = 0; i < this.putAllDataCount; i++) {
         if (!hasTags && putAllData[i].versionTag != null) {
           hasTags = true;
@@ -290,7 +286,7 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
         VersionTag<?> tag = putAllData[i].versionTag;
         versionTags.add(tag);
         putAllData[i].versionTag = null;
-        this.putAllData[i].toData(out, requiresRegionContext);
+        this.putAllData[i].toData(out);
         this.putAllData[i].versionTag = tag;
       }
 
