@@ -11072,8 +11072,7 @@ public class LocalRegion extends AbstractRegion
       final CacheProfile prof = (CacheProfile)profile;
 
       // if region in cache is not yet initialized, exclude
-      if (prof.regionInitialized // fix for bug 41102
-          && !prof.memberUnInitialized) {
+      if (prof.regionInitialized) { // fix for bug 41102
         // cut the visit short if we find a CacheLoader
         return !prof.hasCacheLoader;
       }
@@ -11090,8 +11089,8 @@ public class LocalRegion extends AbstractRegion
       assert profile instanceof CacheProfile;
       final CacheProfile prof = (CacheProfile)profile;
 
-      // if region in cache is in recovery, or member not initialized exclude
-      if (!prof.inRecovery && !prof.memberUnInitialized) {
+      // if region in cache is in recovery
+      if (!prof.inRecovery) {
         // cut the visit short if we find a CacheWriter
         return !prof.hasCacheWriter;
       }

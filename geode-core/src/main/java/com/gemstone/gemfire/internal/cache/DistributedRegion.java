@@ -2300,7 +2300,6 @@ public class DistributedRegion extends LocalRegion implements
     }
     profile.serialNumber = getSerialNumber();
     profile.regionInitialized = this.isInitialized();
-    profile.memberUnInitialized = false;
     profile.persistentID = getPersistentID();
     if(getPersistenceAdvisor() != null) {
       profile.persistenceInitialized = getPersistenceAdvisor().isOnline();
@@ -4049,8 +4048,7 @@ public class DistributedRegion extends LocalRegion implements
       if (this.randIndex < 0) {
         this.randIndex = PartitionedRegion.rand.nextInt(numProfiles);
       }
-      if (cp.dataPolicy.withReplication() && cp.regionInitialized
-          && !cp.memberUnInitialized) {
+      if (cp.dataPolicy.withReplication() && cp.regionInitialized) {
         if (onlyPersistent && !cp.dataPolicy.withPersistence()) {
           return true;
         }
