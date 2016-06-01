@@ -1164,16 +1164,6 @@ public class PartitionedRegion extends LocalRegion implements
   }
   
   @Override
-  void distributeUpdatedProfileOnHubCreation()
-  {
-    if (!(this.isClosed || this.isLocallyDestroyed)) {
-      // tell others of the change in status
-      this.requiresNotification = true;
-      new UpdateAttributesProcessor(this).distribute(false);      
-    }
-  }
-
-  @Override
   void distributeUpdatedProfileOnSenderCreation()
   {
     if (!(this.isClosed || this.isLocallyDestroyed)) {

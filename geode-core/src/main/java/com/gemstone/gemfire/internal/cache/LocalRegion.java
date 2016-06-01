@@ -11508,15 +11508,6 @@ public class LocalRegion extends AbstractRegion
     distributeUpdatedProfileOnSenderCreation();
   }
   
-  /**
-   * @since SqlFabric
-   *
-   */
-  void distributeUpdatedProfileOnHubCreation()
-  {
-    // No op
-  }  
-  
   void distributeUpdatedProfileOnSenderCreation()
   {
     // No op
