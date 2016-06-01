@@ -3112,11 +3112,6 @@ public class LocalizedStrings {
   public static final StringId AttributesFactory_INVALIDATE_REGION_NOT_SUPPORTED_FOR_PR = new StringId(4784,"ExpirationAction INVALIDATE or LOCAL_INVALIDATE for region is not supported for Partitioned Region.");
   public static final StringId AttributesFactory_LOCAL_DESTROY_IS_NOT_SUPPORTED_FOR_PR = new StringId(4785,"ExpirationAction LOCAL_DESTROY is not supported for Partitioned Region.");
   public static final StringId AttributesFactory_LOCAL_INVALIDATE_IS_NOT_SUPPORTED_FOR_PR = new StringId(4786,"ExpirationAction LOCAL_INVALIDATE is not supported for Partitioned Region.");
-  public static final StringId GemFireUtilLauncher_ARGUMENTS = new StringId(4789, "Usage:\n{0} [{1}] <arguments for the utility specified>\n\nThe command to display a particular utility''s usage is:\n{0} <utility name> --help");
-  public static final StringId GemFireUtilLauncher_INVALID_UTILITY_0 = new StringId(4790, "Invalid utility name: {0} was specified.");
-  public static final StringId GemFireUtilLauncher_PROBLEM_STARTING_0 = new StringId(4791, "Problem starting {0}.");
-  public static final StringId GemFireUtilLauncher_MISSING_COMMAND = new StringId(4792, "** Missing command");
-  public static final StringId GemFireUtilLauncher_HELP = new StringId(4793, "** Displaying help information");
   public static final StringId AttributesFactory_DESTROY_REGION_NOT_SUPPORTED_FOR_PR = new StringId(4794,"ExpirationAction DESTROY or LOCAL_DESTROY for region is not supported for Partitioned Region.");
   public static final StringId ExecuteFunction_DS_NOT_CREATED_OR_NOT_READY = new StringId(4795, "DistributedSystem is either not created or not ready");
 
