@@ -205,7 +205,6 @@ public class BucketAdvisor extends CacheDistributionAdvisor  {
     return advisor;
   }
 
-  // For SQLFabric ALTER TABLE that may change colocation
   public void resetParentAdvisor(int bucketId) {
     PartitionedRegion colocatedRegion = ColocationHelper
         .getColocatedRegion(this.pRegion);

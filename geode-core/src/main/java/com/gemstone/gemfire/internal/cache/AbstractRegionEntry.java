@@ -415,7 +415,7 @@ public abstract class AbstractRegionEntry implements RegionEntry,
       ReferenceCountHelper.setReferenceCountOwner(null);
       return null;
     } else {
-      result = OffHeapHelper.copyAndReleaseIfNeeded(result); // sqlf does not dec ref count in this call
+      result = OffHeapHelper.copyAndReleaseIfNeeded(result);
       ReferenceCountHelper.setReferenceCountOwner(null);
       setRecentlyUsed();
       return result;
@@ -752,7 +752,6 @@ public abstract class AbstractRegionEntry implements RegionEntry,
       } 
       else {
         FilterProfile fp = region.getFilterProfile();
-        // rdubey: Old value also required for SqlfIndexManager.
         if (fp != null && ((fp.getCqCount() > 0) || expectedOldValue != null)) {
           //curValue = getValue(region); can cause deadlock will fault in the value
           // and will confuse LRU. rdubey.
@@ -1395,10 +1394,6 @@ public abstract class AbstractRegionEntry implements RegionEntry,
       }
     }
   }
-  /**
-   * soubhik: this method is overridden in sqlf flavor of entries.
-   * Instead of overriding this method; override areSetValue.
-   */
   protected final void _setValue(Object val) {
     setValueField(val);
   }
