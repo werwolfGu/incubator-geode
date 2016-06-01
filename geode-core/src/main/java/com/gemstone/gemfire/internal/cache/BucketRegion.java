@@ -1724,10 +1724,8 @@ implements Bucket
       setDeltaIfNeeded(event);
     }
     if (msg != null) {
-      // The primary bucket member which is being modified remotely by a GemFire
+      // The primary bucket member which is being modified remotely by a
       // thread via a received PartitionedMessage
-      //Asif: Some of the adjunct recepients include those members which 
-      // are sqlFabricHub & would need old value along with news
       msg = msg.getMessageForRelayToListeners(event, adjunctRecipients);
       msg.setSender(this.partitionedRegion.getDistributionManager()
           .getDistributionManagerId());
@@ -2026,11 +2024,11 @@ implements Bucket
       this.entries.removeEntry(event.getKey(), re, updateStats) ;      
     }/*else {
       //if event recorded is true, that means as per event tracker entry is in
-      //system. As per sqlfabric, indexes have been updated. What is not done
+      //system. What is not done
       // is basicPutPart2( distribution etc). So we do nothing as PR's re-attempt
       // will do the required basicPutPart2. If we remove the entry here, than 
       //event tracker will not allow re insertion. So either we do nothing or
-      //if we remove ,than we have to update sqlfindexes as well as undo recording
+      //if we remove ,than we have to undo recording
       // of event.
        //TODO:OQL indexes? : Hope they get updated during retry. The issue is that oql indexes
        // get updated after distribute , so it is entirely possible that oql index are 
