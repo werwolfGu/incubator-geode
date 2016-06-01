@@ -3561,10 +3561,8 @@ public class PartitionedRegion extends LocalRegion implements
       boolean isBucketSetAsFilter) {
     final Set routingKeys = execution.getFilter();
     final boolean primaryMembersNeeded = function.optimizeForWrite();
-    final boolean hasRoutingObjects = execution.hasRoutingObjects();
     HashMap<Integer, HashSet> bucketToKeysMap = FunctionExecutionNodePruner
-        .groupByBucket(this, routingKeys, primaryMembersNeeded,
-            hasRoutingObjects, isBucketSetAsFilter);
+        .groupByBucket(this, routingKeys, primaryMembersNeeded, false, isBucketSetAsFilter);
     HashMap<InternalDistributedMember, HashSet> memberToKeysMap = new HashMap<InternalDistributedMember, HashSet>();
     HashMap<InternalDistributedMember, HashSet<Integer>> memberToBuckets = FunctionExecutionNodePruner
     .groupByMemberToBuckets(this, bucketToKeysMap.keySet(), primaryMembersNeeded);    
@@ -3654,7 +3652,7 @@ public class PartitionedRegion extends LocalRegion implements
     else {
       localBucketSet = FunctionExecutionNodePruner
       .getBucketSet(PartitionedRegion.this, localKeys,
-                    hasRoutingObjects, isBucketSetAsFilter);
+                    false, isBucketSetAsFilter);
       
       remoteOnly = false;
     }
@@ -3690,7 +3688,7 @@ public class PartitionedRegion extends LocalRegion implements
         FunctionRemoteContext context = new FunctionRemoteContext(function,
             execution.getArgumentsForMember(recip.getId()), memKeys,
             FunctionExecutionNodePruner.getBucketSet(this, memKeys,
-                hasRoutingObjects, isBucketSetAsFilter), execution.isReExecute(),
+                false, isBucketSetAsFilter), execution.isReExecute(),
                 execution.isFnSerializationReqd());
         recipMap.put(recip, context);
       }
@@ -3720,15 +3718,8 @@ public class PartitionedRegion extends LocalRegion implements
     if (isBucketSetAsFilter) {
       bucketId = ((Integer) key).intValue();
     } else {
-      if (execution.hasRoutingObjects()) {
-        bucketId = Integer.valueOf(PartitionedRegionHelper
-            .getHashKey(this, key));
-      } else {
-        // bucketId = Integer.valueOf(PartitionedRegionHelper.getHashKey(this,
-        // Operation.FUNCTION_EXECUTION, key, null));
-        bucketId = Integer.valueOf(PartitionedRegionHelper.getHashKey(this,
+      bucketId = Integer.valueOf(PartitionedRegionHelper.getHashKey(this,
             Operation.FUNCTION_EXECUTION, key, null, null));
-      }
     }
     InternalDistributedMember targetNode = null;
     if (function.optimizeForWrite()) {

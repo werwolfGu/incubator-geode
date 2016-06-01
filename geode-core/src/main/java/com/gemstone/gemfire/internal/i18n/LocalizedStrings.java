@@ -734,7 +734,6 @@ public class LocalizedStrings {
   public static final StringId PartitionedRegion_FAILED_REGISTRATION_PRID_0_NAMED_1 = new StringId(1872, "FAILED_REGISTRATION prId={0} named {1}");
   public static final StringId PartitionedRegion_FORCEREATTEMPT_EXCEPTION___0 = new StringId(1873, "ForceReattempt exception :  {0}");
   public static final StringId PartitionedRegion_NEWLY_ADDED_MEMBER_TO_THE_PR_IS_AN_ACCESSOR_AND_WILL_NOT_RECEIVE_INDEX_INFORMATION_0 = new StringId(1874, "Newly added member to the PR is an accessor and will not receive index information : {0}");
-  public static final StringId FunctionService_ROUTING_OBJECTS_SET_IS_NULL = new StringId(1875, "Set for routing objects passed is null");
 
   public static final StringId PartitionedRegion_NO_VM_AVAILABLE_FOR_CONTAINS_KEY_IN_1_ATTEMPTS = new StringId(1877, "No VM available for contains key in {1} attempts");
   public static final StringId PartitionedRegion_NO_VM_AVAILABLE_FOR_CONTAINS_VALUE_FOR_KEY_IN_1_ATTEMPTS = new StringId(1878, "No VM available for contains value for key in {1} attempts");
