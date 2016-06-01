@@ -1325,13 +1325,10 @@ public class TXState implements TXStateInterface {
    * @param rememberRead true if the value read from committed state
    *   needs to be remembered in tx state for repeatable read.
    * @param createIfAbsent should a transactional entry be created if not present. 
-   *        Used by sql fabric system
    * @return a txEntryState or null if the entry doesn't exist in the transaction and/or committed state. 
    */
   public TXEntryState txReadEntry(KeyInfo keyInfo, LocalRegion localRegion,
       boolean rememberRead, boolean createIfAbsent) {
-    // EntryNotFoundException can be expected in case of sqlfabric and should
-    // not be caught.
     localRegion.cache.getCancelCriterion().checkCancelInProgress(null);
     return txReadEntry(keyInfo, localRegion, rememberRead, null, createIfAbsent);
   }
