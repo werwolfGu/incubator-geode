@@ -835,8 +835,6 @@ public class LocalizedStrings {
 
   public static final StringId LocalRegion_THE_FOLLOWING_EXCEPTION_OCCURRED_ATTEMPTING_TO_GET_KEY_0 = new StringId(1995, "The following exception occurred attempting to get key={0}");
 
-  public static final StringId RegionAdvisor_CANNOT_RESET_EXISTING_BUCKET = new StringId(
-                                                                                                1997, "For region {0}: RegionAdvisor cannot reset existing bucket with ID {1}");
   public static final StringId SystemAdmin_LRU_OPTION_HELP = new StringId(1998, "-lru=<type> Sets region''s lru algorithm. Valid types are: none, lru-entry-count, lru-heap-percentage, or lru-memory-size");
   public static final StringId SystemAdmin_LRUACTION_OPTION_HELP = new StringId(1999, "-lruAction=<action> Sets the region''s lru action. Valid actions are: none, overflow-to-disk, local-destroy");
   public static final StringId SystemAdmin_LRULIMIT_OPTION_HELP = new StringId(2000, "-lruLimit=<int> Sets the region''s lru limit. Valid values are >= 0");
