@@ -1423,7 +1423,7 @@ public class EntryEventImpl
       return obj;
     }
     final CachedDeserializable cd;
-    // avoid unneeded serialization of byte[][] used by SQLFabric that
+    // avoid unneeded serialization of byte[][] that
     // will end up being deserialized in any case (serialization is cheap
     //   for byte[][] anyways)
     if (obj instanceof byte[][]) {
