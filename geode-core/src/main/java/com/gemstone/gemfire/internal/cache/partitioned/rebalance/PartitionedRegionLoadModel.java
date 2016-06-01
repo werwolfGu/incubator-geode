@@ -243,8 +243,7 @@ public class PartitionedRegionLoadModel {
         // [sumedh] remove from buckets array too to be consistent since
         // this method will be invoked repeatedly for all colocated regions,
         // and then we may miss some colocated regions for a bucket leading
-        // to all kinds of issues later (e.g. see SQLF test for #41472 that
-        //   shows some problems including NPEs, hangs etc.)
+        // to all kinds of issues later
         this.buckets[i] = null;
         continue;
       }
@@ -555,17 +554,11 @@ public class PartitionedRegionLoadModel {
   public Move findBestPrimaryMove() {
     Move bestMove= null;
     double bestImprovement = 0;
-    GemFireCacheImpl cache = null;
     for(Member source: this.members.values()) {
       for(Bucket bucket: source.getPrimaryBuckets()) {
         for(Member target: bucket.getMembersHosting()) {
           if(source.equals(target)) {
             continue;
-          }
-          // If node is not fully initialized yet, then skip this node
-          // (SQLFabric DDL replay in progress).
-          if (cache == null) {
-            cache = GemFireCacheImpl.getInstance();
           }
           double improvement = improvement(source.getPrimaryLoad(), source
               .getWeight(), target.getPrimaryLoad(), target.getWeight(), bucket.getPrimaryLoad(),
