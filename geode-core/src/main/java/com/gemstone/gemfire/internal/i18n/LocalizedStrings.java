@@ -2970,9 +2970,6 @@ public class LocalizedStrings {
   public static final StringId GemFireCache_INITIALIZATION_FAILED_FOR_REGION_0 = new StringId(4609, "Initialization failed for Region {0}");
   public static final StringId LocalRegion_INITIALIZATION_FAILED_FOR_REGION_0 = new StringId(4610, "Initialization failed for Region {0}");
   public static final StringId PartitionedRegion_0_EVICTIONATTRIBUTES_1_DO_NOT_MATCH_WITH_OTHER_2 = new StringId(4611, "For Partitioned Region {0} the locally configured EvictionAttributes {1} do not match with other EvictionAttributes {2} and may cause misses during reads from VMs with smaller maximums.");
-  public static final StringId DSFIDFactory_COULD_NOT_INSTANTIATE_SQLFABRIC_MESSAGE_CLASSID_0_1 = new StringId(4616, "Could not instantiate SQLFabric message [classId:{0}]:{1}");
-  public static final StringId DSFIDFactory_ILLEGAL_ACCESS_FOR_SQLFABRIC_MESSAGE_CLASSID_0_1 = new StringId(4617, "Illegal access for SQLFabric message [classId:{0}]:{1}");
-  public static final StringId DSFIDFactory_UNKNOWN_CLASSID_0_FOR_SQLFABRIC_MESSAGE = new StringId(4618, "Unknown ClassId [{0}] for SQLFabric message");
   public static final StringId AbstractRegionMap_THE_CURRENT_VALUE_WAS_NOT_EQUAL_TO_EXPECTED_VALUE = new StringId(4619, "The current value was not equal to expected value.");
   public static final StringId AbstractRegionEntry_THE_CURRENT_VALUE_WAS_NOT_EQUAL_TO_EXPECTED_VALUE = new StringId(4620, "The current value was not equal to expected value.");
   public static final StringId AbstractRegionMap_ENTRY_NOT_FOUND_WITH_EXPECTED_VALUE = new StringId(4621, "entry not found with expected value");
