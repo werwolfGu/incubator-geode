@@ -93,10 +93,6 @@ public class TXEntryState implements Releasable
    */
   private int nearSideEventOffset = -1;
 
-  //Asif: In case of Sqlfabric, the pending value may be a SerializableDelta object 
-  //which may be containing base value ( in case of Tx create) along with bunch 
-  //of incremental deltas, so for correct behaviour this field should be accessed only 
-  //by its getter. Do not use it directly  
   private Object pendingValue;
   
   /**
