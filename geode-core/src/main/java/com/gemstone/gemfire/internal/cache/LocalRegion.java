@@ -1703,17 +1703,6 @@ public class LocalRegion extends AbstractRegion
       if (!eventReturned) event.release();
     }
   }
-  /**
-   * Creates an EntryEventImpl that is optimized to not fetch data from HDFS.
-   * This is meant to be used by PUT dml from GemFireXD.
-   */
-  @Retained
-  public final EntryEventImpl newPutEntryEvent(Object key, Object value,
-      Object aCallbackArgument) {
-    EntryEventImpl ev = newUpdateEntryEvent(key, value, aCallbackArgument);
-    ev.setPutDML(true);
-    return ev;
-  }
   private void extractDeltaIntoEvent(Object value, EntryEventImpl event) {
     // 1. Check for DS-level delta property.
     // 2. Default value for operation type is UPDATE, so no need to check that here.
