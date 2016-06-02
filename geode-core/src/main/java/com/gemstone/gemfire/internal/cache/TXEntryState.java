@@ -2063,7 +2063,6 @@ public class TXEntryState implements Releasable
   }
   
 
-  // Asif:Add for sql fabric as it has to plug in its own TXEntry object
   private final static TXEntryStateFactory factory = new TXEntryStateFactory() {
 
     public TXEntryState createEntry()
