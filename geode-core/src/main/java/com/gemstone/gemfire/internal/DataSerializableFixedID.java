@@ -829,9 +829,6 @@ public interface DataSerializableFixedID extends SerializationVersions {
    * class. e.g. if msg format changed in version 80, create toDataPre_GFE_8_0_0_0, add
    * Version.GFE_80 to the getSerializationVersions array and copy previous toData contents 
    * to this newly created toDataPre_GFE_X_X_X_X() method.
-   * <p>
-   * For GemFireXD use "GFXD" (or whatever we decide on as a product identifier
-   * in Version) instead of "GFE" in method names.
    * @throws IOException
    *           A problem occurs while writing to <code>out</code>
    */
@@ -847,10 +844,6 @@ public interface DataSerializableFixedID extends SerializationVersions {
    * class. e.g. if msg format changed in version 80, create fromDataPre_GFE_8_0_0_0, add
    * Version.GFE_80 to the getSerializationVersions array  and copy previous fromData 
    * contents to this newly created fromDataPre_GFE_X_X_X_X() method.
-   * <p>
-   * For GemFireXD use "GFXD" (or whatever we decide on as a product identifier
-   * in Version) instead of "GFE" in method names.
-   * 
    * @throws IOException
    *           A problem occurs while reading from <code>in</code>
    * @throws ClassNotFoundException
