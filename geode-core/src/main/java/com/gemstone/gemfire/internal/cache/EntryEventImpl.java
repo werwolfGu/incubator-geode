@@ -166,13 +166,6 @@ public class EntryEventImpl
   protected ClientProxyMembershipID context = null;
   
   /**
-   * A custom context object that can be used for any other contextual
-   * information. Currently used by SQL Fabric to pass around evaluated rows
-   * from raw byte arrays and routing object.
-   */
-  private transient Object contextObj = null;
-
-  /**
    * this holds the bytes representing the change in value effected by this
    * event.  It is used when the value implements the Delta interface.
    */
@@ -2490,14 +2483,6 @@ public class EntryEventImpl
   public EntryEventImpl setCreate(boolean isCreate) {
     setEventFlag(EventFlags.FLAG_ISCREATE, isCreate);
     return this;
-  }
-
-  public final void setContextObject(Object ctx) {
-    this.contextObj = ctx;
-  }
-
-  public final Object getContextObject() {
-    return this.contextObj;
   }
 
   /**
