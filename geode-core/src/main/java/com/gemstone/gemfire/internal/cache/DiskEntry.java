@@ -925,11 +925,7 @@ public interface DiskEntry extends RegionEntry {
         }
         else {
           //The new value in the entry needs to be set after the disk writing 
-          // has succeeded. If not , for GemFireXD , it is possible that other thread
-          // may pick this transient value from region entry ( which for 
-          //offheap will eventually be released ) as index key, 
-          //given that this operation is bound to fail in case of
-          //disk access exception.
+          // has succeeded.
           
           //entry.setValueWithContext(region, newValue); // OFFHEAP newValue already prepared
           
@@ -944,10 +940,7 @@ public interface DiskEntry extends RegionEntry {
           if (dr.isBackup()) {
             dr.testIsRecoveredAndClear(did); // fixes bug 41409
             if (dr.isSync()) {
-              //In case of compression the value is being set first 
-              // because atleast for now , GemFireXD does not support compression
-              // if and when it does support, this needs to be taken care of else
-              // we risk Bug 48965
+              //In case of compression the value is being set first
               if (AbstractRegionEntry.isCompressible(dr, newValue)) {
                 entry.setValueWithContext(region, newValue); // OFFHEAP newValue already prepared
                 
