@@ -136,11 +136,6 @@ public abstract class InternalDataSerializer extends DataSerializer implements D
    */
   private static final ConcurrentHashMap<String, DataSerializer> classesToSerializers = new ConcurrentHashMap<String, DataSerializer>();
   
-  public static ConcurrentHashMap<String, DataSerializer> getClassesToSerializers() {
-    return classesToSerializers;
-  }
-  
-  
   private static final String serializationVersionTxt = System.getProperty("gemfire.serializationVersion");
   /**
    * Any time new serialization format is added then a new enum needs to be added here.
