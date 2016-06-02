@@ -42,9 +42,7 @@ import com.gemstone.gemfire.internal.cache.execute.InternalRegionFunctionContext
 import com.gemstone.gemfire.internal.cache.partitioned.PRLocallyDestroyedException;
 import com.gemstone.gemfire.internal.cache.persistence.PRPersistentConfig;
 import com.gemstone.gemfire.internal.cache.wan.parallel.ParallelGatewaySenderQueue;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
 import com.gemstone.gemfire.internal.logging.LogService;
-import com.gemstone.gemfire.internal.logging.log4j.LocalizedMessage;
 
 /**
  * An utility class to retrieve colocated regions in a colocation hierarchy in
@@ -57,55 +55,8 @@ public class ColocationHelper {
 
   /** Logging mechanism for debugging */
   private static final Logger logger = LogService.getLogger();
-   /**
-    * An utility method to retrieve colocated region name of a given partitioned
-    * region without waiting on initialize
-    *
-    * @param partitionedRegion
-    * @return colocated PartitionedRegion
-    * @since cheetah
-    */
-  public static PartitionedRegion getColocatedRegionName(
-      final PartitionedRegion partitionedRegion) {
-    Assert.assertTrue(partitionedRegion != null); // precondition1
-    String colocatedWith = partitionedRegion.getPartitionAttributes().getColocatedWith();
-    if (colocatedWith == null) {
-      // the region is not colocated with any region
-      return null;
-    }
-    PartitionedRegion colocatedPR = partitionedRegion.getColocatedWithRegion();
-    if (colocatedPR != null && !colocatedPR.isLocallyDestroyed
-        && !colocatedPR.isDestroyed()) {
-      return colocatedPR;
-    }
-    Region prRoot = PartitionedRegionHelper.getPRRoot(partitionedRegion
-        .getCache());
-    PartitionRegionConfig prConf = (PartitionRegionConfig)prRoot
-        .get(getRegionIdentifier(colocatedWith));
-    int prID = -1; 
-    try {
-      if (prConf == null) {
-        colocatedPR = getColocatedPR(partitionedRegion, colocatedWith);
-      }
-      else {
-        prID = prConf.getPRId();
-        colocatedPR = PartitionedRegion.getPRFromId(prID);
-        if (colocatedPR == null && prID > 0) {
-          // colocatedPR might have not called registerPartitionedRegion() yet, but since prID is valid,
-          // we are able to get colocatedPR and do colocatedPR.waitOnBucketMetadataInitialization()
-          colocatedPR = getColocatedPR(partitionedRegion, colocatedWith);
-        }
-      }
-    }
-    catch (PRLocallyDestroyedException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("PRLocallyDestroyedException : Region with prId=" + prID
-            + " is locally destroyed on this node", e);
-      } 
-    } 
-    return colocatedPR;
-  }
-    private static PartitionedRegion getColocatedPR(
+
+  private static PartitionedRegion getColocatedPR(
       final PartitionedRegion partitionedRegion, final String colocatedWith) {
     PartitionedRegion colocatedPR = (PartitionedRegion) partitionedRegion
         .getCache().getPartitionedRegion(colocatedWith, false);
@@ -525,17 +476,6 @@ public class ColocationHelper {
       prRegion = parentRegion;
     }
     
-    return prRegion;
-  }
-  
-  // Gemfirexd will skip initialization for PR, so just get region name without waitOnInitialize
-  public static PartitionedRegion getLeaderRegionName(PartitionedRegion prRegion) {
-    PartitionedRegion parentRegion;
-    
-    while((parentRegion = getColocatedRegionName(prRegion)) != null) {
-      prRegion = parentRegion;
-    } 
-      
     return prRegion;
   }
 
