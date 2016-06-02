@@ -183,8 +183,6 @@ public class EntryEventImpl
   /** version tag for concurrency checks */
   protected VersionTag versionTag;
 
-  private transient boolean isPutDML = false;
-
   /** boolean to indicate that the RegionEntry for this event has been evicted*/
   private transient boolean isEvicted = false;
   
@@ -2806,13 +2804,5 @@ public class EntryEventImpl
 
   public boolean isOldValueOffHeap() {
     return isOffHeapReference(this.oldValue);
-  }
-
-  public final boolean isPutDML() {
-    return this.isPutDML;
-  }
-
-  public final void setPutDML(boolean val) {
-    this.isPutDML = val;
   }
 }

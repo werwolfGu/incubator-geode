@@ -82,7 +82,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
 
   protected static final short HAS_BRIDGE_CONTEXT = UNRESERVED_FLAGS_START;
   protected static final short SKIP_CALLBACKS = (HAS_BRIDGE_CONTEXT << 1);
-  protected static final short IS_PUT_DML = (SKIP_CALLBACKS << 1);
 
   private EventID eventId;
   
@@ -92,8 +91,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
 
 //  private boolean useOriginRemote;
 
-  private boolean isPutDML;
-  
   public void addEntry(PutAllEntryData entry) {
     this.putAllData[this.putAllDataCount++] = entry;
   }
@@ -190,7 +187,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
     this.eventId = event.getEventId();
     this.skipCallbacks = skipCallbacks;
     this.callbackArg = event.getCallbackArgument();
-	this.isPutDML = event.isPutDML();
   }
 
   public RemotePutAllMessage() {
@@ -241,7 +237,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
       this.bridgeContext = DataSerializer.readObject(in);
     }
     this.skipCallbacks = (flags & SKIP_CALLBACKS) != 0;
-    this.isPutDML = (flags & IS_PUT_DML) != 0;
     this.putAllDataCount = (int)InternalDataSerializer.readUnsignedVL(in);
     this.putAllData = new PutAllEntryData[putAllDataCount];
     if (this.putAllDataCount > 0) {
@@ -303,7 +298,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
     if (this.posDup) flags |= POS_DUP;
     if (this.bridgeContext != null) flags |= HAS_BRIDGE_CONTEXT;
     if (this.skipCallbacks) flags |= SKIP_CALLBACKS;
-    if (this.isPutDML) flags |= IS_PUT_DML;
     return flags;
   }
 
@@ -366,7 +360,6 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
       baseEvent.setContext(this.bridgeContext);
     }
     baseEvent.setPossibleDuplicate(this.posDup);
-	baseEvent.setPutDML(this.isPutDML);
     if (logger.isDebugEnabled()) {
       logger.debug("RemotePutAllMessage.doLocalPutAll: eventSender is {}, baseEvent is {}, msg is {}",
           eventSender, baseEvent, this);
@@ -380,7 +373,7 @@ public final class RemotePutAllMessage extends RemoteOperationMessageWithDirectR
 //        final boolean requiresRegionContext = dr.keyRequiresRegionContext();
         InternalDistributedMember myId = r.getDistributionManager().getDistributionManagerId();
         for (int i = 0; i < putAllDataCount; ++i) {
-          @Released EntryEventImpl ev = PutAllPRMessage.getEventFromEntry(r, myId, eventSender, i, putAllData, false, bridgeContext, posDup, !skipCallbacks, isPutDML);
+          @Released EntryEventImpl ev = PutAllPRMessage.getEventFromEntry(r, myId, eventSender, i, putAllData, false, bridgeContext, posDup, !skipCallbacks);
           try {
           ev.setPutAllOperation(dpao);
           if (logger.isDebugEnabled()) {

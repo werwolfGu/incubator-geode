@@ -10572,12 +10572,6 @@ public class LocalRegion extends AbstractRegion
     DistributedPutAllOperation dpao = new DistributedPutAllOperation(event, map.size(), false);
     return dpao;
   }
-    public final DistributedPutAllOperation newPutAllForPUTDmlOperation(Map<?, ?> map, Object callbackArg) {
-    DistributedPutAllOperation dpao = newPutAllOperation(map, callbackArg);
-    dpao.getEvent().setPutDML(true);
-    return dpao;
-  }
-
   
   public final DistributedRemoveAllOperation newRemoveAllOperation(Collection<?> keys, Object callbackArg) {
     if (keys == null) {
@@ -10629,8 +10623,6 @@ public class LocalRegion extends AbstractRegion
         putallOp, this, Operation.PUTALL_CREATE, key, value);
 
     try {
-    event.setPutDML(putallOp.getEvent().isPutDML());
-    
     if (tagHolder != null) {
       event.setVersionTag(tagHolder.getVersionTag());
       event.setFromServer(tagHolder.isFromServer());

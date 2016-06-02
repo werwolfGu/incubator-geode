@@ -572,7 +572,7 @@ public class DistTXState extends TXState {
           @Released EntryEventImpl ev = PutAllPRMessage.getEventFromEntry(theRegion,
               myId, myId, i, putallOp.putAllData, false, putallOp
                   .getBaseEvent().getContext(), false, !putallOp.getBaseEvent()
-                  .isGenerateCallbacks(), false);
+                  .isGenerateCallbacks());
           try {
 //            ev.setPutAllOperation(putallOp);
             

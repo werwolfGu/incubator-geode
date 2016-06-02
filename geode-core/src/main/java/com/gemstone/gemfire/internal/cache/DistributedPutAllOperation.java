@@ -854,7 +854,6 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
     PutAllMessage msg = new PutAllMessage();
     msg.eventId = event.getEventId();
     msg.context = event.getContext();
-    msg.setPutDML(event.isPutDML());
     return msg;
   }
 
@@ -868,7 +867,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
   public PutAllPRMessage createPRMessagesNotifyOnly(int bucketId) {
     final EntryEventImpl event = getBaseEvent();
     PutAllPRMessage prMsg = new PutAllPRMessage(bucketId, putAllDataSize, true,
-        event.isPossibleDuplicate(), !event.isGenerateCallbacks(), event.getCallbackArgument(), false /*isPutDML*/);
+        event.isPossibleDuplicate(), !event.isGenerateCallbacks(), event.getCallbackArgument());
     if (event.getContext() != null) {
       prMsg.setBridgeContext(event.getContext());
     }
@@ -897,7 +896,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
       PutAllPRMessage prMsg = (PutAllPRMessage)prMsgMap.get(bucketId);
       if (prMsg == null) {
         prMsg = new PutAllPRMessage(bucketId.intValue(), putAllDataSize, false,
-            event.isPossibleDuplicate(), !event.isGenerateCallbacks(), event.getCallbackArgument(), event.isPutDML());
+            event.isPossibleDuplicate(), !event.isGenerateCallbacks(), event.getCallbackArgument());
         prMsg.setTransactionDistributed(event.getRegion().getCache().getTxManager().isDistributed());
 
         // set dpao's context(original sender) into each PutAllMsg
@@ -1074,8 +1073,6 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
 
     protected EventID eventId = null;
     
-    private transient boolean isPutDML = false;
-
     protected static final short HAS_BRIDGE_CONTEXT = UNRESERVED_FLAGS_START;
     protected static final short SKIP_CALLBACKS =
       (short)(HAS_BRIDGE_CONTEXT << 1);
@@ -1130,11 +1127,10 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
      * @param rgn
      *          the region the entry is put in
      */
-    public void doEntryPut(PutAllEntryData entry, DistributedRegion rgn, boolean isPutDML) {
+    public void doEntryPut(PutAllEntryData entry, DistributedRegion rgn) {
       @Released EntryEventImpl ev = PutAllMessage.createEntryEvent(entry, getSender(), 
           this.context, rgn, this.possibleDuplicate,
           this.needsRouting, this.callbackArg, true, skipCallbacks);
-      ev.setPutDML(isPutDML);
       // we don't need to set old value here, because the msg is from remote. local old value will get from next step
       try {
         super.basicOperateOnRegion(ev, rgn);
@@ -1223,7 +1219,7 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
               logger.debug("putAll processing {} with {} sender={}", putAllData[i], putAllData[i].versionTag, sender);
             }
             putAllData[i].setSender(sender);
-            doEntryPut(putAllData[i], rgn,  isPutDML);
+            doEntryPut(putAllData[i], rgn);
           }
         }
       }, ev.getEventId());
@@ -1342,19 +1338,6 @@ public class DistributedPutAllOperation extends AbstractUpdateOperation
             valueObj, deserializationPolicy, this.callbackArg);
       }
       return Arrays.asList(ops);
-    }
-    
-    public void setPutDML(boolean val) {
-      this.isPutDML = val;
-    }
-    
-    @Override
-    protected short computeCompressedExtBits(short bits) {
-      bits = super.computeCompressedExtBits(bits);
-      if (isPutDML) {
-        bits |= IS_PUT_DML;
-      }
-      return bits;
     }
   }
 }

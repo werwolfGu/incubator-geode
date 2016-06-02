@@ -843,8 +843,6 @@ public abstract class DistributedCacheOperation {
 
     private final static int INHIBIT_NOTIFICATIONS_MASK = 0x400;
 
-    protected final static short IS_PUT_DML = 0x100;
-
     public boolean needsRouting;
 
     protected String regionPath;
@@ -1344,9 +1342,6 @@ public abstract class DistributedCacheOperation {
       }
       if ((extBits & INHIBIT_NOTIFICATIONS_MASK) != 0) {
         this.inhibitAllNotifications = true;
-	  if (this instanceof PutAllMessage) {
-        ((PutAllMessage) this).setPutDML((extBits & IS_PUT_DML) != 0);
-      }
       }
     }
 

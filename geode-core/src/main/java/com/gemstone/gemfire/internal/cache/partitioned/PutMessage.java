@@ -180,15 +180,11 @@ public final class PutMessage extends PartitionMessageWithDirectReply implements
 
   private VersionTag versionTag;
 
-  private transient boolean isPutDML;
-  
   // additional bitmask flags used for serialization/deserialization
 
   protected static final short CACHE_WRITE = UNRESERVED_FLAGS_START;
   protected static final short HAS_EXPECTED_OLD_VAL = (CACHE_WRITE << 1);
   protected static final short HAS_VERSION_TAG = (HAS_EXPECTED_OLD_VAL << 1);
-  //using the left most bit for IS_PUT_DML, the last available bit
-  protected static final short IS_PUT_DML = (short) (HAS_VERSION_TAG << 1);
 
   // extraFlags
   protected static final int HAS_BRIDGE_CONTEXT =
@@ -629,10 +625,6 @@ public final class PutMessage extends PartitionMessageWithDirectReply implements
     if ((flags & HAS_VERSION_TAG) != 0) {
       this.versionTag =  DataSerializer.readObject(in);
     }
-    if ((flags & IS_PUT_DML) != 0) {
-      this.isPutDML = true;
-    }
-    
   }
   
   @Override
@@ -739,7 +731,6 @@ public final class PutMessage extends PartitionMessageWithDirectReply implements
       }
     }
     if (this.versionTag != null) s |= HAS_VERSION_TAG;
-    if (this.event.isPutDML()) s |= IS_PUT_DML;
     return s;
   }
 
@@ -798,7 +789,6 @@ public final class PutMessage extends PartitionMessageWithDirectReply implements
     ev.setCausedByMessage(this);
     ev.setInvokePRCallbacks(!notificationOnly);
     ev.setPossibleDuplicate(this.posDup);
-    ev.setPutDML(this.isPutDML);
     /*if (this.hasOldValue) {
       if (this.oldValueIsSerialized) {
         ev.setSerializedOldValue(getOldValueBytes());
