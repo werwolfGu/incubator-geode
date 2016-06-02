@@ -2765,8 +2765,7 @@ public abstract class AbstractRegionMap implements RegionMap {
                 } finally {
                   OffHeapHelper.release(oldValueForDelta);
                   if (re != null && !onlyExisting && !isOpComplete(re, event)) {
-                    owner.cleanUpOnIncompleteOp(event, re, eventRecorded,
-                        false/* updateStats */, replaceOnClient);
+                    owner.cleanUpOnIncompleteOp(event, re);
                   }
                   else if (re != null && owner.isUsedForPartitionedRegionBucket()) {
                   BucketRegion br = (BucketRegion)owner;

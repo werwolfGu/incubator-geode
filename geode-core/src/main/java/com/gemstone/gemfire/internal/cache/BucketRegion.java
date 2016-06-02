@@ -2014,28 +2014,6 @@ implements Bucket
   public CacheWriter basicGetWriter() {
     return this.partitionedRegion.basicGetWriter();
   }
-   @Override
-  void cleanUpOnIncompleteOp(EntryEventImpl event,   RegionEntry re, 
-      boolean eventRecorded, boolean updateStats, boolean isReplace) {
-     
-    
-    if(!eventRecorded || isReplace) {
-      //No indexes updated so safe to remove.
-      this.entries.removeEntry(event.getKey(), re, updateStats) ;      
-    }/*else {
-      //if event recorded is true, that means as per event tracker entry is in
-      //system. What is not done
-      // is basicPutPart2( distribution etc). So we do nothing as PR's re-attempt
-      // will do the required basicPutPart2. If we remove the entry here, than 
-      //event tracker will not allow re insertion. So either we do nothing or
-      //if we remove ,than we have to undo recording
-      // of event.
-       //TODO:OQL indexes? : Hope they get updated during retry. The issue is that oql indexes
-       // get updated after distribute , so it is entirely possible that oql index are 
-        // not updated. what if retry fails?
-       
-    }*/
-  }
 
   /* (non-Javadoc)
    * @see com.gemstone.gemfire.internal.cache.partitioned.Bucket#getBucketOwners()

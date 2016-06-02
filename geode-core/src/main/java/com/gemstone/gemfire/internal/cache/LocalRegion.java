@@ -7868,19 +7868,9 @@ public class LocalRegion extends AbstractRegion
       }
     }
   }
-  void cleanUpOnIncompleteOp(EntryEventImpl event,   RegionEntry re, 
-      boolean eventRecorded, boolean updateStats, boolean isReplace) {
-    if(!eventRecorded || isReplace) {
-      //Ok to remove entry as index has not been modified yet by the operation
-      this.entries.removeEntry(event.getKey(), re, updateStats) ;      
-    }else {
-      //Use the current event to indicate destroy.should be ok
-      Operation oldOp = event.getOperation();
-      event.setOperation(Operation.DESTROY);
-      this.entries.removeEntry(event.getKey(), re, updateStats, event, this);
-      event.setOperation(oldOp);
-    } 
-    
+  void cleanUpOnIncompleteOp(EntryEventImpl event, RegionEntry re) {
+    //Ok to remove entry as index has not been modified yet by the operation
+    this.entries.removeEntry(event.getKey(), re, false) ;      
   }
 
   static void validateRegionName(String name)
