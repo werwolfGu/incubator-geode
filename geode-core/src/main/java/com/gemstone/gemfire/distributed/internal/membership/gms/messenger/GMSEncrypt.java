@@ -20,6 +20,7 @@ import java.math.BigInteger;
 import java.security.*;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,6 @@ import javax.crypto.spec.SecretKeySpec;
 import com.gemstone.gemfire.distributed.internal.membership.InternalDistributedMember;
 import com.gemstone.gemfire.distributed.internal.membership.NetView;
 import com.gemstone.gemfire.distributed.internal.membership.gms.Services;
-
-
 import com.gemstone.gemfire.distributed.internal.DistributionConfig;
 
 public class GMSEncrypt implements Cloneable {
@@ -65,7 +64,11 @@ public class GMSEncrypt implements Cloneable {
 
   private NetView view;
 
-  private Map<InternalDistributedMember, PeerEncryptor> memberToPeerEncryptor = new ConcurrentHashMap<>();
+  private int numberOfPeerEncryptorCopies = 10;
+  private ConcurrentHashMap<InternalDistributedMember, PeerEncryptor>[] copyOfPeerEncryptors;
+  private ClusterEncryptor[] clusterEncryptors;
+  
+  private Map<InternalDistributedMember, byte[]> memberToPeerEncryptor = new ConcurrentHashMap<>();
 
   private ClusterEncryptor clusterEncryptor;
 
@@ -85,6 +88,7 @@ public class GMSEncrypt implements Cloneable {
   protected synchronized void initClusterSecretKey() throws Exception {
     if(this.clusterEncryptor == null) {
       this.clusterEncryptor = new ClusterEncryptor(this);
+      
     }
   }
 
@@ -94,18 +98,25 @@ public class GMSEncrypt implements Cloneable {
   }
 
   protected GMSEncrypt() {
-
+    initEncryptors();
   }
 
   public GMSEncrypt(Services services) throws Exception {
     this.services = services;
+    initEncryptors();
     initDHKeys(services.getConfig().getDistributionConfig());
   }
 
   public GMSEncrypt(Services services, InternalDistributedMember mbr) throws Exception {
     this.services = services;
     this.localMember = mbr;
+    initEncryptors();
     initDHKeys(services.getConfig().getDistributionConfig());
+  }
+  
+  void initEncryptors() {
+    copyOfPeerEncryptors = new  ConcurrentHashMap[numberOfPeerEncryptorCopies];
+    clusterEncryptors = new ClusterEncryptor[numberOfPeerEncryptorCopies];
   }
 
   public byte[] decryptData(byte[] data, InternalDistributedMember member) throws Exception {
@@ -117,7 +128,7 @@ public class GMSEncrypt implements Cloneable {
   }
 
   public byte[] decryptData(byte[] data) throws Exception {
-    return this.clusterEncryptor.decryptBytes(data);
+    return getClusterEncryptor().decryptBytes(data);
   }
   
   public byte[] decryptData(byte[] data, byte[] pkBytes) throws Exception {
@@ -126,7 +137,7 @@ public class GMSEncrypt implements Cloneable {
   }
 
   public byte[] encryptData(byte[] data) throws Exception {
-    return this.clusterEncryptor.encryptBytes(data);
+    return getClusterEncryptor().encryptBytes(data);
   }
 
   protected byte[] getPublicKeyBytes() {
@@ -147,7 +158,8 @@ public class GMSEncrypt implements Cloneable {
   
   protected void setPublicKey(byte[] publickey, InternalDistributedMember mbr) {
     try {
-      createPeerEncryptor(mbr, publickey);
+      //createPeerEncryptor(mbr, publickey);
+      memberToPeerEncryptor.put(mbr, publickey);
     }catch(Exception e) {
       throw new RuntimeException("Unable to create peer encryptor " +  mbr, e);
     }
@@ -200,21 +212,56 @@ public class GMSEncrypt implements Cloneable {
   }
 
   protected PeerEncryptor getPeerEncryptor(InternalDistributedMember member) throws Exception {
-    PeerEncryptor result = memberToPeerEncryptor.get(member);
+    Map<InternalDistributedMember, PeerEncryptor> m = getPeerEncryptorMap();
+
+    PeerEncryptor result = m.get(member);
     if (result == null) {
       synchronized (this) {
-        result = memberToPeerEncryptor.get(member);
+        result = m.get(member);
         if (result == null) {
-          result = createPeerEncryptor(member, (byte[]) view.getPublicKey(member));
+          byte[] pk = (byte[])memberToPeerEncryptor.get(member);
+          result = createPeerEncryptor(member, pk != null ? pk : (byte[]) view.getPublicKey(member));
+          m.put(member, result);
         }
       }
     }
     return result;
   }
 
+  private Map<InternalDistributedMember, PeerEncryptor> getPeerEncryptorMap() {
+    int h = Math.abs(Thread.currentThread().getName().hashCode() % numberOfPeerEncryptorCopies);
+    ConcurrentHashMap m = copyOfPeerEncryptors[h];
+    
+    if(m == null) {
+      synchronized (copyOfPeerEncryptors) {
+        m = copyOfPeerEncryptors[h];
+        if(m == null) {
+          m = new ConcurrentHashMap<InternalDistributedMember, PeerEncryptor>();
+          copyOfPeerEncryptors[h] = m;          
+        }
+      }
+    }
+    return m;
+  }
+  
+  private ClusterEncryptor getClusterEncryptor() {
+    int h = Math.abs(Thread.currentThread().getName().hashCode() % numberOfPeerEncryptorCopies);
+    ClusterEncryptor c = clusterEncryptors[h];
+    
+    if(c == null) {
+      synchronized (copyOfPeerEncryptors) {
+        c = clusterEncryptors[h];
+        if(c == null) {
+          c = new ClusterEncryptor(getClusterSecretKey());
+          clusterEncryptors[h] = c;          
+        }
+      }
+    }
+    return c;
+  }
+  
   private PeerEncryptor createPeerEncryptor(InternalDistributedMember member, byte[] peerKeyBytes) throws Exception {
-    PeerEncryptor result = new PeerEncryptor(peerKeyBytes);
-    memberToPeerEncryptor.put(member, result);
+    PeerEncryptor result = new PeerEncryptor(peerKeyBytes);    
     return result;
   }
 
@@ -265,18 +312,12 @@ public class GMSEncrypt implements Cloneable {
   }
 
   static public byte[] encryptBytes(byte[] data, Cipher encrypt) throws Exception {
-    synchronized (GMSEncrypt.class) {
-      encodingsPerformed++;
-    }
     return encrypt.doFinal(data);
   }
 
   static public byte[] decryptBytes(byte[] data, Cipher decrypt) throws Exception {
     try {
       byte[] decryptBytes = decrypt.doFinal(data);
-      synchronized (GMSEncrypt.class) {
-        decodingsPerformed++;
-      }
       return decryptBytes;
     } catch (Exception ex) {
       throw ex;
@@ -339,7 +380,8 @@ public class GMSEncrypt implements Cloneable {
 
   }
 
-  protected static Cipher getEncryptCipher(String dhSKAlgo, PrivateKey privateKey, PublicKey peerPublicKey) throws Exception {
+  //this needs to synchronize as it uses private key of that member
+  protected static synchronized Cipher getEncryptCipher(String dhSKAlgo, PrivateKey privateKey, PublicKey peerPublicKey) throws Exception {
     KeyAgreement ka = KeyAgreement.getInstance("DH");
     ka.init(privateKey);
     ka.doPhase(peerPublicKey, true);
@@ -392,7 +434,8 @@ public class GMSEncrypt implements Cloneable {
     return encrypt;
   }
 
-  protected static Cipher getDecryptCipher(String dhSKAlgo, PrivateKey privateKey, PublicKey publicKey) throws Exception {
+  //this needs to synchronize as it uses private key of that member
+  protected static synchronized Cipher getDecryptCipher(String dhSKAlgo, PrivateKey privateKey, PublicKey publicKey) throws Exception {
     KeyAgreement ka = KeyAgreement.getInstance("DH");
     ka.init(privateKey);
     ka.doPhase(publicKey, true);
@@ -499,8 +542,9 @@ public class GMSEncrypt implements Cloneable {
       try {
         if (encrypt == null) {
           synchronized (this) {
-            if (encrypt == null)
+            if (encrypt == null) {
               encrypt = GMSEncrypt.getEncryptCipher(dhSKAlgo, secretBytes);
+            }
           }
         }
       } catch (Exception ex) {
@@ -518,8 +562,9 @@ public class GMSEncrypt implements Cloneable {
     private Cipher getDecryptCipher(String dhSKAlgo) throws Exception {
       if (decrypt == null) {
         synchronized (this) {
-          if (decrypt == null)
+          if (decrypt == null) {
             decrypt = GMSEncrypt.getDecryptCipher(dhSKAlgo, secretBytes);
+          }
         }
       }
       return decrypt;

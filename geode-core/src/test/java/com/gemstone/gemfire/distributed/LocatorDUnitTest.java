@@ -125,7 +125,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * it hung with the restarted locator trying to become elder again because
    * it put its address at the beginning of the new view it sent out.
    */
-  public void ntestCollocatedLocatorWithSecurity() throws Exception {
+  public void testCollocatedLocatorWithSecurity() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -255,7 +255,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    *
    * @throws Exception
    */
-  public void ntestStartTwoLocators() throws Exception {
+  public void testStartTwoLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM loc1 = host.getVM(1);
@@ -368,7 +368,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * test lead member selection
    */
-  public void ntestLeadMemberSelection() throws Exception {
+  public void testLeadMemberSelection() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -477,7 +477,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We then kill the lead member and demonstrate that the original locator
    * (which is now the sole remaining member) shuts itself down.
    */
-  public void ntestLeadAndCoordFailure() throws Exception {
+  public void testLeadAndCoordFailure() throws Exception {
     IgnoredException.addIgnoredException("Possible loss of quorum due");
     disconnectAllFromDS();
     Host host = Host.getHost(0);
@@ -610,7 +610,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We then shut down the group coordinator and observe the second locator
    * pick up the job and the remaining member continues to operate normally.
    */
-  public void ntestLeadFailureAndCoordShutdown() throws Exception {
+  public void testLeadFailureAndCoordShutdown() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -756,7 +756,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    */
   // disabled on trunk - should be reenabled on cedar_dev_Oct12
   // this test leaves a CloserThread around forever that logs "pausing" messages every 500 ms
-  public void ntestForceDisconnectAndPeerShutdownCause() throws Exception {
+  public void testForceDisconnectAndPeerShutdownCause() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -893,7 +893,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * We kill the coordinator and shut down the lead member and observe the second locator
    * pick up the job and the remaining member continue to operate normally.
    */
-  public void ntestLeadShutdownAndCoordFailure() throws Exception {
+  public void testLeadShutdownAndCoordFailure() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm1 = host.getVM(1);
@@ -1018,7 +1018,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * Tests that attempting to connect to a distributed system in which
    * no locator is defined throws an exception.
    */
-  public void ntestNoLocator() {
+  public void testNoLocator() {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     int port =
@@ -1078,7 +1078,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * <p>The locator is then restarted and is shown to take over the
    * role of membership coordinator.
    */
-  public void ntestOneLocator() throws Exception {
+  public void testOneLocator() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm0 = host.getVM(0);
@@ -1171,7 +1171,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * is correct.  It then restarts the locator to demonstrate that
    * it can connect to and function as the group coordinator
    */
-  public void ntestLocatorBecomesCoordinator() throws Exception {
+  public void testLocatorBecomesCoordinator() throws Exception {
     disconnectAllFromDS();
     final String expected = "java.net.ConnectException";
     final String addExpected =
@@ -1308,7 +1308,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests starting multiple locators in multiple VMs.
    */
-  public void ntestMultipleLocators() throws Exception {
+  public void testMultipleLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     VM vm0 = host.getVM(0);
@@ -1627,7 +1627,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests starting multiple locators in multiple VMs.
    */
-  public void ntestMultipleMcastLocators() throws Exception {
+  public void testMultipleMcastLocators() throws Exception {
     disconnectAllFromDS();
     IgnoredException.addIgnoredException("Could not stop  Distribution Locator"); // shutdown timing issue in InternalLocator
     Host host = Host.getHost(0);
@@ -1744,7 +1744,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    * Tests that a VM can connect to a locator that is hosted in its
    * own VM.
    */
-  public void ntestConnectToOwnLocator() throws Exception {
+  public void testConnectToOwnLocator() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
 
@@ -1772,7 +1772,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
   /**
    * Tests that a single VM can NOT host multiple locators
    */
-  public void ntestHostingMultipleLocators() throws Exception {
+  public void testHostingMultipleLocators() throws Exception {
     disconnectAllFromDS();
     Host host = Host.getHost(0);
     //VM vm = host.getVM(0);
@@ -1830,7 +1830,7 @@ public class LocatorDUnitTest extends DistributedTestCase {
    *
    * @since 4.1
    */
-  public void ntestRestartLocator() throws Exception {
+  public void testRestartLocator() throws Exception {
     disconnectAllFromDS();
     port1 =
         AvailablePort.getRandomAvailablePort(AvailablePort.SOCKET);
