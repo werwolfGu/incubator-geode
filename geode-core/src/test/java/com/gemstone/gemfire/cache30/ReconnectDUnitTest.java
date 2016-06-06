@@ -117,6 +117,7 @@ public class ReconnectDUnitTest extends CacheTestCase
       dsProperties.put(DistributionConfig.MCAST_PORT_NAME, "0");
       dsProperties.put(DistributionConfig.MEMBER_TIMEOUT_NAME, "1000");
       dsProperties.put(DistributionConfig.LOG_LEVEL_NAME, LogWriterUtils.getDUnitLogLevel());
+      addDSProps(dsProperties);
     }
     return dsProperties;
   }
@@ -1258,5 +1259,8 @@ public class ReconnectDUnitTest extends CacheTestCase
     public void init(Properties props) {
     }
 
+  }
+
+  protected void addDSProps(Properties p) {
   }
 }
