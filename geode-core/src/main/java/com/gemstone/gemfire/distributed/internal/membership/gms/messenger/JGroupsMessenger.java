@@ -17,6 +17,12 @@
 package com.gemstone.gemfire.distributed.internal.membership.gms.messenger;
 
 import com.gemstone.gemfire.*;
+import static com.gemstone.gemfire.distributed.internal.membership.gms.GMSUtil.replaceStrings;
+import static com.gemstone.gemfire.internal.DataSerializableFixedID.JOIN_REQUEST;
+import static com.gemstone.gemfire.internal.DataSerializableFixedID.JOIN_RESPONSE;
+import static com.gemstone.gemfire.internal.DataSerializableFixedID.FIND_COORDINATOR_REQ;
+import static com.gemstone.gemfire.internal.DataSerializableFixedID.FIND_COORDINATOR_RESP;
+
 import com.gemstone.gemfire.distributed.DistributedSystemDisconnectedException;
 import com.gemstone.gemfire.distributed.DurableClientAttributes;
 import com.gemstone.gemfire.distributed.internal.*;
@@ -28,6 +34,8 @@ import com.gemstone.gemfire.distributed.internal.membership.gms.GMSMember;
 import com.gemstone.gemfire.distributed.internal.membership.gms.Services;
 import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.MessageHandler;
 import com.gemstone.gemfire.distributed.internal.membership.gms.interfaces.Messenger;
+import com.gemstone.gemfire.distributed.internal.membership.gms.locator.FindCoordinatorRequest;
+import com.gemstone.gemfire.distributed.internal.membership.gms.locator.FindCoordinatorResponse;
 import com.gemstone.gemfire.distributed.internal.membership.gms.messages.JoinRequestMessage;
 import com.gemstone.gemfire.distributed.internal.membership.gms.messages.JoinResponseMessage;
 import com.gemstone.gemfire.internal.*;
@@ -114,6 +122,8 @@ public class JGroupsMessenger implements Messenger {
     ClassConfigurator.add(JGROUPS_TYPE_JGADDRESS, JGAddress.class);
     ClassConfigurator.addProtocol(JGROUPS_PROTOCOL_TRANSPORT, Transport.class);
   }
+
+  private GMSEncrypt encrypt;
 
   @Override
   @edu.umd.cs.findbugs.annotations.SuppressWarnings(value="ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
@@ -217,7 +227,15 @@ public class JGroupsMessenger implements Messenger {
     properties = replaceStrings(properties, "FC_MAX_BLOCK", ""+dc.getMcastFlowControl().getRechargeBlockMs());
 
     this.jgStackConfig = properties;
-    
+
+    if ( !dc.getSecurityClientDHAlgo().isEmpty() ) {
+      try {
+        this.encrypt = new GMSEncrypt(services);
+        logger.info("Initializing GMSEncrypt ");
+      } catch (Exception e) {
+        throw new GemFireConfigException("problem initializing encryption protocol", e);
+      }
+    }
   }
 
   @Override
@@ -344,6 +362,10 @@ public class JGroupsMessenger implements Messenger {
     this.myChannel.down(new Event(Event.VIEW_CHANGE, jgv));
 
     addressesWithIoExceptionsProcessed.clear();
+
+    if (encrypt != null) {
+      encrypt.installView(v);
+    }
   }
   
 
@@ -766,11 +788,17 @@ public class JGroupsMessenger implements Messenger {
     setMessageFlags(gfmsg, msg);
     try {
       long start = services.getStatistics().startMsgSerialization();
-      HeapDataOutputStream out_stream =
-        new HeapDataOutputStream(Version.fromOrdinalOrCurrent(version));
+      byte[] messageBytes = null;
+      HeapDataOutputStream out_stream = new HeapDataOutputStream(Version.fromOrdinalOrCurrent(version));
       Version.CURRENT.writeOrdinal(out_stream, true);
-      DataSerializer.writeObject(this.localAddress.getNetMember(), out_stream);
-      DataSerializer.writeObject(gfmsg, out_stream);
+      if(encrypt != null) {
+        out_stream.writeBoolean(true);
+        writeEncryptedMessage(gfmsg, version, out_stream);                
+      } else {
+        out_stream.writeBoolean(false);
+        serializeMessage(gfmsg, out_stream);
+      }
+      
       msg.setBuffer(out_stream.toByteArray());
       services.getStatistics().endMsgSerialization(start);
     }
@@ -784,8 +812,81 @@ public class JGroupsMessenger implements Messenger {
         ioe.initCause(ex);
         throw ioe;
       }
+    } catch(Exception ex){
+      logger.warn("Error serializing message", ex);
+      GemFireIOException ioe = new
+          GemFireIOException("Error serializing message");
+        ioe.initCause(ex.getCause());
+        throw ioe;
     }
     return msg;
+  }
+  
+  void writeEncryptedMessage(DistributionMessage gfmsg, short version, HeapDataOutputStream out) throws Exception {
+    InternalDataSerializer.writeDSFIDHeader(gfmsg.getDSFID(), out);
+    byte[] pk = null;
+    int requestId = 0;
+    InternalDistributedMember pkMbr = null;
+    switch (gfmsg.getDSFID()) {
+    case FIND_COORDINATOR_REQ:
+    case JOIN_REQUEST:
+      //need to append mine PK
+      pk = encrypt.getPublicKey(localAddress);
+      
+      pkMbr = gfmsg.getRecipients()[0];      
+      requestId = getRequestId(gfmsg, true);
+      break;
+    case FIND_COORDINATOR_RESP:
+    case JOIN_RESPONSE:
+      pkMbr = gfmsg.getRecipients()[0];
+      requestId = getRequestId(gfmsg, false);
+    default:
+      break;
+    }
+    logger.debug("writeEncryptedMessage gfmsg.getDSFID() = {}  for {} with requestid  {}", gfmsg.getDSFID(), pkMbr, requestId);
+    out.writeInt(requestId);
+    if (pk != null) {      
+      InternalDataSerializer.writeByteArray(pk, out);
+    }
+
+    HeapDataOutputStream out_stream = new HeapDataOutputStream(Version.fromOrdinalOrCurrent(version));
+    byte[] messageBytes = serializeMessage(gfmsg, out_stream);
+    
+    if (pkMbr != null) {
+      // using members private key
+      messageBytes = encrypt.encryptData(messageBytes, pkMbr);
+    } else {
+      // using cluster secret key
+      messageBytes = encrypt.encryptData(messageBytes);
+    }
+    InternalDataSerializer.writeByteArray(messageBytes, out);
+  }
+  
+  int getRequestId(DistributionMessage gfmsg, boolean add) {
+    int requestId = 0;
+    if (gfmsg instanceof FindCoordinatorRequest) {
+      requestId = ((FindCoordinatorRequest) gfmsg).getRequestId();
+    } else if (gfmsg instanceof JoinRequestMessage) {
+      requestId = ((JoinRequestMessage) gfmsg).getRequestId();
+    } else if (gfmsg instanceof FindCoordinatorResponse) {
+      requestId = ((FindCoordinatorResponse) gfmsg).getRequestId();
+    } else if (gfmsg instanceof JoinResponseMessage) {
+      requestId = ((JoinResponseMessage) gfmsg).getRequestId();
+    }
+
+    if (add) {
+      addRequestId(requestId, gfmsg.getRecipients()[0]);
+    }
+
+    return requestId;
+  }
+  
+  byte[] serializeMessage(DistributionMessage gfmsg, HeapDataOutputStream out_stream) throws IOException {
+    
+    DataSerializer.writeObject(this.localAddress.getNetMember(), out_stream);
+    DataSerializer.writeObject(gfmsg, out_stream);
+    
+    return out_stream.toByteArray();
   }
 
   void setMessageFlags(DistributionMessage gfmsg, Message msg) {
@@ -827,9 +928,7 @@ public class JGroupsMessenger implements Messenger {
       // as STABLE_GOSSIP
       logger.trace("message length is zero - ignoring");
       return null;
-    }
-
-    InternalDistributedMember sender = null;
+    }    
 
     Exception problem = null;
     byte[] buf = jgmsg.getRawBuffer();
@@ -845,27 +944,32 @@ public class JGroupsMessenger implements Messenger {
         dis = new VersionedDataInputStream(dis, Version.fromOrdinalNoThrow(
             ordinal, true));
       }
+    
+      //read
+      boolean isEncrypted = dis.readBoolean();
       
-      GMSMember m = DataSerializer.readObject(dis);
-
-      result = DataSerializer.readObject(dis);
-
-      DistributionMessage dm = (DistributionMessage)result;
+      if(isEncrypted && encrypt == null) {
+        throw new GemFireConfigException("Got remote message as encrypted");
+      } 
       
-      // JoinRequestMessages are sent with an ID that may have been
-      // reused from a previous life by way of auto-reconnect,
-      // so we don't want to find a canonical reference for the
-      // request's sender ID
-      if (dm.getDSFID() == JOIN_REQUEST) {
-        sender = ((JoinRequestMessage)dm).getMemberID();
+      if(isEncrypted) {
+        result = readEncryptedMessage(dis, ordinal, encrypt);
       } else {
-        sender = getMemberFromView(m, ordinal);
+        GMSMember m = DataSerializer.readObject(dis);
+  
+        result = DataSerializer.readObject(dis);
+  
+        DistributionMessage dm = (DistributionMessage)result;
+        
+        setSender(dm, m, ordinal);
       }
-      ((DistributionMessage)result).setSender(sender);
+      
       
       services.getStatistics().endMsgDeserialization(start);
     }
     catch (ClassNotFoundException | IOException | RuntimeException e) {
+      problem = e;
+    } catch(Exception e) {
       problem = e;
     }
     if (problem != null) {
@@ -877,6 +981,90 @@ public class JGroupsMessenger implements Messenger {
     return result;
   }
   
+  void setSender(DistributionMessage dm, GMSMember m, short ordinal) {
+    InternalDistributedMember sender = null;
+    // JoinRequestMessages are sent with an ID that may have been
+    // reused from a previous life by way of auto-reconnect,
+    // so we don't want to find a canonical reference for the
+    // request's sender ID
+    if (dm.getDSFID() == JOIN_REQUEST) {
+      sender = ((JoinRequestMessage)dm).getMemberID();
+    } else {
+      sender = getMemberFromView(m, ordinal);
+    }
+    dm.setSender(sender);
+  }
+
+  @SuppressWarnings("resource")
+  DistributionMessage readEncryptedMessage(DataInputStream dis, short ordinal, GMSEncrypt encryptLocal) throws Exception {
+    int dfsid = InternalDataSerializer.readDSFIDHeader(dis);
+    int requestId = dis.readInt();
+
+    try {
+      // TODO seems like we don't need this, just set bit that PK is appended
+
+      logger.debug("readEncryptedMessage Reading Request id " + dfsid + " and requestid is " + requestId + " myid " + this.localAddress);
+      InternalDistributedMember pkMbr = null;
+      boolean readPK = false;
+      switch (dfsid) {
+      case FIND_COORDINATOR_REQ:
+      case JOIN_REQUEST:
+        readPK = true;
+        break;
+      case FIND_COORDINATOR_RESP:
+      case JOIN_RESPONSE:
+        // this will have requestId to know the PK
+        pkMbr = getRequestedMember(requestId);
+        break;
+      }
+
+      byte[] data;
+
+      byte[] pk = null;
+
+      if (readPK) {
+        // need to read PK
+        pk = InternalDataSerializer.readByteArray(dis);
+        // encrypt.setPublicKey(publickey, mbr);
+        data = InternalDataSerializer.readByteArray(dis);
+        // using prefixed pk from sender
+        data = encryptLocal.decryptData(data, pk);
+      } else {
+        data = InternalDataSerializer.readByteArray(dis);
+        // from cluster key
+        if (pkMbr != null) {
+          // using member public key
+          data = encryptLocal.decryptData(data, pkMbr);
+        } else {
+          // from cluster key
+          data = encryptLocal.decryptData(data);
+        }
+      }
+
+      {
+        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
+
+        if (ordinal < Version.CURRENT_ORDINAL) {
+          in = new VersionedDataInputStream(in, Version.fromOrdinalNoThrow(ordinal, true));
+        }
+
+        GMSMember m = DataSerializer.readObject(in);
+
+        DistributionMessage result = (DistributionMessage) DataSerializer.readObject(in);
+
+        setSender(result, m, ordinal);
+
+        if (pk != null) {
+          encryptLocal.setPublicKey(pk, result.getSender());
+        }
+
+        return result;
+      }
+    } catch (Exception e) {
+      throw new Exception("Message id is " + dfsid, e);
+    }
+
+  }
   
   /** look for certain messages that may need to be altered before being sent */
   void filterOutgoingMessage(DistributionMessage m) {
@@ -1087,7 +1275,7 @@ public class JGroupsMessenger implements Messenger {
           if (clazz.isAssignableFrom(msgClazz)) {
             h = handlers.get(clazz);
             handlers.put(msg.getClass(), h);
-            break;
+            break;              
           }
         }
       }
@@ -1098,6 +1286,72 @@ public class JGroupsMessenger implements Messenger {
     }
   }
   
+  @Override
+  public Set<InternalDistributedMember> send(DistributionMessage msg, NetView alternateView) {
+    if (this.encrypt != null) {
+      this.encrypt.installView(alternateView);      
+    }
+    return send(msg, true);
+  }
+
+  @Override
+  public byte[] getPublickey(InternalDistributedMember mbr) {
+    if (encrypt != null) {
+      return encrypt.getPublicKey(mbr);
+    }
+    return null;
+  }
+
+  @Override
+  public void setPublicKey(byte[] publickey, InternalDistributedMember mbr) {
+    if (encrypt != null) {
+      logger.debug("Setting pK for member " + mbr);
+      encrypt.setPublicKey(publickey, mbr);
+    }
+  }
+
+  @Override
+  public void setClusterSecretKey(byte[] clusterSecretKey) {
+    if (encrypt != null) {
+      logger.debug("Setting cluster key");
+      encrypt.addClusterKey(clusterSecretKey);
+    }
+  }
+
+  @Override
+  public byte[] getClusterSecretKey() {
+    if (encrypt != null) {
+      return encrypt.getClusterSecretKey();
+    }
+    return null;
+  }
+
+  private Random randomId = new Random();
+  private HashMap<Integer, InternalDistributedMember> requestIdVsRecipients = new HashMap<>();
   
+  InternalDistributedMember getRequestedMember(int requestId) {
+    //TODO: what if we don't get response, need to remove this otherwise it will be leak
+    return requestIdVsRecipients.remove(requestId);
+  }
   
+  void addRequestId(int requestId, InternalDistributedMember mbr) {
+    requestIdVsRecipients.put(requestId, mbr);
+  }
+  
+  @Override
+  public int getRequestId() {
+    return randomId.nextInt();
+  }
+
+  @Override
+  public void initClusterKey() {
+    if (encrypt != null) {
+      try {
+        logger.debug("Initializing cluster key");
+        encrypt.initClusterSecretKey();
+      } catch (Exception e) {
+        throw new RuntimeException("unable to create cluster key ", e);
+      }
+    }
+  }
 }

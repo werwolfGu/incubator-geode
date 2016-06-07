@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.gemstone.gemfire.distributed.internal.DistributionMessage;
 import com.gemstone.gemfire.distributed.internal.membership.InternalDistributedMember;
+import com.gemstone.gemfire.distributed.internal.membership.NetView;
 import com.gemstone.gemfire.distributed.internal.membership.QuorumChecker;
 
 public interface Messenger extends Service {
@@ -28,6 +29,13 @@ public interface Messenger extends Service {
    * adds a handler for the given class/interface of messages
    */
   void addHandler(Class c, MessageHandler h);
+
+  /**
+   * sends an asynchronous message when the membership view may not have
+   * been established.  Returns destinations that did not
+   * receive the message due to no longer being in the view
+   */
+  Set<InternalDistributedMember> send(DistributionMessage m, NetView alternateView);
 
   /**
    * sends an asynchronous message.  Returns destinations that did not
@@ -78,4 +86,16 @@ public interface Messenger extends Service {
    * @param state the state of that member's outgoing messaging to this member
    */
   void waitForMessageState(InternalDistributedMember member, Map state) throws InterruptedException;
+  
+  byte[] getPublickey(InternalDistributedMember mbr);
+  
+  void setPublicKey(byte[] publickey, InternalDistributedMember mbr);
+  
+  void setClusterSecretKey(byte[] clusterSecretKey);
+  
+  byte[] getClusterSecretKey();
+  
+  int getRequestId();
+  
+  void initClusterKey();
 }
