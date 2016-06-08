@@ -228,7 +228,7 @@ public class JGroupsMessenger implements Messenger {
 
     this.jgStackConfig = properties;
 
-    if ( !dc.getSecurityClientDHAlgo().isEmpty() ) {
+    if ( !dc.getSecurityUDPDHAlgo().isEmpty() ) {
       try {
         this.encrypt = new GMSEncrypt(services);
         logger.info("Initializing GMSEncrypt ");
@@ -1055,7 +1055,15 @@ public class JGroupsMessenger implements Messenger {
         setSender(result, m, ordinal);
 
         if (pk != null) {
-          encryptLocal.setPublicKey(pk, result.getSender());
+          
+          /*InternalDistributedMember mbr = null;
+          if (result instanceof JoinRequestMessage) {
+            mbr = ((JoinRequestMessage)result).getMemberID();
+          } else {
+            mbr = ((FindCoordinatorRequest)result).getMemberID();
+          }*/
+          logger.info("Setting public key for " + result.getSender() +  " len " + pk.length);
+          setPublicKey(pk, result.getSender());
         }
 
         return result;

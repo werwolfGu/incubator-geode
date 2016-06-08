@@ -2184,7 +2184,7 @@ public interface DistributionConfig extends Config, LogConfig, DistributedSystem
    */
   @ConfigAttributeGetter(name = SECURITY_CLIENT_DHALGO)
   String getSecurityClientDHAlgo();
-
+  
   /**
    * Set the name of algorithm to use for Diffie-Hellman key exchange <a
    * href="../DistributedSystem.html#security-client-dhalgo">"security-client-dhalgo"</a>
@@ -2192,6 +2192,21 @@ public interface DistributionConfig extends Config, LogConfig, DistributedSystem
    */
   @ConfigAttributeSetter(name = SECURITY_CLIENT_DHALGO)
   void setSecurityClientDHAlgo(String attValue);
+  
+  /**
+   * Returns name of algorithm to use for Diffie-Hellman key exchange <a
+   * href="../DistributedSystem.html#security-udp-dhalgo">"security-udp-dhalgo"</a>
+   */
+  @ConfigAttributeGetter(name = SECURITY_UDP_DHALGO)
+  String getSecurityUDPDHAlgo();
+
+  /**
+   * Set the name of algorithm to use for Diffie-Hellman key exchange <a
+   * href="../DistributedSystem.html#security-udp-dhalgo">"security-udp-dhalgo"</a>
+   * property.
+   */
+  @ConfigAttributeSetter(name = SECURITY_UDP_DHALGO)
+  void setSecurityUDPDHAlgo(String attValue);
 
   /**
    * The name of the Diffie-Hellman symmetric algorithm "security-client-dhalgo"
@@ -2199,6 +2214,13 @@ public interface DistributionConfig extends Config, LogConfig, DistributedSystem
    */
   @ConfigAttribute(type = String.class)
   String SECURITY_CLIENT_DHALGO_NAME = SECURITY_CLIENT_DHALGO;
+  
+  /**
+   * The name of the Diffie-Hellman symmetric algorithm "security-client-dhalgo"
+   * property.
+   */
+  @ConfigAttribute(type = String.class)
+  String SECURITY_UDP_DHALGO_NAME = SECURITY_UDP_DHALGO;
 
   /**
    * The default Diffie-Hellman symmetric algorithm name.
@@ -2207,6 +2229,14 @@ public interface DistributionConfig extends Config, LogConfig, DistributedSystem
    * JDK like "DES", "DESede", "AES", "Blowfish".
    */
   String DEFAULT_SECURITY_CLIENT_DHALGO = "";
+  
+  /**
+   * The default Diffie-Hellman symmetric algorithm name.
+   * <p>
+   * Actual value of this is one of the available symmetric algorithm names in
+   * JDK like "DES", "DESede", "AES", "Blowfish".
+   */
+  String DEFAULT_SECURITY_UDP_DHALGO = "";
 
   /**
    * Returns user defined method name for peer authentication initializer in <a

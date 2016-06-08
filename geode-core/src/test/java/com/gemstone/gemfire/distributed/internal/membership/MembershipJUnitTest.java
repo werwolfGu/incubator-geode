@@ -17,6 +17,7 @@
 package com.gemstone.gemfire.distributed.internal.membership;
 
 import com.gemstone.gemfire.GemFireConfigException;
+import com.gemstone.gemfire.distributed.DistributedSystemConfigProperties;
 import com.gemstone.gemfire.distributed.Locator;
 import com.gemstone.gemfire.distributed.internal.*;
 import com.gemstone.gemfire.distributed.internal.membership.gms.GMSUtil;
@@ -30,6 +31,7 @@ import com.gemstone.gemfire.internal.AvailablePortHelper;
 import com.gemstone.gemfire.internal.SocketCreator;
 import com.gemstone.gemfire.internal.admin.remote.RemoteTransportConfig;
 import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
+
 import org.apache.logging.log4j.Level;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -240,7 +242,7 @@ public class MembershipJUnitTest {
       nonDefault.put(DistributionConfig.GROUPS_NAME, "red, blue");
       nonDefault.put(DistributionConfig.MEMBER_TIMEOUT_NAME, "2000");
       nonDefault.put(DistributionConfig.LOCATORS_NAME, localHost.getHostName()+'['+port+']');
-      nonDefault.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+      nonDefault.put(DistributedSystemConfigProperties.SECURITY_CLIENT_DHALGO, "AES:128");
       DistributionConfigImpl config = new DistributionConfigImpl(nonDefault);
       RemoteTransportConfig transport = new RemoteTransportConfig(config,
         DistributionManager.NORMAL_DM_TYPE);
@@ -321,7 +323,6 @@ public class MembershipJUnitTest {
 
       assertTrue(m1.getView().size() == 1);
 
-      System.out.println("encodings performed: " + GMSEncrypt.encodingsPerformed + "; decodings performed: " + GMSEncrypt.decodingsPerformed);
     }
     finally {
 

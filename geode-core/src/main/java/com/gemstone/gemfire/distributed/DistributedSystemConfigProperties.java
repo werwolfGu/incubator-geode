@@ -541,6 +541,11 @@ public interface DistributedSystemConfigProperties {
    */
   String SECURITY_CLIENT_DHALGO = SECURITY_PREFIX + "client-dhalgo";
   /**
+   * The static definition of the <a href="DistributedSystem.html#security-udp-dhalgo">"security-udp-dhalgo"</a>
+   * property
+   */
+  String SECURITY_UDP_DHALGO = SECURITY_PREFIX + "udp-dhalgo";
+  /**
    * The static definition of the <a href="DistributedSystem.html#security-log-file">"security-log-file"</a>
    * property
    */
