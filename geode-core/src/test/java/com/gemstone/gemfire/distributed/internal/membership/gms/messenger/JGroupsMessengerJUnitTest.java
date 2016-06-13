@@ -18,6 +18,7 @@ package com.gemstone.gemfire.distributed.internal.membership.gms.messenger;
 
 import com.gemstone.gemfire.ForcedDisconnectException;
 import com.gemstone.gemfire.GemFireIOException;
+import com.gemstone.gemfire.distributed.DistributedSystemConfigProperties;
 import com.gemstone.gemfire.distributed.DistributedSystemDisconnectedException;
 import com.gemstone.gemfire.distributed.internal.*;
 import com.gemstone.gemfire.distributed.internal.membership.InternalDistributedMember;
@@ -902,7 +903,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -912,7 +913,7 @@ public class JGroupsMessengerJUnitTest {
     messenger.setPublicKey(otherMbrEncrptor.getPublicKeyBytes(), otherMbr);
     messenger.initClusterKey();
     
-    FindCoordinatorRequest gfmsg = new FindCoordinatorRequest(messenger.getMemberID(), new ArrayList<InternalDistributedMember>(2), 1, messenger.getPublickey(messenger.getMemberID()), 1);
+    FindCoordinatorRequest gfmsg = new FindCoordinatorRequest(messenger.getMemberID(), new ArrayList<InternalDistributedMember>(2), 1, messenger.getPublickey(messenger.getMemberID()), 1, "");
     Set<InternalDistributedMember> recipients = new HashSet<>();
     recipients.add(otherMbr);
     gfmsg.setRecipients(recipients);
@@ -937,7 +938,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -975,7 +976,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -1007,7 +1008,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributionConfig.SECURITY_CLIENT_DHALGO_NAME, "AES:128");
+    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
