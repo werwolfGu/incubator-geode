@@ -18,7 +18,7 @@ package com.gemstone.gemfire.distributed.internal.membership.gms.messenger;
 
 import com.gemstone.gemfire.ForcedDisconnectException;
 import com.gemstone.gemfire.GemFireIOException;
-import com.gemstone.gemfire.distributed.DistributedSystemConfigProperties;
+import com.gemstone.gemfire.distributed.ConfigurationProperties;
 import com.gemstone.gemfire.distributed.DistributedSystemDisconnectedException;
 import com.gemstone.gemfire.distributed.internal.*;
 import com.gemstone.gemfire.distributed.internal.membership.InternalDistributedMember;
@@ -944,7 +944,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
+    p.put(ConfigurationProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -979,7 +979,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
+    p.put(ConfigurationProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -1017,7 +1017,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
+    p.put(ConfigurationProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
@@ -1049,7 +1049,7 @@ public class JGroupsMessengerJUnitTest {
     InternalDistributedMember otherMbr = new InternalDistributedMember("localhost", 8888);
     
     Properties p = new Properties();    
-    p.put(DistributedSystemConfigProperties.SECURITY_UDP_DHALGO, "AES:128");
+    p.put(ConfigurationProperties.SECURITY_UDP_DHALGO, "AES:128");
     initMocks(false, p);
     
     NetView v = createView(otherMbr);
