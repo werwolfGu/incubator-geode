@@ -16,7 +16,8 @@
  */
 package com.gemstone.gemfire.cache.lucene;
 
-import static com.gemstone.gemfire.cache.lucene.test.LuceneTestUtilities.verifyQueryKeys;
+import static com.gemstone.gemfire.cache.lucene.test.LuceneTestUtilities.*;
+import static javax.swing.Action.DEFAULT;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
 
@@ -41,6 +42,8 @@ import com.gemstone.gemfire.cache.RegionShortcut;
 import com.gemstone.gemfire.cache.execute.FunctionException;
 import com.gemstone.gemfire.cache.lucene.test.TestObject;
 import com.gemstone.gemfire.cache.query.QueryException;
+import com.gemstone.gemfire.pdx.JSONFormatter;
+import com.gemstone.gemfire.pdx.PdxInstance;
 import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
 
 /**
@@ -83,28 +86,34 @@ public class LuceneQueriesIntegrationTest extends LuceneIntegrationTest {
     // but standard analyzer will parse value "one@three" to be "one three"
     // query will be--fields1:"one three"
     // so C will be hit by query
-    verifyQuery("field1:\"one three\"", "A", "C");
+    verifyQuery("field1:\"one three\"", DEFAULT_FIELD, "A", "C");
     
     // standard analyzer will not tokenize by '_'
     // this query string will be parsed as "one_three"
     // query will be--field1:one_three
-    verifyQuery("field1:one_three");
+    verifyQuery("field1:one_three", DEFAULT_FIELD);
     
     // standard analyzer will tokenize by '@'
     // this query string will be parsed as "one" "three"
     // query will be--field1:one field1:three
-    verifyQuery("field1:one@three", "A", "B", "C");
+    verifyQuery("field1:one@three", DEFAULT_FIELD, "A", "B", "C");
+    
+    HashMap expectedResults = new HashMap();
+    expectedResults.put("A", new TestObject(value1, value1));
+    expectedResults.put("B", new TestObject(value2, value2));
+    expectedResults.put("C", new TestObject(value3, value3));
+    verifyQuery("field1:one@three", expectedResults);
     
     // keyword analyzer, this query will only match the entry that exactly matches
     // this query string will be parsed as "one three"
     // but keyword analyzer will parse one@three to be "one three"
     // query will be--field2:one three
-    verifyQuery("field2:\"one three\"", "A");
+    verifyQuery("field2:\"one three\"", DEFAULT_FIELD, "A");
 
     // keyword analyzer without double quote. It should be the same as 
     // with double quote
     // query will be--field2:one@three
-    verifyQuery("field2:one@three", "C");
+    verifyQuery("field2:one@three", DEFAULT_FIELD, "C");
   }
 
   @Test()
@@ -130,9 +139,9 @@ public class LuceneQueriesIntegrationTest extends LuceneIntegrationTest {
 
     index.waitUntilFlushed(60000);
 
-    verifyQuery("field1:one AND field2:two_four", "A");
-    verifyQuery("field1:one AND field2:two", "A");
-    verifyQuery("field1:three AND field2:four", "A");
+    verifyQuery("field1:one AND field2:two_four", DEFAULT_FIELD, "A");
+    verifyQuery("field1:one AND field2:two", DEFAULT_FIELD, "A");
+    verifyQuery("field1:three AND field2:four", DEFAULT_FIELD, "A");
   }
 
   @Test()
@@ -150,7 +159,30 @@ public class LuceneQueriesIntegrationTest extends LuceneIntegrationTest {
     region.put("A", new TestObject(value1, null));
     index.waitUntilFlushed(60000);
 
-    verifyQuery("field1:one", "A");
+    verifyQuery("field1:one", DEFAULT_FIELD, "A");
+  }
+
+  @Test()
+  public void queryJsonObject() throws ParseException {
+    Map<String, Analyzer> fields = new HashMap<String, Analyzer>();
+    fields.put("name", null);
+    fields.put("lastName", null);
+    fields.put("address", null);
+    luceneService.createIndex(INDEX_NAME, REGION_NAME, fields);
+    Region region = cache.createRegionFactory(RegionShortcut.PARTITION)
+      .create(REGION_NAME);
+    final LuceneIndex index = luceneService.getIndex(INDEX_NAME, REGION_NAME);
+
+    //Put two values with some of the same tokens
+    PdxInstance pdx1 = insertAJson(region, "jsondoc1");
+    PdxInstance pdx2 = insertAJson(region, "jsondoc2");
+    PdxInstance pdx10 = insertAJson(region, "jsondoc10");
+    index.waitUntilFlushed(60000);
+
+    HashMap expectedResults = new HashMap();
+    expectedResults.put("jsondoc1", pdx1);
+    expectedResults.put("jsondoc10", pdx10);
+    verifyQuery("name:jsondoc1*", expectedResults);
   }
 
   @Test()
@@ -162,7 +194,7 @@ public class LuceneQueriesIntegrationTest extends LuceneIntegrationTest {
 
     //Create a query that throws an exception
     final LuceneQuery<Object, Object> query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME,
-      index -> {
+      (index) -> {
         throw new QueryException("Bad query");
       });
 
@@ -177,12 +209,49 @@ public class LuceneQueriesIntegrationTest extends LuceneIntegrationTest {
     }
 
   }
+  
+  private PdxInstance insertAJson(Region region, String key) {
+    String jsonCustomer = "{"
+        + "\"name\": \""+key+"\","
+        + "\"lastName\": \"Smith\","
+        + " \"age\": 25,"
+        + "\"address\":"
+        + "{"
+        + "\"streetAddress\": \"21 2nd Street\","
+        + "\"city\": \"New York\","
+        + "\"state\": \"NY\","
+        + "\"postalCode\": \"10021\""
+        + "},"
+        + "\"phoneNumber\":"
+        + "["
+        + "{"
+        + " \"type\": \"home\","
+        + "\"number\": \"212 555-1234\""
+        + "},"
+        + "{"
+        + " \"type\": \"fax\","
+        + "\"number\": \"646 555-4567\""
+        + "}"
+        + "]"
+        + "}";
 
-  private void verifyQuery(String query, String ... expectedKeys) throws ParseException {
+    PdxInstance pdx = JSONFormatter.fromJSON(jsonCustomer);
+    region.put(key, pdx);
+    return pdx;
+  }
+
+  private void verifyQuery(String query, String defaultField, String ... expectedKeys) throws ParseException {
+    final LuceneQuery<String, Object> queryWithStandardAnalyzer = luceneService.createLuceneQueryFactory().create(
+      INDEX_NAME, REGION_NAME, query, defaultField);
+
+    verifyQueryKeys(queryWithStandardAnalyzer, expectedKeys);
+  }
+  
+  private void verifyQuery(String query, HashMap expectedResults) throws ParseException {
     final LuceneQuery<String, Object> queryWithStandardAnalyzer = luceneService.createLuceneQueryFactory().create(
       INDEX_NAME, REGION_NAME, query);
 
-    verifyQueryKeys(queryWithStandardAnalyzer, expectedKeys);
+    verifyQueryKeyAndValues(queryWithStandardAnalyzer, expectedResults);
   }
 
   private static class MyCharacterTokenizer extends CharTokenizer {

@@ -22,13 +22,18 @@ import static com.gemstone.gemfire.cache.lucene.test.LuceneTestUtilities.*;
 import static org.junit.Assert.*;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
+
+import com.jayway.awaitility.Awaitility;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.gemstone.gemfire.cache.Region;
 import com.gemstone.gemfire.cache.RegionShortcut;
+import com.gemstone.gemfire.cache.lucene.internal.LuceneIndexForPartitionedRegion;
+import com.gemstone.gemfire.cache.lucene.internal.LuceneIndexStats;
+import com.gemstone.gemfire.cache.lucene.internal.filesystem.FileSystemStats;
 import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
-
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
 
 @Category(IntegrationTest.class)
 public class LuceneIndexMaintenanceIntegrationTest extends LuceneIntegrationTest {
@@ -47,7 +52,7 @@ public class LuceneIndexMaintenanceIntegrationTest extends LuceneIntegrationTest
 
     LuceneIndex index = luceneService.getIndex(INDEX_NAME, REGION_NAME);
     index.waitUntilFlushed(WAIT_FOR_FLUSH_TIME);
-    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"");
+    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"", DEFAULT_FIELD);
     LuceneQueryResults<Integer, TestObject> results = query.search();
     assertEquals(3, results.size());
 
@@ -70,7 +75,7 @@ public class LuceneIndexMaintenanceIntegrationTest extends LuceneIntegrationTest
 
     LuceneIndex index = luceneService.getIndex(INDEX_NAME, REGION_NAME);
     index.waitUntilFlushed(WAIT_FOR_FLUSH_TIME);
-    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"");
+    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"", DEFAULT_FIELD);
     LuceneQueryResults<Integer, TestObject> results = query.search();
     assertEquals(3, results.size());
 
@@ -94,7 +99,7 @@ public class LuceneIndexMaintenanceIntegrationTest extends LuceneIntegrationTest
 
     LuceneIndex index = luceneService.getIndex(INDEX_NAME, REGION_NAME);
     index.waitUntilFlushed(WAIT_FOR_FLUSH_TIME);
-    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"");
+    LuceneQuery query = luceneService.createLuceneQueryFactory().create(INDEX_NAME, REGION_NAME, "description:\"hello world\"", DEFAULT_FIELD);
     LuceneQueryResults<Integer, TestObject> results = query.search();
     assertEquals(3, results.size());
 
@@ -104,6 +109,31 @@ public class LuceneIndexMaintenanceIntegrationTest extends LuceneIntegrationTest
     index.waitUntilFlushed(WAIT_FOR_FLUSH_TIME);
 
     assertEquals(3, query.search().size());
+  }
+
+  @Test
+  public void statsAreUpdatedAfterACommit() throws Exception {
+    luceneService.createIndex(INDEX_NAME, REGION_NAME, "title", "description");
+
+    Region region = createRegion(REGION_NAME, RegionShortcut.PARTITION);
+    region.put("object-1", new TestObject("title 1", "hello world"));
+    region.put("object-2", new TestObject("title 2", "this will not match"));
+    region.put("object-3", new TestObject("title 3", "hello world"));
+    region.put("object-4", new TestObject("hello world", "hello world"));
+
+    LuceneIndexForPartitionedRegion index = (LuceneIndexForPartitionedRegion) luceneService.getIndex(INDEX_NAME, REGION_NAME);
+    index.waitUntilFlushed(WAIT_FOR_FLUSH_TIME);
+
+    FileSystemStats fileSystemStats = index.getFileSystemStats();
+    LuceneIndexStats indexStats = index.getIndexStats();
+    await(() -> assertEquals(4, indexStats.getDocuments()));
+    await(() -> assertTrue(fileSystemStats.getFiles() > 0));
+    await(() -> assertTrue(fileSystemStats.getChunks() > 0));
+    await(() -> assertTrue(fileSystemStats.getBytes() > 0));
+  }
+
+  private void await(Runnable runnable) {
+    Awaitility.await().atMost(30, TimeUnit.SECONDS).until(runnable);
   }
 
   private static class TestObject implements Serializable {

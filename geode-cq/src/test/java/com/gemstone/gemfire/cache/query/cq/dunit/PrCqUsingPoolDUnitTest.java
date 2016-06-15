@@ -16,6 +16,15 @@
  */
 package com.gemstone.gemfire.cache.query.cq.dunit;
 
+import org.junit.experimental.categories.Category;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
+
+import com.gemstone.gemfire.test.dunit.cache.internal.JUnit4CacheTestCase;
+import com.gemstone.gemfire.test.dunit.internal.JUnit4DistributedTestCase;
+import com.gemstone.gemfire.test.junit.categories.DistributedTest;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,10 +67,11 @@ import com.gemstone.gemfire.test.junit.categories.FlakyTest;
  * 
  * @since GemFire 5.5
  */
-public class PrCqUsingPoolDUnitTest extends CacheTestCase {
+@Category(DistributedTest.class)
+public class PrCqUsingPoolDUnitTest extends JUnit4CacheTestCase {
 
-  public PrCqUsingPoolDUnitTest(String name) {
-    super(name);
+  public PrCqUsingPoolDUnitTest() {
+    super();
   }
   
   static public final String[] regions = new String[] {
@@ -71,9 +81,9 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
   
   static public final String KEY = "key-";
   
-  private final CqQueryUsingPoolDUnitTest cqHelper = new CqQueryUsingPoolDUnitTest("HelperPartitonedRegionCqTest");
+  private final CqQueryUsingPoolDUnitTest cqHelper = new CqQueryUsingPoolDUnitTest();
   
-  private final CqStatsDUnitTest cqStatsHelper = new CqStatsDUnitTest("HelperPrCqUsingPool");
+  private final CqStatsDUnitTest cqStatsHelper = new CqStatsDUnitTest();
 
   public final String[] cqs = new String [] {
       //0 - Test for ">" 
@@ -109,6 +119,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
   
   private static int bridgeServerPort;
   
+  @Test
   public void testCQAndPartitionedRegion() throws Exception {
     // creating servers.
     final Host host = Host.getHost(0);
@@ -223,6 +234,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
   /**
    * test for registering cqs on a bridge server with local max memory zero.
    */
+  @Test
   public void testPartitionedCqOnAccessorBridgeServer() throws Exception {
  // creating servers.
     final Host host = Host.getHost(0);
@@ -317,12 +329,76 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
     cqHelper.closeServer(server2);
     cqHelper.closeServer(server1);
   }
-  
+
+  /**
+   * Test for registering cqs on a bridge server with local max memory zero.
+   */
+  public void testCqOnAccessorServerWithUpdatesResultingInDestroyedCQEvents() throws Exception {
+
+    final Host host = Host.getHost(0);
+    VM server1 = host.getVM(0);
+    VM server2 = host.getVM(1);
+    VM client = host.getVM(2);
+
+    // creating an accessor vm with Bridge Server installed.
+    createServer(server1,true);
+
+    createServer(server2);
+
+    // create client
+    final int port = server1.invoke(() -> PrCqUsingPoolDUnitTest.getCacheServerPort());
+    final String host0 = NetworkUtils.getServerHostName(server1.getHost());
+
+    String poolName = "testPartitionedCqOnAccessorBridgeServer";
+    createPool(client, poolName, host0, port);
+
+    // register cq.
+    createCQ(client, poolName, "testCQEvents_0", cqs[0]);
+    cqHelper.executeCQ(client, "testCQEvents_0", false, null);
+
+    // create values
+    final int size = 10;
+    createValues(server1, regions[0], size);
+
+    // do updates that results in destroy CQEvents.
+    updateValuesToGenerateDestroyCQEvent(server1, regions[0], size);
+
+    // validate cq for expected Destroy CQ events.
+    cqHelper.validateCQ(client, "testCQEvents_0",
+        /* resultSize: */ CqQueryUsingPoolDUnitTest.noTest,
+        /* creates: */ size,
+        /* updates: */ size,
+        /* deletes; */ 0,
+        /* queryInserts: */ size,
+        /* queryUpdates: */ 0,
+        /* queryDeletes: */ size,
+        /* totalEvents: */ (size+size));
+
+    // Create values to generate Create CQ Events.
+    createValues(server1, regions[0], size);
+
+    cqHelper.validateCQ(client, "testCQEvents_0",
+        /* resultSize: */ CqQueryUsingPoolDUnitTest.noTest,
+        /* creates: */ size,
+        /* updates: */ size * 2,
+        /* deletes; */ 0,
+        /* queryInserts: */ size * 2,
+        /* queryUpdates: */ 0,
+        /* queryDeletes: */ size,
+        /* totalEvents: */ CqQueryUsingPoolDUnitTest.noTest);
+
+    cqHelper.closeClient(client);
+    cqHelper.closeServer(server2);
+    cqHelper.closeServer(server1);
+  }
+
+
   /**
    * test for registering cqs on single Bridge server hosting all the data. This
    * will generate all the events locally and should always have the old value 
    * and should not sent the profile update on wire.
    */
+  @Test
   public void testPartitionedCqOnSingleBridgeServer() throws Exception { 
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -416,6 +492,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * will generate all the events locally but the puts, updates and destroys originate
    * at an accessor vm.
    */
+  @Test
   public void testPRCqOnSingleBridgeServerUpdatesOriginatingAtAccessor() throws Exception { 
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -515,6 +592,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
   /**
    * test to check invalidates on bridge server hosting datastores as well.
    */
+  @Test
   public void testPRCqWithInvalidatesOnBridgeServer()  {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -614,6 +692,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * test cqs with invalidates on bridge server not hosting datastores.
    * 
    */
+  @Test
   public void testPRCqWithInvalidatesOnAccessorBridgeServer() throws Exception {
     
     final Host host = Host.getHost(0);
@@ -714,6 +793,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * test cqs with create updates and destroys from client on bridge server
    * hosting datastores.
    */
+  @Test
   public void testPRCqWithUpdatesFromClients() throws Exception {
     
     final Host host = Host.getHost(0);
@@ -821,6 +901,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * test cqs on multiple partitioned region hosted by bridge servers.
    * 
    */
+  @Test
   public void testPRCqWithMultipleRegionsOnServer() throws Exception {
     
     final Host host = Host.getHost(0);
@@ -967,6 +1048,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * for not requiring old values.
    * 
    */
+  @Test
   public void testPRWithCQsAndProfileUpdates() throws Exception {
     
     final Host host = Host.getHost(0);
@@ -1193,6 +1275,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
    * @throws Exception
    */
   @Category(FlakyTest.class) // GEODE-1181: random ports, eats exceptions (fixed some), async behavior
+  @Test
   public void testEventsDuringQueryExecution() throws Exception {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -1321,6 +1404,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
 
   }
 
+  @Test
   public void testCQsWithPutalls() throws Exception {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -1415,6 +1499,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
     cqHelper.closeServer(server1);   
   }
   
+  @Test
   public void testCQsWithPutallsValidateStats() throws Exception {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -1517,6 +1602,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
     cqHelper.closeServer(server1);   
   }
   
+  @Test
   public void testCQsWithPutallsWithTx() throws Exception {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -1639,6 +1725,7 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
   
   }
   
+  @Test
   public void testCQsWithPutallsWithTxValidateStats() throws Exception {
     final Host host = Host.getHost(0);
     VM server1 = host.getVM(0);
@@ -1994,7 +2081,20 @@ public class PrCqUsingPoolDUnitTest extends CacheTestCase {
       }
     });
   }
+
  
+  public void updateValuesToGenerateDestroyCQEvent(VM vm, final String regionName, final int size) {
+    vm.invoke(new CacheSerializableRunnable("Update values for region : "+regionName) {
+      public void run2() throws CacheException {
+        Region region1 = getRootRegion().getSubregion(regionName);
+        for (int i = 1; i <= size; i++) {
+          region1.put(KEY+i, new Portfolio(i * -1));
+        }
+        LogWriterUtils.getLogWriter().info("### Number of Entries in Region :" + region1.keys().size());
+      }
+    });
+  }
+
   public void createValuesPutall(VM vm, final String regionName, final int size) {
     vm.invoke(new CacheSerializableRunnable("Create values for region : "+regionName) {
       public void run2() throws CacheException {

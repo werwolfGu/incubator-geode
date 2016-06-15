@@ -6,8 +6,7 @@ import com.gemstone.gemfire.distributed.internal.DistributionConfig;
 import static com.gemstone.gemfire.distributed.DistributedSystemConfigProperties.*;
 public class ReconnectWithUDPSecurityDUnitTest extends ReconnectDUnitTest{
 
-  public ReconnectWithUDPSecurityDUnitTest(String name) {
-    super(name);
+  public ReconnectWithUDPSecurityDUnitTest() {
   }
   
   @Override

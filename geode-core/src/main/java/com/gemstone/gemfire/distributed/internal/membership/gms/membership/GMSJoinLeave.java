@@ -47,8 +47,8 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.gemstone.gemfire.distributed.DistributedSystemConfigProperties.LOCATORS;
-import static com.gemstone.gemfire.distributed.DistributedSystemConfigProperties.START_LOCATOR;
+import static com.gemstone.gemfire.distributed.ConfigurationProperties.LOCATORS;
+import static com.gemstone.gemfire.distributed.ConfigurationProperties.START_LOCATOR;
 import static com.gemstone.gemfire.distributed.internal.membership.gms.ServiceConfig.MEMBER_REQUEST_COLLECTION_INTERVAL;
 import static com.gemstone.gemfire.internal.DataSerializableFixedID.*;
 
@@ -537,7 +537,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
     }
 
     if (!isCoordinator && !isStopping && !services.getCancelCriterion().isCancelInProgress()) {
-      logger.debug("JoinLeave is checking to see if I should become coordinator");
+      logger.debug("Checking to see if I should become coordinator");
       NetView check = new NetView(v, v.getViewId() + 1);
       check.remove(incomingRequest.getMemberID());
       synchronized (removedMembers) {
@@ -604,7 +604,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
     }
 
     if (!isCoordinator && !isStopping && !services.getCancelCriterion().isCancelInProgress()) {
-      logger.debug("JoinLeave is checking to see if I should become coordinator");
+      logger.debug("Checking to see if I should become coordinator");
       NetView check = new NetView(v, v.getViewId() + 1);
       synchronized (removedMembers) {
         removedMembers.add(mbr);
@@ -634,7 +634,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
   }
 
   private void recordViewRequest(DistributionMessage request) {
-    logger.debug("JoinLeave is recording the request to be processed in the next membership view");
+    logger.debug("Recording the request to be processed in the next membership view");
     synchronized (viewRequests) {
       viewRequests.add(request);
       if (viewCreator != null) {
@@ -1514,7 +1514,7 @@ public class GMSJoinLeave implements JoinLeave, MessageHandler {
       if (view != null) {
         if (view.size() > 1) {
           List<InternalDistributedMember> coords = view.getPreferredCoordinators(Collections.<InternalDistributedMember>emptySet(), localAddress, 5);
-          logger.debug("JoinLeave sending a leave request to {}", coords);
+          logger.debug("Sending my leave request to {}", coords);
           LeaveRequestMessage m = new LeaveRequestMessage(coords, this.localAddress, "this member is shutting down");
           services.getMessenger().send(m);
         } // view.size
