@@ -17,12 +17,12 @@
 
 package com.gemstone.gemfire.compression;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.xerial.snappy.Snappy;
-import org.xerial.snappy.SnappyError;
+
+import org.iq80.snappy.CorruptionException;
+import org.iq80.snappy.Snappy;
 
 import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
 
@@ -39,25 +39,11 @@ public final class SnappyCompressor implements Compressor, Serializable {
   // instance in the VM.
   private static final AtomicReference<SnappyCompressor> defaultInstance = new AtomicReference<SnappyCompressor>();
   
-  // Set to true when we've loaded the Snappy native library.
-  private static boolean nativeLibraryLoaded = false;
-  
   /**
    * Create a new instance of the SnappyCompressor.
    * @throws IllegalStateException when the Snappy native library is unavailable
    */
   public SnappyCompressor() {
-    synchronized (defaultInstance) {
-      if (!nativeLibraryLoaded) {
-        try {
-          String s = Snappy.getNativeLibraryVersion();
-          System.out.println(s);
-        } catch (SnappyError se) {
-          throw new IllegalStateException(LocalizedStrings.SnappyCompressor_UNABLE_TO_LOAD_NATIVE_SNAPPY_LIBRARY.toLocalizedString(), se);
-        }
-        nativeLibraryLoaded = true;
-      }
-    }
   }
   
   /**
@@ -75,18 +61,14 @@ public final class SnappyCompressor implements Compressor, Serializable {
 
   @Override
   public byte[] compress(byte[] input) {
-    try {
       return Snappy.compress(input);
-    } catch (IOException e) {
-      throw new CompressionException(e);
-    }
   }
 
   @Override
   public byte[] decompress(byte[] input) {
     try {
-      return Snappy.uncompress(input);
-    } catch (IOException e) {
+      return Snappy.uncompress(input, 0, input.length);
+    } catch (CorruptionException e) {
       throw new CompressionException(e);
     }
   }
