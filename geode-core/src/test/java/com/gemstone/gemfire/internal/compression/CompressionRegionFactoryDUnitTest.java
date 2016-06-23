@@ -69,13 +69,7 @@ public class CompressionRegionFactoryDUnitTest extends JUnit4CacheTestCase {
    */
   @Test
   public void testRegionFactoryCompressor() {
-    Compressor compressor = null;
-    try {
-      compressor = SnappyCompressor.getDefaultInstance();
-    } catch (Throwable t) {
-      // Not a supported OS
-      return;
-    }
+    Compressor compressor = SnappyCompressor.getDefaultInstance();
     assertTrue(createCompressedRegionOnVm(getVM(TEST_VM), COMPRESSED_REGION_NAME, compressor));
     assertCompressor(getVM(TEST_VM), COMPRESSED_REGION_NAME, compressor);
     cleanup(getVM(TEST_VM));
