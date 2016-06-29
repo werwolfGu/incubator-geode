@@ -18,45 +18,31 @@
 package com.gemstone.gemfire.compression;
 
 import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicReference;
-
 
 import org.iq80.snappy.CorruptionException;
 import org.iq80.snappy.Snappy;
 
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
-
 /**
  * An implementation of {@link Compressor} for Google's Snappy compression
- * codec. Utilizes the xerial java-snappy wrapper.
+ * codec. Utilizes the java-snappy wrapper.
  * 
  * @since GemFire 8.0
  */
 public final class SnappyCompressor implements Compressor, Serializable {
   private static final long serialVersionUID = 496609875302446099L;
   
-  // It's possible to create more than one, but there only needs to be a single
-  // instance in the VM.
-  private static final AtomicReference<SnappyCompressor> defaultInstance = new AtomicReference<SnappyCompressor>();
-  
   /**
    * Create a new instance of the SnappyCompressor.
-   * @throws IllegalStateException when the Snappy native library is unavailable
    */
   public SnappyCompressor() {
   }
   
   /**
    * Get the single, default instance of the SnappyCompressor.
+   * @deprecated Starting GEODE 1.0 getDefaultInstance is deprecated. Use constructor instead.
    */
   public static final SnappyCompressor getDefaultInstance() {
-    SnappyCompressor instance = defaultInstance.get();
-    if (instance != null) {
-      return instance;
-    }
-
-    defaultInstance.compareAndSet(null, new SnappyCompressor());
-    return defaultInstance.get();
+    return new SnappyCompressor();
   }
 
   @Override
