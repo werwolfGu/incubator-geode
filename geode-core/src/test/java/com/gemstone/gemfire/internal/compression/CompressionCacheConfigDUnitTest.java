@@ -69,7 +69,7 @@ public class CompressionCacheConfigDUnitTest extends JUnit4CacheTestCase {
   public void testCreateCacheWithGoodCompressor() throws Exception {
     File cacheXml = createCacheXml(GOOD_COMPRESSOR);
     assertTrue(createCacheOnVM(getVM(0),cacheXml.getCanonicalPath()));
-    assertCompressorOnVM(getVM(0),SnappyCompressor.getDefaultInstance(),REGION_NAME);
+    assertCompressorOnVM(getVM(0), new SnappyCompressor(), REGION_NAME);
     cleanup(getVM(0));
     cacheXml.delete();
   }

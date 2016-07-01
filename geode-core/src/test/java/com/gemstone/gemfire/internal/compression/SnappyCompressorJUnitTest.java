@@ -37,7 +37,7 @@ public class SnappyCompressorJUnitTest {
   @Test
   public void testCompressByteArray() throws Exception {
     String compressMe = "Hello, how are you?";
-    byte[] compressMeData = SnappyCompressor.getDefaultInstance().compress(compressMe.getBytes());
+    byte[] compressMeData = new SnappyCompressor().compress(compressMe.getBytes());
     String uncompressedMe = new String(SnappyCompressor.getDefaultInstance().decompress(compressMeData));
 
     assertEquals(compressMe, uncompressedMe);

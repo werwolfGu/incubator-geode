@@ -177,7 +177,7 @@ public class CompressionCacheListenerDUnitTest extends JUnit4CacheTestCase {
   }
   
   protected void createRegion() {
-    createCompressedRegionOnVm(getVM(TEST_VM), REGION_NAME, SnappyCompressor.getDefaultInstance());
+    createCompressedRegionOnVm(getVM(TEST_VM), REGION_NAME, new SnappyCompressor());
   }
 
   @Override

@@ -48,7 +48,7 @@ public class CompressionRegionFactoryDUnitTest extends JUnit4CacheTestCase {
   /**
    * A valid compressor.
    */
-  protected static final Compressor compressor = SnappyCompressor.getDefaultInstance();
+  protected static final Compressor compressor = new SnappyCompressor();
   
   /**
    * Our test vm.
@@ -69,7 +69,6 @@ public class CompressionRegionFactoryDUnitTest extends JUnit4CacheTestCase {
    */
   @Test
   public void testRegionFactoryCompressor() {
-    Compressor compressor = SnappyCompressor.getDefaultInstance();
     assertTrue(createCompressedRegionOnVm(getVM(TEST_VM), COMPRESSED_REGION_NAME, compressor));
     assertCompressor(getVM(TEST_VM), COMPRESSED_REGION_NAME, compressor);
     cleanup(getVM(TEST_VM));

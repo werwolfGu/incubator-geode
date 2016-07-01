@@ -131,7 +131,7 @@ public class CompressionRegionOperationsDUnitTest extends JUnit4CacheTestCase {
   }
   
   protected void createRegion() {
-    Compressor compressor = SnappyCompressor.getDefaultInstance();;
+    Compressor compressor = new SnappyCompressor();
     createCompressedRegionOnVm(getVM(TEST_VM), REGION_NAME, compressor);
   }
   
