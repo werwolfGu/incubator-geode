@@ -14,24 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal.tcp;
+package org.apache.geode.internal.tcp;
 
-import com.gemstone.gemfire.CancelCriterion;
-import com.gemstone.gemfire.CancelException;
-import com.gemstone.gemfire.SystemFailure;
-import com.gemstone.gemfire.distributed.DistributedMember;
-import com.gemstone.gemfire.distributed.DistributedSystemDisconnectedException;
-import com.gemstone.gemfire.distributed.internal.*;
-import com.gemstone.gemfire.distributed.internal.direct.DirectChannel;
-import com.gemstone.gemfire.distributed.internal.membership.InternalDistributedMember;
-import com.gemstone.gemfire.distributed.internal.membership.MembershipManager;
-import com.gemstone.gemfire.internal.SocketCreator;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
-import com.gemstone.gemfire.internal.logging.LogService;
-import com.gemstone.gemfire.internal.logging.LoggingThreadGroup;
-import com.gemstone.gemfire.internal.logging.log4j.AlertAppender;
-import com.gemstone.gemfire.internal.logging.log4j.LocalizedMessage;
-import com.gemstone.gemfire.internal.logging.log4j.LogMarker;
+import org.apache.geode.CancelCriterion;
+import org.apache.geode.CancelException;
+import org.apache.geode.SystemFailure;
+import org.apache.geode.distributed.DistributedMember;
+import org.apache.geode.distributed.DistributedSystemDisconnectedException;
+import org.apache.geode.distributed.internal.*;
+import org.apache.geode.distributed.internal.direct.DirectChannel;
+import org.apache.geode.distributed.internal.membership.InternalDistributedMember;
+import org.apache.geode.distributed.internal.membership.MembershipManager;
+import org.apache.geode.internal.SocketCreator;
+import org.apache.geode.internal.i18n.LocalizedStrings;
+import org.apache.geode.internal.logging.LogService;
+import org.apache.geode.internal.logging.LoggingThreadGroup;
+import org.apache.geode.internal.logging.log4j.AlertAppender;
+import org.apache.geode.internal.logging.log4j.LocalizedMessage;
+import org.apache.geode.internal.logging.log4j.LogMarker;
 import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.SSLException;
@@ -1107,7 +1107,7 @@ public class TCPConduit implements Runnable {
   protected class Stopper extends CancelCriterion {
 
     /* (non-Javadoc)
-     * @see com.gemstone.gemfire.CancelCriterion#cancelInProgress()
+     * @see org.apache.geode.CancelCriterion#cancelInProgress()
      */
     @Override
     public String cancelInProgress() {
@@ -1122,7 +1122,7 @@ public class TCPConduit implements Runnable {
     }
     
     /* (non-Javadoc)
-     * @see com.gemstone.gemfire.CancelCriterion#generateCancelledException(java.lang.Throwable)
+     * @see org.apache.geode.CancelCriterion#generateCancelledException(java.lang.Throwable)
      */
     @Override
     public RuntimeException generateCancelledException(Throwable e) {

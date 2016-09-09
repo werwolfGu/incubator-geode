@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.service;
+package com.vmware.geode.tools.pulse.internal.service;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

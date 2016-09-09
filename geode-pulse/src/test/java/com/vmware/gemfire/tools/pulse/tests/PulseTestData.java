@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package com.vmware.gemfire.tools.pulse.tests;
+package com.vmware.geode.tools.pulse.tests;
 
 public class PulseTestData {
 	

@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package com.vmware.gemfire.tools.pulse.tests;
+package com.vmware.geode.tools.pulse.tests;
 
 import java.io.File;
 import java.io.FileInputStream;

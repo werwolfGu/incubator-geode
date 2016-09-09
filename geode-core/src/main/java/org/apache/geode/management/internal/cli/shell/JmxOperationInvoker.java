@@ -14,20 +14,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal.cli.shell;
+package org.apache.geode.management.internal.cli.shell;
 
-import com.gemstone.gemfire.internal.lang.StringUtils;
-import com.gemstone.gemfire.internal.util.ArrayUtils;
-import com.gemstone.gemfire.internal.util.IOUtils;
-import com.gemstone.gemfire.management.DistributedSystemMXBean;
-import com.gemstone.gemfire.management.MemberMXBean;
-import com.gemstone.gemfire.management.internal.MBeanJMXAdapter;
-import com.gemstone.gemfire.management.internal.ManagementConstants;
-import com.gemstone.gemfire.management.internal.cli.CliUtil;
-import com.gemstone.gemfire.management.internal.cli.CommandRequest;
-import com.gemstone.gemfire.management.internal.cli.LogWrapper;
-import com.gemstone.gemfire.management.internal.cli.commands.ShellCommands;
-import com.gemstone.gemfire.management.internal.cli.i18n.CliStrings;
+import org.apache.geode.internal.lang.StringUtils;
+import org.apache.geode.internal.util.ArrayUtils;
+import org.apache.geode.internal.util.IOUtils;
+import org.apache.geode.management.DistributedSystemMXBean;
+import org.apache.geode.management.MemberMXBean;
+import org.apache.geode.management.internal.MBeanJMXAdapter;
+import org.apache.geode.management.internal.ManagementConstants;
+import org.apache.geode.management.internal.cli.CliUtil;
+import org.apache.geode.management.internal.cli.CommandRequest;
+import org.apache.geode.management.internal.cli.LogWrapper;
+import org.apache.geode.management.internal.cli.commands.ShellCommands;
+import org.apache.geode.management.internal.cli.i18n.CliStrings;
 
 import javax.management.*;
 import javax.management.remote.JMXConnectionNotification;
@@ -45,7 +45,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 /**
  * OperationInvoker JMX Implementation

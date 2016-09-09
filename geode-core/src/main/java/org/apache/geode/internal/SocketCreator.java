@@ -14,25 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal;
+package org.apache.geode.internal;
 
-import com.gemstone.gemfire.GemFireConfigException;
-import com.gemstone.gemfire.SystemConnectException;
-import com.gemstone.gemfire.SystemFailure;
-import com.gemstone.gemfire.admin.internal.InetAddressUtil;
-import com.gemstone.gemfire.cache.wan.GatewaySender;
-import com.gemstone.gemfire.cache.wan.GatewayTransportFilter;
-import com.gemstone.gemfire.distributed.ClientSocketFactory;
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.distributed.internal.DistributionConfigImpl;
-import com.gemstone.gemfire.distributed.internal.InternalDistributedSystem;
-import com.gemstone.gemfire.internal.GfeConsoleReaderFactory.GfeConsoleReader;
-import com.gemstone.gemfire.internal.cache.wan.TransportFilterServerSocket;
-import com.gemstone.gemfire.internal.cache.wan.TransportFilterSocketFactory;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
-import com.gemstone.gemfire.internal.logging.LogService;
-import com.gemstone.gemfire.internal.logging.log4j.LocalizedMessage;
-import com.gemstone.gemfire.internal.util.PasswordUtil;
+import org.apache.geode.GemFireConfigException;
+import org.apache.geode.SystemConnectException;
+import org.apache.geode.SystemFailure;
+import org.apache.geode.admin.internal.InetAddressUtil;
+import org.apache.geode.cache.wan.GatewaySender;
+import org.apache.geode.cache.wan.GatewayTransportFilter;
+import org.apache.geode.distributed.ClientSocketFactory;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.distributed.internal.DistributionConfigImpl;
+import org.apache.geode.distributed.internal.InternalDistributedSystem;
+import org.apache.geode.internal.GfeConsoleReaderFactory.GfeConsoleReader;
+import org.apache.geode.internal.cache.wan.TransportFilterServerSocket;
+import org.apache.geode.internal.cache.wan.TransportFilterSocketFactory;
+import org.apache.geode.internal.i18n.LocalizedStrings;
+import org.apache.geode.internal.logging.LogService;
+import org.apache.geode.internal.logging.log4j.LocalizedMessage;
+import org.apache.geode.internal.util.PasswordUtil;
 import org.apache.logging.log4j.Logger;
 
 import javax.naming.Context;
@@ -397,7 +397,7 @@ public class SocketCreator {
             System.setProperty( "p2p.useSSL", "false" );
           }
           // make sure TCPConduit picks up p2p properties...
-          com.gemstone.gemfire.internal.tcp.TCPConduit.init();
+          org.apache.geode.internal.tcp.TCPConduit.init();
         } else if (this.useSSL && sslContext == null) {
           try {
             sslContext = createAndConfigureSSLContext(protocols, props);

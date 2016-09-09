@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.distributed.internal.tcpserver;
+package org.apache.geode.distributed.internal.tcpserver;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -28,13 +28,13 @@ import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
-import com.gemstone.gemfire.DataSerializer;
-import com.gemstone.gemfire.cache.UnsupportedVersionException;
-import com.gemstone.gemfire.internal.SocketCreator;
-import com.gemstone.gemfire.internal.Version;
-import com.gemstone.gemfire.internal.VersionedDataInputStream;
-import com.gemstone.gemfire.internal.VersionedDataOutputStream;
-import com.gemstone.gemfire.internal.logging.LogService;
+import org.apache.geode.DataSerializer;
+import org.apache.geode.cache.UnsupportedVersionException;
+import org.apache.geode.internal.SocketCreator;
+import org.apache.geode.internal.Version;
+import org.apache.geode.internal.VersionedDataInputStream;
+import org.apache.geode.internal.VersionedDataOutputStream;
+import org.apache.geode.internal.logging.LogService;
 
 /**
  * Client for the TcpServer. These methods were refactored out of GossipClient,

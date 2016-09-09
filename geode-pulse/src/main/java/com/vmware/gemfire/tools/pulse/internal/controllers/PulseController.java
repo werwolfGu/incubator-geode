@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.controllers;
+package com.vmware.geode.tools.pulse.internal.controllers;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -30,15 +30,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vmware.gemfire.tools.pulse.internal.data.Cluster;
-import com.vmware.gemfire.tools.pulse.internal.data.PulseConstants;
-import com.vmware.gemfire.tools.pulse.internal.data.PulseVersion;
-import com.vmware.gemfire.tools.pulse.internal.data.Repository;
-import com.vmware.gemfire.tools.pulse.internal.log.PulseLogWriter;
-import com.vmware.gemfire.tools.pulse.internal.service.PulseService;
-import com.vmware.gemfire.tools.pulse.internal.service.PulseServiceFactory;
-import com.vmware.gemfire.tools.pulse.internal.service.SystemAlertsService;
-import com.vmware.gemfire.tools.pulse.internal.util.StringUtils;
+import com.vmware.geode.tools.pulse.internal.data.Cluster;
+import com.vmware.geode.tools.pulse.internal.data.PulseConstants;
+import com.vmware.geode.tools.pulse.internal.data.PulseVersion;
+import com.vmware.geode.tools.pulse.internal.data.Repository;
+import com.vmware.geode.tools.pulse.internal.log.PulseLogWriter;
+import com.vmware.geode.tools.pulse.internal.service.PulseService;
+import com.vmware.geode.tools.pulse.internal.service.PulseServiceFactory;
+import com.vmware.geode.tools.pulse.internal.service.SystemAlertsService;
+import com.vmware.geode.tools.pulse.internal.util.StringUtils;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;

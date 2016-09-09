@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.data;
+package com.vmware.geode.tools.pulse.internal.data;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

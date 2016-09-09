@@ -17,14 +17,14 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal;
+package com.vmware.geode.tools.pulse.internal;
 
-import com.vmware.gemfire.tools.pulse.internal.controllers.PulseController;
-import com.vmware.gemfire.tools.pulse.internal.data.PulseConfig;
-import com.vmware.gemfire.tools.pulse.internal.data.PulseConstants;
-import com.vmware.gemfire.tools.pulse.internal.data.Repository;
-import com.vmware.gemfire.tools.pulse.internal.log.PulseLogWriter;
-import com.vmware.gemfire.tools.pulse.internal.util.StringUtils;
+import com.vmware.geode.tools.pulse.internal.controllers.PulseController;
+import com.vmware.geode.tools.pulse.internal.data.PulseConfig;
+import com.vmware.geode.tools.pulse.internal.data.PulseConstants;
+import com.vmware.geode.tools.pulse.internal.data.Repository;
+import com.vmware.geode.tools.pulse.internal.log.PulseLogWriter;
+import com.vmware.geode.tools.pulse.internal.util.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

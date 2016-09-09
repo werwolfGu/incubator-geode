@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.data;
+package com.vmware.geode.tools.pulse.internal.data;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -27,8 +27,8 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
 
-import com.vmware.gemfire.tools.pulse.internal.log.PulseLogWriter;
-import com.vmware.gemfire.tools.pulse.internal.util.ConnectionUtil;
+import com.vmware.geode.tools.pulse.internal.log.PulseLogWriter;
+import com.vmware.geode.tools.pulse.internal.util.ConnectionUtil;
 
 /**
  * This class can be used to connect to a locator and ask it to find a jmx

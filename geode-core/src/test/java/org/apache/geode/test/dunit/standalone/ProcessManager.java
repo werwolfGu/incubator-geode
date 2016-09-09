@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.test.dunit.standalone;
+package org.apache.geode.test.dunit.standalone;
 
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.distributed.internal.InternalLocator;
-import com.gemstone.gemfire.internal.FileUtil;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.distributed.internal.InternalLocator;
+import org.apache.geode.internal.FileUtil;
 import org.apache.commons.io.FileUtils;
 
 import java.io.*;
@@ -33,7 +33,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 /**
  *

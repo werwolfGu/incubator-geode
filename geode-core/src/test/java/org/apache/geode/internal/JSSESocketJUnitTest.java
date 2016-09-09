@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal;
+package org.apache.geode.internal;
 
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.internal.logging.LogService;
-import com.gemstone.gemfire.test.dunit.ThreadUtils;
-import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
-import com.gemstone.gemfire.util.test.TestUtil;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.internal.logging.LogService;
+import org.apache.geode.test.dunit.ThreadUtils;
+import org.apache.geode.test.junit.categories.IntegrationTest;
+import org.apache.geode.util.test.TestUtil;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Appender;
@@ -42,7 +42,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -184,7 +184,7 @@ public class JSSESocketJUnitTest {
 
   static boolean factoryInvoked;
 
-  public static class TSocketFactory implements com.gemstone.gemfire.distributed.ClientSocketFactory {
+  public static class TSocketFactory implements org.apache.geode.distributed.ClientSocketFactory {
     public TSocketFactory() {
     }
 

@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.service;
+package com.vmware.geode.tools.pulse.internal.service;
 
 import javax.servlet.http.HttpServletRequest;
 

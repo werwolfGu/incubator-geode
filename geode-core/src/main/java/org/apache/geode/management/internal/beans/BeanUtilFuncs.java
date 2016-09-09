@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal.beans;
+package org.apache.geode.management.internal.beans;
 
-import com.gemstone.gemfire.cache.Cache;
-import com.gemstone.gemfire.cache.CacheFactory;
-import com.gemstone.gemfire.distributed.DistributedMember;
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.management.GemFireProperties;
-import com.gemstone.gemfire.management.internal.cli.CliUtil;
+import org.apache.geode.cache.Cache;
+import org.apache.geode.cache.CacheFactory;
+import org.apache.geode.distributed.DistributedMember;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.management.GemFireProperties;
+import org.apache.geode.management.internal.cli.CliUtil;
 
 import java.io.*;
 import java.util.Set;

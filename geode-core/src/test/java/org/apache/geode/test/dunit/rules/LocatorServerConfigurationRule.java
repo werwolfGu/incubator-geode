@@ -15,15 +15,15 @@
  * limitations under the License.
  */
 
-package com.gemstone.gemfire.test.dunit.rules;
+package org.apache.geode.test.dunit.rules;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.ENABLE_CLUSTER_CONFIGURATION;
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.LOCATORS;
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.MCAST_PORT;
-import static com.gemstone.gemfire.internal.AvailablePortHelper.getRandomAvailableTCPPorts;
-import static com.gemstone.gemfire.test.dunit.Host.getHost;
-import static com.gemstone.gemfire.test.dunit.internal.JUnit4DistributedTestCase.disconnectAllFromDS;
-import static com.gemstone.gemfire.test.dunit.internal.JUnit4DistributedTestCase.disconnectFromDS;
+import static org.apache.geode.distributed.ConfigurationProperties.ENABLE_CLUSTER_CONFIGURATION;
+import static org.apache.geode.distributed.ConfigurationProperties.LOCATORS;
+import static org.apache.geode.distributed.ConfigurationProperties.MCAST_PORT;
+import static org.apache.geode.internal.AvailablePortHelper.getRandomAvailableTCPPorts;
+import static org.apache.geode.test.dunit.Host.getHost;
+import static org.apache.geode.test.dunit.internal.JUnit4DistributedTestCase.disconnectAllFromDS;
+import static org.apache.geode.test.dunit.internal.JUnit4DistributedTestCase.disconnectFromDS;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -36,11 +36,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.rules.ExternalResource;
 
-import com.gemstone.gemfire.distributed.Locator;
-import com.gemstone.gemfire.distributed.internal.InternalLocator;
-import com.gemstone.gemfire.test.dunit.Host;
-import com.gemstone.gemfire.test.dunit.VM;
-import com.gemstone.gemfire.test.dunit.cache.internal.JUnit4CacheTestCase;
+import org.apache.geode.distributed.Locator;
+import org.apache.geode.distributed.internal.InternalLocator;
+import org.apache.geode.test.dunit.Host;
+import org.apache.geode.test.dunit.VM;
+import org.apache.geode.test.dunit.cache.internal.JUnit4CacheTestCase;
 import com.jayway.awaitility.Awaitility;
 
 

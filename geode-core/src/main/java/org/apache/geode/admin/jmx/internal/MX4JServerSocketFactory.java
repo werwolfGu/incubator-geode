@@ -14,13 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.admin.jmx.internal;
+package org.apache.geode.admin.jmx.internal;
 
-import com.gemstone.gemfire.admin.DistributedSystemConfig;
-import com.gemstone.gemfire.admin.internal.InetAddressUtil;
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.internal.SocketCreator;
-import com.gemstone.gemfire.internal.logging.LogService;
+import org.apache.geode.admin.DistributedSystemConfig;
+import org.apache.geode.admin.internal.InetAddressUtil;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.internal.SocketCreator;
+import org.apache.geode.internal.logging.LogService;
 import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;

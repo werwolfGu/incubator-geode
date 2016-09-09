@@ -17,11 +17,11 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.service;
+package com.vmware.geode.tools.pulse.internal.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vmware.gemfire.tools.pulse.internal.controllers.PulseController;
+import com.vmware.geode.tools.pulse.internal.controllers.PulseController;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;

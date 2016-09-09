@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal;
+package org.apache.geode.management.internal;
 
 import java.io.File;
 import java.util.Properties;
@@ -33,9 +33,9 @@ import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.webapp.WebAppContext;
 
-import com.gemstone.gemfire.GemFireConfigException;
-import com.gemstone.gemfire.internal.lang.StringUtils;
-import com.gemstone.gemfire.internal.logging.LogService;
+import org.apache.geode.GemFireConfigException;
+import org.apache.geode.internal.lang.StringUtils;
+import org.apache.geode.internal.logging.LogService;
 
 /**
  * @since GemFire 8.1
@@ -219,7 +219,7 @@ public class JettyHelper {
       latch.await();
     } else {
       System.out.printf(
-          "usage:%n>java com.gemstone.gemfire.management.internal.TomcatHelper <web-app-context> <war-file-path> [<web-app-context> <war-file-path>]*");
+          "usage:%n>java org.apache.geode.management.internal.TomcatHelper <web-app-context> <war-file-path> [<web-app-context> <war-file-path>]*");
     }
   }
 

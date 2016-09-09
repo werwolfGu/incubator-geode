@@ -14,31 +14,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal.cli.commands;
+package org.apache.geode.management.internal.cli.commands;
 
-import com.gemstone.gemfire.cache.Region;
-import com.gemstone.gemfire.cache.client.*;
-import com.gemstone.gemfire.distributed.AbstractLauncher.ServiceState;
-import com.gemstone.gemfire.distributed.AbstractLauncher.Status;
-import com.gemstone.gemfire.distributed.LocatorLauncher;
-import com.gemstone.gemfire.distributed.LocatorLauncher.Builder;
-import com.gemstone.gemfire.distributed.LocatorLauncher.Command;
-import com.gemstone.gemfire.distributed.LocatorLauncher.LocatorState;
-import com.gemstone.gemfire.distributed.ServerLauncher;
-import com.gemstone.gemfire.distributed.ServerLauncher.ServerState;
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.internal.AvailablePortHelper;
-import com.gemstone.gemfire.internal.lang.ObjectUtils;
-import com.gemstone.gemfire.internal.lang.StringUtils;
-import com.gemstone.gemfire.internal.lang.SystemUtils;
-import com.gemstone.gemfire.internal.process.ProcessType;
-import com.gemstone.gemfire.internal.util.IOUtils;
-import com.gemstone.gemfire.management.cli.Result;
-import com.gemstone.gemfire.management.internal.cli.i18n.CliStrings;
-import com.gemstone.gemfire.management.internal.cli.result.CommandResult;
-import com.gemstone.gemfire.management.internal.cli.util.CommandStringBuilder;
-import com.gemstone.gemfire.test.dunit.WaitCriterion;
-import com.gemstone.gemfire.test.junit.categories.DistributedTest;
+import org.apache.geode.cache.Region;
+import org.apache.geode.cache.client.*;
+import org.apache.geode.distributed.AbstractLauncher.ServiceState;
+import org.apache.geode.distributed.AbstractLauncher.Status;
+import org.apache.geode.distributed.LocatorLauncher;
+import org.apache.geode.distributed.LocatorLauncher.Builder;
+import org.apache.geode.distributed.LocatorLauncher.Command;
+import org.apache.geode.distributed.LocatorLauncher.LocatorState;
+import org.apache.geode.distributed.ServerLauncher;
+import org.apache.geode.distributed.ServerLauncher.ServerState;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.internal.AvailablePortHelper;
+import org.apache.geode.internal.lang.ObjectUtils;
+import org.apache.geode.internal.lang.StringUtils;
+import org.apache.geode.internal.lang.SystemUtils;
+import org.apache.geode.internal.process.ProcessType;
+import org.apache.geode.internal.util.IOUtils;
+import org.apache.geode.management.cli.Result;
+import org.apache.geode.management.internal.cli.i18n.CliStrings;
+import org.apache.geode.management.internal.cli.result.CommandResult;
+import org.apache.geode.management.internal.cli.util.CommandStringBuilder;
+import org.apache.geode.test.dunit.WaitCriterion;
+import org.apache.geode.test.junit.categories.DistributedTest;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -64,9 +64,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
-import static com.gemstone.gemfire.test.dunit.Assert.*;
-import static com.gemstone.gemfire.test.dunit.Wait.waitForCriterion;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
+import static org.apache.geode.test.dunit.Assert.*;
+import static org.apache.geode.test.dunit.Wait.waitForCriterion;
 
 /**
  * The LauncherLifecycleCommandsDUnitTest class is a test suite of integration tests testing the contract and
@@ -74,14 +74,14 @@ import static com.gemstone.gemfire.test.dunit.Wait.waitForCriterion;
  *
  * @see javax.management.MBeanServerConnection
  * @see javax.management.remote.JMXConnector
- * @see com.gemstone.gemfire.distributed.AbstractLauncher
- * @see com.gemstone.gemfire.distributed.LocatorLauncher
- * @see com.gemstone.gemfire.distributed.ServerLauncher
- * @see com.gemstone.gemfire.internal.AvailablePortHelper
- * @see com.gemstone.gemfire.management.internal.cli.shell.Gfsh
- * @see com.gemstone.gemfire.management.internal.cli.commands.CliCommandTestBase
- * @see com.gemstone.gemfire.management.internal.cli.commands.LauncherLifecycleCommands
- * @see com.gemstone.gemfire.management.internal.cli.util.CommandStringBuilder
+ * @see org.apache.geode.distributed.AbstractLauncher
+ * @see org.apache.geode.distributed.LocatorLauncher
+ * @see org.apache.geode.distributed.ServerLauncher
+ * @see org.apache.geode.internal.AvailablePortHelper
+ * @see org.apache.geode.management.internal.cli.shell.Gfsh
+ * @see org.apache.geode.management.internal.cli.commands.CliCommandTestBase
+ * @see org.apache.geode.management.internal.cli.commands.LauncherLifecycleCommands
+ * @see org.apache.geode.management.internal.cli.util.CommandStringBuilder
  * @since GemFire 7.0
  */
 @Category(DistributedTest.class)
@@ -321,7 +321,7 @@ public class LauncherLifecycleCommandsDUnitTest extends CliCommandTestBase {
         "Exception in thread \"main\" java.lang.RuntimeException: A PID file already exists and a Locator may be running in " + IOUtils.tryGetCanonicalFileElseGetAbsoluteFile(
             workingDirectory)));
     assertTrue(resultString, resultString.contains(
-        "Caused by: com.gemstone.gemfire.internal.process.FileAlreadyExistsException: Pid file already exists: " + IOUtils.tryGetCanonicalFileElseGetAbsoluteFile(
+        "Caused by: org.apache.geode.internal.process.FileAlreadyExistsException: Pid file already exists: " + IOUtils.tryGetCanonicalFileElseGetAbsoluteFile(
             pidFile)));
   }
 

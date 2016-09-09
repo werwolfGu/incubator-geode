@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package com.vmware.gemfire.tools.pulse.tests;
+package com.vmware.geode.tools.pulse.tests;
 
 import static org.junit.Assert.*;
 
@@ -44,8 +44,8 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.gemstone.gemfire.management.internal.JettyHelper;
-import com.vmware.gemfire.tools.pulse.internal.data.PulseConstants;
+import org.apache.geode.management.internal.JettyHelper;
+import com.vmware.geode.tools.pulse.internal.data.PulseConstants;
 
 @SuppressWarnings("deprecated")
 public abstract class PulseAbstractTest extends PulseBaseTest {

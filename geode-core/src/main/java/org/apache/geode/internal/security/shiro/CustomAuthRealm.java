@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal.security.shiro;
+package org.apache.geode.internal.security.shiro;
 
 import java.io.Serializable;
 import java.util.Properties;
@@ -31,8 +31,8 @@ import org.apache.shiro.authz.Permission;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 
-import com.gemstone.gemfire.internal.security.SecurityService;
-import com.gemstone.gemfire.management.internal.security.ResourceConstants;
+import org.apache.geode.internal.security.SecurityService;
+import org.apache.geode.management.internal.security.ResourceConstants;
 
 public class CustomAuthRealm extends AuthorizingRealm {
 

@@ -17,9 +17,9 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.data;
+package com.vmware.geode.tools.pulse.internal.data;
 
-import com.vmware.gemfire.tools.pulse.internal.log.PulseLogWriter;
+import com.vmware.geode.tools.pulse.internal.log.PulseLogWriter;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 

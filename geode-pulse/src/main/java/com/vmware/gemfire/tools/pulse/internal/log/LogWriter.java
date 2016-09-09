@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.log;
+package com.vmware.geode.tools.pulse.internal.log;
 
 /**
  * interface LogWriter

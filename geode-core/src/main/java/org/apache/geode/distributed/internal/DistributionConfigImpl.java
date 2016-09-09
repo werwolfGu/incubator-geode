@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gemstone.gemfire.distributed.internal;
+package org.apache.geode.distributed.internal;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,15 +37,15 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 import org.apache.geode.redis.GeodeRedisServer;
 
-import com.gemstone.gemfire.GemFireConfigException;
-import com.gemstone.gemfire.GemFireIOException;
-import com.gemstone.gemfire.distributed.DistributedSystem;
+import org.apache.geode.GemFireConfigException;
+import org.apache.geode.GemFireIOException;
+import org.apache.geode.distributed.DistributedSystem;
 import org.apache.geode.security.SecurableComponents;
-import com.gemstone.gemfire.internal.ConfigSource;
-import com.gemstone.gemfire.internal.SocketCreator;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
-import com.gemstone.gemfire.internal.process.ProcessLauncherContext;
-import com.gemstone.gemfire.memcached.GemFireMemcachedServer;
+import org.apache.geode.internal.ConfigSource;
+import org.apache.geode.internal.SocketCreator;
+import org.apache.geode.internal.i18n.LocalizedStrings;
+import org.apache.geode.internal.process.ProcessLauncherContext;
+import org.apache.geode.memcached.GemFireMemcachedServer;
 
 /**
  * Provides an implementation of <code>DistributionConfig</code> that
@@ -109,7 +109,7 @@ public class DistributionConfigImpl
   
   /** The level at which log messages are logged
    *
-   * @see com.gemstone.gemfire.internal.logging.LogWriterImpl#levelNameToCode(String)
+   * @see org.apache.geode.internal.logging.LogWriterImpl#levelNameToCode(String)
    */
   protected int logLevel = DEFAULT_LOG_LEVEL;
 
@@ -244,7 +244,7 @@ public class DistributionConfigImpl
   /**
    * The level at which security related log messages are logged
    *
-   * @see com.gemstone.gemfire.internal.logging.LogWriterImpl#levelNameToCode(String)
+   * @see org.apache.geode.internal.logging.LogWriterImpl#levelNameToCode(String)
    */
   protected int securityLogLevel = DEFAULT_LOG_LEVEL;
 
@@ -623,7 +623,7 @@ public class DistributionConfigImpl
   /**
    * Creates a new <code>DistributionConfigImpl</code> with the given
    * non-default configuration properties.  See {@link
-   * com.gemstone.gemfire.distributed.DistributedSystem#connect} for a
+   * org.apache.geode.distributed.DistributedSystem#connect} for a
    * list of exceptions that may be thrown.
    *
    * @param nonDefault
@@ -636,7 +636,7 @@ public class DistributionConfigImpl
   /**
    * Creates a new <code>DistributionConfigImpl</code> with the given
    * non-default configuration properties. See
-   * {@link com.gemstone.gemfire.distributed.DistributedSystem#connect} for a
+   * {@link org.apache.geode.distributed.DistributedSystem#connect} for a
    * list of exceptions that may be thrown.
    * 
    * @param nonDefault
@@ -656,7 +656,7 @@ public class DistributionConfigImpl
   /**
    * Creates a new <code>DistributionConfigImpl</code> with the given
    * non-default configuration properties. See
-   * {@link com.gemstone.gemfire.distributed.DistributedSystem#connect} for a
+   * {@link org.apache.geode.distributed.DistributedSystem#connect} for a
    * list of exceptions that may be thrown.
    * 
    * @param nonDefault
@@ -3194,14 +3194,14 @@ public class DistributionConfigImpl
   }
 
   /* (non-Javadoc)
-   * @see com.gemstone.gemfire.distributed.internal.DistributionConfig#getMembershipPortRange()
+   * @see org.apache.geode.distributed.internal.DistributionConfig#getMembershipPortRange()
    */
   public int[] getMembershipPortRange() {
     return membershipPortRange;
   }
 
   /* (non-Javadoc)
-   * @see com.gemstone.gemfire.distributed.internal.DistributionConfig#setMembershipPortRange(int[])
+   * @see org.apache.geode.distributed.internal.DistributionConfig#setMembershipPortRange(int[])
    */
   public void setMembershipPortRange(int[] range) {
     membershipPortRange = (int[])checkAttribute(MEMBERSHIP_PORT_RANGE, range);

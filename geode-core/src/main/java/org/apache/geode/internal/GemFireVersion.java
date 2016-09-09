@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal;
+package org.apache.geode.internal;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,9 +28,9 @@ import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TreeMap;
 
-import com.gemstone.gemfire.InternalGemFireError;
-import com.gemstone.gemfire.SystemFailure;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
+import org.apache.geode.InternalGemFireError;
+import org.apache.geode.SystemFailure;
+import org.apache.geode.internal.i18n.LocalizedStrings;
 
 /**
  * This class provides build and version information about GemFire.

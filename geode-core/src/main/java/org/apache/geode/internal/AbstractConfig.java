@@ -15,13 +15,13 @@
  * limitations under the License.
  */
 
-package com.gemstone.gemfire.internal;
+package org.apache.geode.internal;
 
-import com.gemstone.gemfire.InternalGemFireException;
-import com.gemstone.gemfire.UnmodifiableException;
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
-import com.gemstone.gemfire.distributed.internal.FlowControlParams;
-import com.gemstone.gemfire.internal.i18n.LocalizedStrings;
+import org.apache.geode.InternalGemFireException;
+import org.apache.geode.UnmodifiableException;
+import org.apache.geode.distributed.internal.DistributionConfig;
+import org.apache.geode.distributed.internal.FlowControlParams;
+import org.apache.geode.internal.i18n.LocalizedStrings;
 
 import java.io.*;
 import java.lang.reflect.Array;
@@ -29,7 +29,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.*;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 /**
  * Provides an implementation of the {@link Config} interface
  * that implements functionality that all {@link Config} implementations

@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.json;
+package com.vmware.geode.tools.pulse.internal.json;
 
 /**
  * The XMLTokener extends the JSONTokener to provide additional methods

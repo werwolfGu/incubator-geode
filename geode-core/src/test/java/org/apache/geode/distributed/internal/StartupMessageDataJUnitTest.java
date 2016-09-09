@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.distributed.internal;
+package org.apache.geode.distributed.internal;
 
 import static org.junit.Assert.*;
 
@@ -29,12 +29,12 @@ import java.util.StringTokenizer;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.gemstone.gemfire.DataSerializer;
-import com.gemstone.gemfire.internal.InternalDataSerializer;
-import com.gemstone.gemfire.internal.SocketCreator;
-import com.gemstone.gemfire.internal.ByteArrayData;
-import com.gemstone.gemfire.internal.admin.remote.DistributionLocatorId;
-import com.gemstone.gemfire.test.junit.categories.UnitTest;
+import org.apache.geode.DataSerializer;
+import org.apache.geode.internal.InternalDataSerializer;
+import org.apache.geode.internal.SocketCreator;
+import org.apache.geode.internal.ByteArrayData;
+import org.apache.geode.internal.admin.remote.DistributionLocatorId;
+import org.apache.geode.test.junit.categories.UnitTest;
 
 /**
  * Tests {@link StartupMessageData}.

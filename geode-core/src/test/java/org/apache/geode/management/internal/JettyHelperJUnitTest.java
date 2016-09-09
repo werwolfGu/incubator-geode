@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal;
+package org.apache.geode.management.internal;
 
 import static org.junit.Assert.*;
 
@@ -23,13 +23,13 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.gemstone.gemfire.test.junit.categories.UnitTest;
+import org.apache.geode.test.junit.categories.UnitTest;
 
 /**
  * The JettyHelperJUnitTest class is a test suite of test cases testing the
  * contract and functionality of the JettyHelper class. Does not start Jetty.
  *
- * @see com.gemstone.gemfire.management.internal.JettyHelper
+ * @see org.apache.geode.management.internal.JettyHelper
  * @see org.jmock.Mockery
  * @see org.junit.Assert
  * @see org.junit.Test

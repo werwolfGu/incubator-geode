@@ -14,15 +14,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.distributed.internal.tcpserver;
+package org.apache.geode.distributed.internal.tcpserver;
 
-import com.gemstone.gemfire.CancelException;
-import com.gemstone.gemfire.DataSerializer;
-import com.gemstone.gemfire.SystemFailure;
-import com.gemstone.gemfire.distributed.internal.*;
-import com.gemstone.gemfire.internal.*;
-import com.gemstone.gemfire.internal.cache.GemFireCacheImpl;
-import com.gemstone.gemfire.internal.logging.LogService;
+import org.apache.geode.CancelException;
+import org.apache.geode.DataSerializer;
+import org.apache.geode.SystemFailure;
+import org.apache.geode.distributed.internal.*;
+import org.apache.geode.internal.*;
+import org.apache.geode.internal.cache.GemFireCacheImpl;
+import org.apache.geode.internal.logging.LogService;
 import org.apache.logging.log4j.Logger;
 
 import javax.net.ssl.SSLException;

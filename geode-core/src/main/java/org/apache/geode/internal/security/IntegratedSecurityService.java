@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal.security;
+package org.apache.geode.internal.security;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -28,8 +28,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadState;
 
-import com.gemstone.gemfire.internal.logging.LogService;
-import com.gemstone.gemfire.management.internal.security.ResourceOperation;
+import org.apache.geode.internal.logging.LogService;
+import org.apache.geode.management.internal.security.ResourceOperation;
 
 /**
  * Default implementation of {@code SecurityService} for Integrated Security.

@@ -15,9 +15,9 @@
  * limitations under the License.
  */
 
-package com.gemstone.gemfire.distributed.internal;
+package org.apache.geode.distributed.internal;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 import java.io.File;
 import java.lang.reflect.Field;
@@ -30,14 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import com.gemstone.gemfire.distributed.ConfigurationProperties;
-import com.gemstone.gemfire.distributed.DistributedSystem;
-import com.gemstone.gemfire.internal.Config;
-import com.gemstone.gemfire.internal.ConfigSource;
-import com.gemstone.gemfire.internal.logging.InternalLogWriter;
-import com.gemstone.gemfire.internal.logging.LogConfig;
-import com.gemstone.gemfire.internal.tcp.Connection;
-import com.gemstone.gemfire.memcached.GemFireMemcachedServer;
+import org.apache.geode.distributed.ConfigurationProperties;
+import org.apache.geode.distributed.DistributedSystem;
+import org.apache.geode.internal.Config;
+import org.apache.geode.internal.ConfigSource;
+import org.apache.geode.internal.logging.InternalLogWriter;
+import org.apache.geode.internal.logging.LogConfig;
+import org.apache.geode.internal.tcp.Connection;
+import org.apache.geode.memcached.GemFireMemcachedServer;
 
 /**
  * Provides accessor (and in some cases mutator) methods for the
@@ -49,7 +49,7 @@ import com.gemstone.gemfire.memcached.GemFireMemcachedServer;
  * <p>
  * Descriptions of these properties can be found {@link ConfigurationProperties}.
  *
- * @see com.gemstone.gemfire.internal.Config
+ * @see org.apache.geode.internal.Config
  * @since GemFire 2.1
  */
 public interface DistributionConfig extends Config, LogConfig {
@@ -77,8 +77,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * <p> The name can not be changed while the system is running.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    */
   @ConfigAttributeSetter(name = NAME)
@@ -300,8 +300,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * @param value must be of the form <code>hostName[portNum]</code>.
    *              Multiple elements are allowed and must be seperated by a comma.
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    */
   @ConfigAttributeSetter(name = LOCATORS)
@@ -370,8 +370,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * Sets the system's deploy working directory.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    */
   @ConfigAttributeSetter(name = DEPLOY_WORKING_DIR)
@@ -399,8 +399,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * Sets the system's user command path.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    */
   @ConfigAttributeSetter(name = USER_COMMAND_PACKAGES)
@@ -432,8 +432,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * <p> The system log file can not be changed while the system is running.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    */
 
@@ -456,7 +456,7 @@ public interface DistributionConfig extends Config, LogConfig {
   /**
    * Returns the value of the {@link ConfigurationProperties#LOG_LEVEL} property
    *
-   * @see com.gemstone.gemfire.internal.logging.LogWriterImpl
+   * @see org.apache.geode.internal.logging.LogWriterImpl
    */
   @ConfigAttributeGetter(name = LOG_LEVEL)
   int getLogLevel();
@@ -464,7 +464,7 @@ public interface DistributionConfig extends Config, LogConfig {
   /**
    * Sets the value of the {@link ConfigurationProperties#LOG_LEVEL} property
    *
-   * @see com.gemstone.gemfire.internal.logging.LogWriterImpl
+   * @see org.apache.geode.internal.logging.LogWriterImpl
    */
   @ConfigAttributeSetter(name = LOG_LEVEL)
   void setLogLevel(int value);
@@ -1187,7 +1187,7 @@ public interface DistributionConfig extends Config, LogConfig {
 
   /**
    * The name of an internal property that specifies a {@link
-   * com.gemstone.gemfire.i18n.LogWriterI18n} instance to log to.
+   * org.apache.geode.i18n.LogWriterI18n} instance to log to.
    * Set this property with put(), not with setProperty()
    *
    * @since GemFire 4.0
@@ -1223,7 +1223,7 @@ public interface DistributionConfig extends Config, LogConfig {
 
   /**
    * The name of an internal property that specifies a {@link
-   * com.gemstone.gemfire.LogWriter} instance to log security messages to. Set
+   * org.apache.geode.LogWriter} instance to log security messages to. Set
    * this property with put(), not with setProperty()
    *
    * @since GemFire 5.5
@@ -2351,8 +2351,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * The security log file can not be changed while the system is running.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error when writing to
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error when writing to
    *                                                    the system's configuration file.
    */
   @ConfigAttributeSetter(name = SECURITY_LOG_FILE)
@@ -2598,8 +2598,8 @@ public interface DistributionConfig extends Config, LogConfig {
    * <p> The groups can not be changed while the system is running.
    *
    * @throws IllegalArgumentException                   if the specified value is not acceptable.
-   * @throws com.gemstone.gemfire.UnmodifiableException if this attribute can not be modified.
-   * @throws com.gemstone.gemfire.GemFireIOException    if the set failure is caused by an error
+   * @throws org.apache.geode.UnmodifiableException if this attribute can not be modified.
+   * @throws org.apache.geode.GemFireIOException    if the set failure is caused by an error
    *                                                    when writing to the system's configuration file.
    * @since GemFire 7.0
    */

@@ -14,18 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.management.internal.security;
+package org.apache.geode.management.internal.security;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 import org.apache.geode.security.templates.SampleSecurityManager;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
 
-import com.gemstone.gemfire.internal.security.GeodeSecurityUtil;
-import com.gemstone.gemfire.internal.security.IntegratedSecurityService;
-import com.gemstone.gemfire.test.junit.categories.IntegrationTest;
-import com.gemstone.gemfire.test.junit.categories.SecurityTest;
+import org.apache.geode.internal.security.GeodeSecurityUtil;
+import org.apache.geode.internal.security.IntegratedSecurityService;
+import org.apache.geode.test.junit.categories.IntegrationTest;
+import org.apache.geode.test.junit.categories.SecurityTest;
 
 /**
  * Integration tests for {@link GeodeSecurityUtil} using shiro-ini.json.
@@ -37,7 +37,7 @@ public class GeodeSecurityUtilCustomRealmJUnitTest extends GeodeSecurityUtilWith
 
   @BeforeClass
   public static void beforeClass() throws Exception {
-    props.put(SampleSecurityManager.SECURITY_JSON, "com/gemstone/gemfire/management/internal/security/shiro-ini.json");
+    props.put(SampleSecurityManager.SECURITY_JSON, "org/apache/geode/management/internal/security/shiro-ini.json");
     props.put(SECURITY_MANAGER, SampleSecurityManager.class.getName());
     IntegratedSecurityService.getSecurityService().initSecurity(props);
   }

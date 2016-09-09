@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.internal.json;
+package com.vmware.geode.tools.pulse.internal.json;
 
 import java.io.BufferedReader;
 import java.io.IOException;

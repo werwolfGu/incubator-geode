@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package com.vmware.gemfire.tools.pulse.testbed;
+package com.vmware.geode.tools.pulse.testbed;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.LOCATORS;
+import static org.apache.geode.distributed.ConfigurationProperties.LOCATORS;
 
 
 /**

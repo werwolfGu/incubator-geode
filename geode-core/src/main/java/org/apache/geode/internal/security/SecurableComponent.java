@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal.security;
+package org.apache.geode.internal.security;
 
 import org.springframework.util.StringUtils;
 
-import com.gemstone.gemfire.GemFireConfigException;
+import org.apache.geode.GemFireConfigException;
 import org.apache.geode.security.SecurableComponents;
 
 public enum SecurableComponent {

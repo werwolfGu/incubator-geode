@@ -17,7 +17,7 @@
  *
  */
 
-package com.vmware.gemfire.tools.pulse.testbed;
+package com.vmware.geode.tools.pulse.testbed;
 
 public class GemfireTopology {
 

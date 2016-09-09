@@ -16,7 +16,7 @@
  * limitations under the License.
  *
  */
-package com.vmware.gemfire.tools.pulse.internal.util;
+package com.vmware.geode.tools.pulse.internal.util;
 
 import java.io.IOException;
 

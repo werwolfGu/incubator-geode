@@ -14,11 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.gemstone.gemfire.internal.admin;
+package org.apache.geode.internal.admin;
 
-import com.gemstone.gemfire.distributed.internal.DistributionConfig;
+import org.apache.geode.distributed.internal.DistributionConfig;
 
-import static com.gemstone.gemfire.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.ConfigurationProperties.*;
 
 import java.util.Iterator;
 import java.util.Properties;
@@ -110,7 +110,7 @@ public class SSLConfig {
   /**
    * Populates a <code>Properties</code> object with the SSL-related
    * configuration information used by {@link
-   * com.gemstone.gemfire.distributed.DistributedSystem#connect}.
+   * org.apache.geode.distributed.DistributedSystem#connect}.
    *
    * @since GemFire 4.0
    */
