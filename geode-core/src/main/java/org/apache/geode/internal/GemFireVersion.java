@@ -207,7 +207,12 @@ public class GemFireVersion {
     }
 
     public String getProperty(String key) {
-      return error.orElse(description.getProperty(key));
+      if(description != null) {
+    	return error.orElse(description.getProperty(key));
+      } else {
+        return null;
+      }
+    	  
     }
     
     public String getNativeCodeVersion() {

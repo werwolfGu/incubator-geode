@@ -312,11 +312,11 @@ public class DiskStoreCommandsDUnitTest extends CliCommandTestBase {
         "describe offline-disk-store --name=" + diskStoreName1 + " --disk-dirs=" + diskStoreDir.getAbsolutePath() + " --pdx=true");
     String stringResult = commandResultToString(cmdResult);
     assertTrue(stringContainsLine(stringResult, ".*PDX Types.*"));
-    assertTrue(stringContainsLine(stringResult, ".*com\\.gemstone\\.gemfire\\.cache\\.query\\.data\\.PortfolioPdx.*"));
-    assertTrue(stringContainsLine(stringResult, ".*com\\.gemstone\\.gemfire\\.cache\\.query\\.data\\.PositionPdx.*"));
+    assertTrue(stringContainsLine(stringResult, ".*org\\.apache\\.geode\\.cache\\.query\\.data\\.PortfolioPdx.*"));
+    assertTrue(stringContainsLine(stringResult, ".*org\\.apache\\.geode\\.cache\\.query\\.data\\.PositionPdx.*"));
     assertTrue(stringContainsLine(stringResult, ".*PDX Enums.*"));
     assertTrue(
-        stringContainsLine(stringResult, ".*com\\.gemstone\\.gemfire\\.cache\\.query\\.data\\.PortfolioPdx\\$Day.*"));
+        stringContainsLine(stringResult, ".*org\\.apache\\.geode\\.cache\\.query\\.data\\.PortfolioPdx\\$Day.*"));
   }
 
   @Test
