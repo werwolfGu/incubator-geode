@@ -18,6 +18,22 @@
  */
 package org.apache.geode.security;
 
+import static org.apache.geode.distributed.ConfigurationProperties.*;
+import static org.apache.geode.internal.AvailablePort.*;
+import static org.apache.geode.security.SecurityTestUtils.*;
+import static org.apache.geode.test.dunit.Assert.*;
+import static org.apache.geode.test.dunit.IgnoredException.*;
+import static org.apache.geode.test.dunit.NetworkUtils.*;
+import static org.apache.geode.test.dunit.Wait.*;
+
+import java.util.Properties;
+
+import javax.net.ssl.SSLHandshakeException;
+
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
 import org.apache.geode.distributed.ConfigurationProperties;
 import org.apache.geode.distributed.DistributedSystem;
 import org.apache.geode.distributed.Locator;
@@ -36,22 +52,6 @@ import org.apache.geode.test.dunit.internal.JUnit4DistributedTestCase;
 import org.apache.geode.test.junit.categories.DistributedTest;
 import org.apache.geode.test.junit.categories.FlakyTest;
 import org.apache.geode.test.junit.categories.SecurityTest;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-
-import javax.net.ssl.SSLHandshakeException;
-import java.util.Properties;
-
-import static org.apache.geode.distributed.ConfigurationProperties.*;
-import static org.apache.geode.internal.AvailablePort.SOCKET;
-import static org.apache.geode.internal.AvailablePort.getRandomAvailablePort;
-import static org.apache.geode.security.SecurityTestUtils.startLocator;
-import static org.apache.geode.security.SecurityTestUtils.stopLocator;
-import static org.apache.geode.test.dunit.Assert.*;
-import static org.apache.geode.test.dunit.IgnoredException.addIgnoredException;
-import static org.apache.geode.test.dunit.NetworkUtils.getIPLiteral;
-import static org.apache.geode.test.dunit.Wait.pause;
 
 /**
  * Tests peer to peer authentication in Gemfire

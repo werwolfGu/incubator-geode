@@ -41,6 +41,7 @@ import org.apache.geode.internal.logging.LogService;
 import org.apache.geode.internal.net.SocketCreator;
 import org.apache.geode.internal.net.SocketCreatorFactory;
 import org.apache.geode.internal.security.SecurableCommunicationChannel;
+import org.apache.geode.internal.security.SecurableComponent;
 
 /**
  * <p>Client for the TcpServer component of the Locator.

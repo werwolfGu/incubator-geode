@@ -87,6 +87,7 @@ import org.apache.geode.internal.logging.LoggingThreadGroup;
 import org.apache.geode.internal.logging.log4j.LocalizedMessage;
 import org.apache.geode.internal.security.IntegratedSecurityService;
 import org.apache.geode.internal.security.SecurableCommunicationChannel;
+import org.apache.geode.internal.security.SecurableComponent;
 import org.apache.geode.internal.security.SecurityService;
 import org.apache.geode.internal.net.SocketCreatorFactory;
 import org.apache.geode.internal.tcp.ConnectionTable;
@@ -629,7 +630,8 @@ public class AcceptorImpl extends Acceptor implements Runnable
       this.hsPool = tmp_hsPool;
     }
 
-    isAuthenticationRequired = this.securityService.isClientSecurityRequired();
+    isAuthenticationRequired = (this.isGatewayReceiver && this.securityService.isGatewaySecurityRequired()) ||
+                               (! this.isGatewayReceiver && this.securityService.isClientSecurityRequired());
 
     isIntegratedSecurity = this.securityService.isIntegratedSecurity();
 
