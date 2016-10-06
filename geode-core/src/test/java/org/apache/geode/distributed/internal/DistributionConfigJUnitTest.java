@@ -329,35 +329,6 @@ public class DistributionConfigJUnitTest {
   }
 
   @Test
-  public void testSecurityProps() {
-    Properties props = new Properties();
-    props.put(SECURITY_MANAGER, SampleSecurityManager.class.getName());
-    props.put(SECURITY_POST_PROCESSOR, SamplePostProcessor.class.getName());
-    props.put(SECURITY_LOG_LEVEL, "config");
-    // add another non-security property to verify it won't get put in the security properties
-    props.put(ACK_WAIT_THRESHOLD, 2);
-
-    DistributionConfig config = new DistributionConfigImpl(props);
-    // SECURITY_ENABLED_COMPONENTS is automatically added to getSecurityProps
-    assertEquals(config.getSecurityProps().size(), 3);
-  }
-
-  @Test
-  public void testSecurityPropsWithNoSetter() {
-    Properties props = new Properties();
-    props.put(SECURITY_MANAGER, SampleSecurityManager.class.getName());
-    props.put(SECURITY_POST_PROCESSOR, SamplePostProcessor.class.getName());
-    props.put(SECURITY_LOG_LEVEL, "config");
-    // add another non-security property to verify it won't get put in the security properties
-    props.put(ACK_WAIT_THRESHOLD, 2);
-    props.put("security-username", "testName");
-
-    DistributionConfig config = new DistributionConfigImpl(props);
-    // SECURITY_ENABLED_COMPONENTS is automatically added to getSecurityProps
-    assertEquals(config.getSecurityProps().size(), 4);
-  }
-
-  @Test
   public void testSSLEnabledComponents() {
     Properties props = new Properties();
     props.put(MCAST_PORT, "0");
