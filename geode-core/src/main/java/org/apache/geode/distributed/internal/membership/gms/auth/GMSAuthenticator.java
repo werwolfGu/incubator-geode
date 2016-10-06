@@ -17,10 +17,12 @@
 package org.apache.geode.distributed.internal.membership.gms.auth;
 
 import static org.apache.geode.distributed.ConfigurationProperties.*;
+import static org.apache.geode.distributed.internal.DistributionConfig.*;
 import static org.apache.geode.internal.i18n.LocalizedStrings.*;
 
 import java.security.Principal;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.geode.LogWriter;
 import org.apache.geode.distributed.DistributedMember;
@@ -38,6 +40,9 @@ import org.apache.geode.security.GemFireSecurityException;
 
 public class GMSAuthenticator implements Authenticator {
 
+  private final static String SEC_PREFIX = GEMFIRE_PREFIX + "sys.security-";
+  private final static int SYS_PREFIX_LEN = (GEMFIRE_PREFIX + "sys.").length();
+
   private Services services;
   private Properties securityProps;
   private SecurityService securityService = IntegratedSecurityService.getSecurityService();
@@ -45,7 +50,7 @@ public class GMSAuthenticator implements Authenticator {
   @Override
   public void init(Services s) {
     this.services = s;
-    this.securityProps = this.services.getConfig().getDistributionConfig().getSecurityProps();
+    this.securityProps = addSystemSecurityProps(new Properties(this.services.getConfig().getDistributionConfig().getSecurityProps()));
   }
 
   @Override
@@ -199,5 +204,16 @@ public class GMSAuthenticator implements Authenticator {
 
   @Override
   public void emergencyClose() {
+  }
+
+  private static Properties addSystemSecurityProps(final Properties props) {
+    Set keys = System.getProperties().keySet();
+    for (Object key: keys) {
+      String propKey = (String) key;
+      if (propKey.startsWith(SEC_PREFIX)) {
+        props.setProperty(propKey.substring(SYS_PREFIX_LEN), System.getProperty(propKey));
+      }
+    }
+    return props;
   }
 }
