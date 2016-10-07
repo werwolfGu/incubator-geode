@@ -21,10 +21,8 @@ import static org.apache.geode.distributed.internal.DistributionConfig.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
