@@ -44,13 +44,13 @@ public class GMSAuthenticator implements Authenticator {
   private final static int SYS_PREFIX_LEN = (GEMFIRE_PREFIX + "sys.").length();
 
   private Services services;
-  private Properties securityProps;
+  private Properties securityProps = addSystemSecurityProps(new Properties());
   private SecurityService securityService = IntegratedSecurityService.getSecurityService();
 
   @Override
   public void init(Services s) {
     this.services = s;
-    this.securityProps = addSystemSecurityProps(new Properties(this.services.getConfig().getDistributionConfig().getSecurityProps()));
+    addSecurityProperties(this.services.getConfig().getDistributionConfig().getSecurityProps());
   }
 
   @Override
@@ -204,6 +204,10 @@ public class GMSAuthenticator implements Authenticator {
 
   @Override
   public void emergencyClose() {
+  }
+
+  private void addSecurityProperties(final Properties propsToAdd) {
+    this.securityProps.putAll(propsToAdd);
   }
 
   private static Properties addSystemSecurityProps(final Properties props) {
