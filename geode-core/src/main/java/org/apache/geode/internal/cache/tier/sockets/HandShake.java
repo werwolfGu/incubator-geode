@@ -728,6 +728,7 @@ public class HandShake implements ClientHandShake
     try {
       InternalLogWriter securityLogWriter = (InternalLogWriter)this.system.getSecurityLogWriter();
       securityLogWriter.fine("HandShake: using Diffie-Hellman key exchange with algo " + dhSKAlgo);
+      logger.info("KIRK: HandShake: using Diffie-Hellman key exchange with algo {}", dhSKAlgo); // TODO: KIRK: remove
       boolean requireAuthentication = (certificateFilePath != null && certificateFilePath
           .length() > 0);
       if (requireAuthentication) {
@@ -860,6 +861,7 @@ public class HandShake implements ClientHandShake
 
   private Cipher getEncryptCipher(String dhSKAlgo, PublicKey publicKey) 
       throws Exception{
+    logger.info("KIRK: called getEncryptCipher with dhSKAlgo={}", dhSKAlgo); // TODO: KIRK: remove
     try {
       if(_encrypt == null) {
         KeyAgreement ka = KeyAgreement.getInstance("DH");
@@ -1176,6 +1178,7 @@ public class HandShake implements ClientHandShake
       byte[] someBytes = new byte[48];
       random.nextBytes(someBytes);
     }
+    logger.info("KIRK: dhSKAlgo={}", dhSKAlgo); // TODO: KIRK: remove
   }
   
   public void accept(OutputStream out, InputStream in, byte epType, int qSize,
