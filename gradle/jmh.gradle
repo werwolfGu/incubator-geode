@@ -1,0 +1,6 @@
+subprojects {
+  apply plugin: "me.champeau.gradle.jmh"
+  jmh {
+    duplicateClassesStrategy = 'warn'
+  }
+}
