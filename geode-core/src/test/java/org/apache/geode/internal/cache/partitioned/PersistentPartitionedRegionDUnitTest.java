@@ -1629,12 +1629,12 @@ public class PersistentPartitionedRegionDUnitTest extends PersistentPartitionedR
     AsyncInvocation asyncCreate = vm0.invokeAsync(createData);
 
     SerializableCallable waitForIntValue = new SerializableCallable() {
-      public Object call() throws InterruptedException {
+      public Object call() {
         Cache cache = getCache();
         Region region = cache.getRegion(PR_REGION_NAME);
         // The value is initialized as a String so wait
         // for it to be changed to an Integer.
-        await().atMost(30, SECONDS).until(() -> {
+        await().atMost(60, SECONDS).until(() -> {
           return region.get(0) instanceof Integer;
         });
         return region.get(0);
