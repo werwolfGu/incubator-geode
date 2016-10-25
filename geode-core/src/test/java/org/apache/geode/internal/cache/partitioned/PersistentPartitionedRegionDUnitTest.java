@@ -1641,6 +1641,7 @@ public class PersistentPartitionedRegionDUnitTest extends PersistentPartitionedR
       }
     };
     vm0.invoke(waitForIntValue);
+    vm1.invoke(waitForIntValue);
 
     AsyncInvocation close0 = closeCacheAsync(vm0);
     AsyncInvocation close1 = closeCacheAsync(vm1);
