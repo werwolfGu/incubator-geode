@@ -14,15 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.apache.geode.test.junit.rules.serializable;
 
-dependencies {
-  compile 'com.jayway.jsonpath:json-path:' + project.'json-path.version'
-  testCompile 'commons-lang:commons-lang:' + project.'commons-lang.version'
-  testCompile 'com.google.guava:guava:' + project.'guava.version'
-  testCompile 'org.assertj:assertj-core:' + project.'assertj-core.version'
+import java.io.Serializable;
 
-  compile('junit:junit:' + project.'junit.version') {
-    exclude module: 'hamcrest-core'
-  }
-  compile 'org.hamcrest:hamcrest-all:' + project.'hamcrest-all.version'
+import org.junit.runners.model.Statement;
+
+/**
+ * Serializable subclass of {@link Statement}.
+ */
+public abstract class SerializableStatement extends Statement implements Serializable {
 }

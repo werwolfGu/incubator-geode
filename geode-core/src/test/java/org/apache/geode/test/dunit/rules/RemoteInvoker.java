@@ -18,7 +18,8 @@ import static org.apache.geode.test.dunit.Invoke.*;
 
 import java.io.Serializable;
 
-import org.apache.geode.test.dunit.SerializableRunnable;
+import org.apache.geode.test.dunit.Invoke;
+import org.apache.geode.test.dunit.SerializableRunnableIF;
 
 /**
  * Provides remote invocation support to a {@code TestRule}. These methods will invoke a
@@ -28,18 +29,21 @@ class RemoteInvoker implements Serializable {
 
   private static final long serialVersionUID = -1759722991299584649L;
 
-  public void invokeEverywhere(final SerializableRunnable runnable) {
+  // controller VM
+  // dunit VMs
+  // locator VM
+
+  public void invokeInEveryVMAndController(final SerializableRunnableIF runnable) {
     try {
       runnable.run();
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
-    invokeInEveryVM(runnable);
-    invokeInLocator(runnable);
+    Invoke.invokeInEveryVM(runnable);
   }
 
-  public void remoteInvokeInEveryVMAndLocator(final SerializableRunnable runnable) {
-    invokeInEveryVM(runnable);
+  public void invokeInEveryVMAndLocator(final SerializableRunnableIF runnable) {
+    Invoke.invokeInEveryVM(runnable);
     invokeInLocator(runnable);
   }
 }

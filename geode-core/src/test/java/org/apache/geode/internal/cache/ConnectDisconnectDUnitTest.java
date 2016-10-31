@@ -40,19 +40,19 @@ public class ConnectDisconnectDUnitTest extends JUnit4CacheTestCase {
   // see bugs #50785 and #46438
   @Test
   public void testManyConnectsAndDisconnects() throws Throwable {
-    // invokeInEveryVM(new SerializableRunnable() {
-    //
-    // @Override
-    // public void run() {
-    // Log.setLogWriterLevel("info");
-    // }
-    // });
+//    invokeInEveryVMAndController(new SerializableRunnable() {
+//
+//      @Override
+//      public void run() {
+//        Log.setLogWriterLevel("info");
+//      }
+//    });
 
-    // uncomment these lines to use stand-alone locators
-    // int[] ports = AvailablePortHelper.getRandomAvailableTCPPorts(4);
-    // setLocatorPorts(ports);
+// uncomment these lines to use stand-alone locators
+//     int[] ports = AvailablePortHelper.getRandomAvailableTCPPorts(4);
+//     setLocatorPorts(ports);
 
-    for (int i = 0; i < 20; i++) {
+    for(int i = 0; i < 20; i++) {
       LogWriterUtils.getLogWriter().info("Test run: " + i);
       runOnce();
       tearDown();

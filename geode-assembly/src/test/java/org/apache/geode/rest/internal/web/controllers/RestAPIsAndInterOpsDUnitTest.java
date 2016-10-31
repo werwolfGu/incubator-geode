@@ -65,7 +65,6 @@ import org.apache.geode.distributed.DistributedSystem;
 import org.apache.geode.internal.AvailablePort;
 import org.apache.geode.internal.AvailablePortHelper;
 import org.apache.geode.internal.cache.GemFireCacheImpl;
-import org.apache.geode.management.ManagementTestBase;
 import org.apache.geode.pdx.PdxInstance;
 import org.apache.geode.test.dunit.Host;
 import org.apache.geode.test.dunit.NetworkUtils;
@@ -78,55 +77,51 @@ import org.apache.geode.test.junit.runners.CategoryWithParameterizedRunnerFactor
  *
  * @since GemFire 8.0
  */
-
 @Category(DistributedTest.class)
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(CategoryWithParameterizedRunnerFactory.class)
+@SuppressWarnings("serial")
 public class RestAPIsAndInterOpsDUnitTest extends LocatorTestBase {
-
-  private static final long serialVersionUID = -254776154266339226L;
-
-  @Parameterized.Parameter
-  public String urlContext;
-
-  @Parameterized.Parameters
-  public static Collection<String> data() {
-    return Arrays.asList("/geode", "/gemfire-api");
-  }
-
-  private ManagementTestBase helper;
 
   public static final String PEOPLE_REGION_NAME = "People";
 
-  // private static RestTemplate restTemplate;
+  private static final String findAllPeopleQuery = "/queries?id=findAllPeople&q=SELECT%20*%20FROM%20/People";
+  private static final String findPeopleByGenderQuery = "/queries?id=filterByGender&q=SELECT%20*%20from%20/People%20where%20gender=$1";
+  private static final String findPeopleByLastNameQuery = "/queries?id=filterByLastName&q=SELECT%20*%20from%20/People%20where%20lastName=$1";
 
-  private static final String findAllPeopleQuery =
-      "/queries?id=findAllPeople&q=SELECT%20*%20FROM%20/People";
-  private static final String findPeopleByGenderQuery =
-      "/queries?id=filterByGender&q=SELECT%20*%20from%20/People%20where%20gender=$1";
-  private static final String findPeopleByLastNameQuery =
-      "/queries?id=filterByLastName&q=SELECT%20*%20from%20/People%20where%20lastName=$1";
+  private static final String[] PARAM_QUERY_IDS_ARRAY = { "findAllPeople",
+      "filterByGender", "filterByLastName" };
 
-  private static final String[] PARAM_QUERY_IDS_ARRAY =
-      {"findAllPeople", "filterByGender", "filterByLastName"};
+  final static String QUERY_ARGS = "["
+      + "{"
+      + "\"@type\": \"string\","
+      + "\"@value\": \"Patel\""
+      + "}"
+      + "]";
 
-  final static String QUERY_ARGS =
-      "[" + "{" + "\"@type\": \"string\"," + "\"@value\": \"Patel\"" + "}" + "]";
+  final static String PERSON_AS_JSON_CAS = "{"
+      + "\"@old\" :"
+      + "{"
+      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
+      + "\"id\": 101," + " \"firstName\": \"Mithali\","
+      + " \"middleName\": \"Dorai\"," + " \"lastName\": \"Raj\","
+      + " \"birthDate\": \"12/04/1982\"," + "\"gender\": \"FEMALE\""
+      + "},"
+      + "\"@new\" :"
+      + "{"
+      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
+      + "\"id\": 1101," + " \"firstName\": \"Virat\","
+      + " \"middleName\": \"Premkumar\"," + " \"lastName\": \"Kohli\","
+      + " \"birthDate\": \"08/11/1988\"," + "\"gender\": \"MALE\""
+      + "}"
+      + "}";
 
-  final static String PERSON_AS_JSON_CAS = "{" + "\"@old\" :" + "{"
-      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 101,"
-      + " \"firstName\": \"Mithali\"," + " \"middleName\": \"Dorai\"," + " \"lastName\": \"Raj\","
-      + " \"birthDate\": \"12/04/1982\"," + "\"gender\": \"FEMALE\"" + "}," + "\"@new\" :" + "{"
-      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 1101,"
-      + " \"firstName\": \"Virat\"," + " \"middleName\": \"Premkumar\","
-      + " \"lastName\": \"Kohli\"," + " \"birthDate\": \"08/11/1988\"," + "\"gender\": \"MALE\""
-      + "}" + "}";
-
-  final static String PERSON_AS_JSON_REPLACE =
-      "{" + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 501,"
-          + " \"firstName\": \"Barack\"," + " \"middleName\": \"Hussein\","
-          + " \"lastName\": \"Obama\"," + " \"birthDate\": \"04/08/1961\"," + "\"gender\": \"MALE\""
-          + "}";
+  final static String PERSON_AS_JSON_REPLACE = "{"
+      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
+      + "\"id\": 501," + " \"firstName\": \"Barack\","
+      + " \"middleName\": \"Hussein\"," + " \"lastName\": \"Obama\","
+      + " \"birthDate\": \"04/08/1961\"," + "\"gender\": \"MALE\""
+      + "}";
 
   private static final String PERSON_LIST_AS_JSON = "[" + "{"
       + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 3,"
@@ -161,23 +156,12 @@ public class RestAPIsAndInterOpsDUnitTest extends LocatorTestBase {
       + " \"lastName\": \"Patel\"," + " \"birthDate\": \"23/08/2012\"," + "\"gender\": \"MALE\""
       + "}" + "]";
 
-  public RestAPIsAndInterOpsDUnitTest() {
-    super();
-    this.helper = new ManagementTestBase() {
-      {
-      }
-    };
+  @Parameterized.Parameter
+  public String urlContext;
 
-  }
-
-  @Override
-  public final void preSetUp() throws Exception {
-    disconnectAllFromDS();
-  }
-
-  @Override
-  protected final void postTearDownLocatorTestBase() throws Exception {
-    disconnectAllFromDS();
+  @Parameterized.Parameters
+  public static Collection<String> data() {
+    return Arrays.asList("/geode", "/gemfire-api");
   }
 
   public String startBridgeServerWithRestService(final String hostName, final String[] groups,
@@ -828,14 +812,6 @@ public class RestAPIsAndInterOpsDUnitTest extends LocatorTestBase {
 
     // Querying
     doQueryOpsUsingRestApis(restEndpoint);
-
-    // stop the client and make sure the bridge server notifies
-    // stopBridgeMemberVM(client);
-    helper.closeCache(locator);
-    helper.closeCache(manager);
-    helper.closeCache(server);
-    helper.closeCache(client);
-
   }
 
   private void createClientCache(final String host, final int port) throws Exception {

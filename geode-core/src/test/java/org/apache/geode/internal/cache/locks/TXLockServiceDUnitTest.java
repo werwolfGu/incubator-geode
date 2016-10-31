@@ -88,11 +88,12 @@ public class TXLockServiceDUnitTest extends JUnit4DistributedTestCase {
 
   @Override
   public final void preTearDown() throws Exception {
-    // invokeInEveryVM(TXLockServiceDUnitTest.class,
-    // "remoteDumpAllDLockServices");
-
-    Invoke.invokeInEveryVM(TXLockServiceDUnitTest.class, "destroyServices");
-
+//    invokeInEveryVMAndController(TXLockServiceDUnitTest.class,
+//                    "remoteDumpAllDLockServices");
+                    
+    Invoke.invokeInEveryVM(TXLockServiceDUnitTest.class,
+                    "destroyServices"); 
+    
     destroyServices();
 
     // // Disconnects the DistributedSystem in every VM - since
@@ -112,10 +113,9 @@ public class TXLockServiceDUnitTest extends JUnit4DistributedTestCase {
   @Test
   public void testGetAndDestroy() {
     forEachVMInvoke("checkGetAndDestroy", new Object[] {});
-    /*
-     * invokeInEveryVM(TXLockServiceDUnitTest.class, "destroyServices");
-     * forEachVMInvoke("checkGetAndDestroy", new Object[] {});
-     */
+    /*invokeInEveryVMAndController(TXLockServiceDUnitTest.class,
+                    "destroyServices"); 
+    forEachVMInvoke("checkGetAndDestroy", new Object[] {});*/
   }
 
   @Test
