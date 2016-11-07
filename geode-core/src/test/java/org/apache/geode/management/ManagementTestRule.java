@@ -32,6 +32,8 @@ import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.Statement;
 
 import org.apache.geode.cache.Cache;
+import org.apache.geode.cache.client.ClientCache;
+import org.apache.geode.cache.client.ClientCacheFactory;
 import org.apache.geode.distributed.DistributedMember;
 import org.apache.geode.distributed.DistributedSystemDisconnectedException;
 import org.apache.geode.distributed.internal.DM;
@@ -169,6 +171,10 @@ public class ManagementTestRule implements MethodRule, Serializable {
 //      return cache;
 //    }
     return this.helper.getCache();
+  }
+
+  public ClientCache getClientCache() {
+    return this.helper.getClientCache(new ClientCacheFactory());
   }
 
   public boolean hasCache() {
