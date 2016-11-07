@@ -83,7 +83,8 @@ public class DUnitLauncher {
   private static final int LOCATOR_VM_NUM = -2;
 
   static final long STARTUP_TIMEOUT = 120 * 1000;
-  private static final String STARTUP_TIMEOUT_MESSAGE = "VMs did not start up within " + (STARTUP_TIMEOUT/1000) + " seconds";
+  private static final String STARTUP_TIMEOUT_MESSAGE =
+      "VMs did not start up within " + (STARTUP_TIMEOUT / 1000) + " seconds";
 
   private static final String SUSPECT_FILENAME = "dunit_suspect.log";
   private static File DUNIT_SUSPECT_FILE;
@@ -201,8 +202,8 @@ public class DUnitLauncher {
     // Create a VM for the locator
     processManager.launchVM(LOCATOR_VM_NUM);
 
-    //wait for the VM to start up
-    if(!processManager.waitForVMs(STARTUP_TIMEOUT)) {
+    // wait for the VM to start up
+    if (!processManager.waitForVMs(STARTUP_TIMEOUT)) {
       throw new RuntimeException("VMs did not start up within 30 seconds");
     }
 
@@ -216,8 +217,8 @@ public class DUnitLauncher {
       processManager.launchVM(i);
     }
 
-    //wait for the VMS to start up
-    if(!processManager.waitForVMs(STARTUP_TIMEOUT)) {
+    // wait for the VMS to start up
+    if (!processManager.waitForVMs(STARTUP_TIMEOUT)) {
       throw new RuntimeException("VMs did not start up within 30 seconds");
     }
 

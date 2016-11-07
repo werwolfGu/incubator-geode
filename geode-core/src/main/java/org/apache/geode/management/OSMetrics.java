@@ -25,7 +25,7 @@ import java.io.Serializable;
  *
  */
 public class OSMetrics implements Serializable {
-  
+
   /**
    * Maximum number file descriptor which can be opened
    */

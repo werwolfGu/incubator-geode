@@ -85,43 +85,33 @@ public class RestAPIsAndInterOpsDUnitTest extends LocatorTestBase {
 
   public static final String PEOPLE_REGION_NAME = "People";
 
-  private static final String findAllPeopleQuery = "/queries?id=findAllPeople&q=SELECT%20*%20FROM%20/People";
-  private static final String findPeopleByGenderQuery = "/queries?id=filterByGender&q=SELECT%20*%20from%20/People%20where%20gender=$1";
-  private static final String findPeopleByLastNameQuery = "/queries?id=filterByLastName&q=SELECT%20*%20from%20/People%20where%20lastName=$1";
+  private static final String findAllPeopleQuery =
+      "/queries?id=findAllPeople&q=SELECT%20*%20FROM%20/People";
+  private static final String findPeopleByGenderQuery =
+      "/queries?id=filterByGender&q=SELECT%20*%20from%20/People%20where%20gender=$1";
+  private static final String findPeopleByLastNameQuery =
+      "/queries?id=filterByLastName&q=SELECT%20*%20from%20/People%20where%20lastName=$1";
 
-  private static final String[] PARAM_QUERY_IDS_ARRAY = { "findAllPeople",
-      "filterByGender", "filterByLastName" };
+  private static final String[] PARAM_QUERY_IDS_ARRAY =
+      {"findAllPeople", "filterByGender", "filterByLastName"};
 
-  final static String QUERY_ARGS = "["
-      + "{"
-      + "\"@type\": \"string\","
-      + "\"@value\": \"Patel\""
-      + "}"
-      + "]";
+  final static String QUERY_ARGS =
+      "[" + "{" + "\"@type\": \"string\"," + "\"@value\": \"Patel\"" + "}" + "]";
 
-  final static String PERSON_AS_JSON_CAS = "{"
-      + "\"@old\" :"
-      + "{"
-      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
-      + "\"id\": 101," + " \"firstName\": \"Mithali\","
-      + " \"middleName\": \"Dorai\"," + " \"lastName\": \"Raj\","
-      + " \"birthDate\": \"12/04/1982\"," + "\"gender\": \"FEMALE\""
-      + "},"
-      + "\"@new\" :"
-      + "{"
-      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
-      + "\"id\": 1101," + " \"firstName\": \"Virat\","
-      + " \"middleName\": \"Premkumar\"," + " \"lastName\": \"Kohli\","
-      + " \"birthDate\": \"08/11/1988\"," + "\"gender\": \"MALE\""
-      + "}"
-      + "}";
+  final static String PERSON_AS_JSON_CAS = "{" + "\"@old\" :" + "{"
+      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 101,"
+      + " \"firstName\": \"Mithali\"," + " \"middleName\": \"Dorai\"," + " \"lastName\": \"Raj\","
+      + " \"birthDate\": \"12/04/1982\"," + "\"gender\": \"FEMALE\"" + "}," + "\"@new\" :" + "{"
+      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 1101,"
+      + " \"firstName\": \"Virat\"," + " \"middleName\": \"Premkumar\","
+      + " \"lastName\": \"Kohli\"," + " \"birthDate\": \"08/11/1988\"," + "\"gender\": \"MALE\""
+      + "}" + "}";
 
-  final static String PERSON_AS_JSON_REPLACE = "{"
-      + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\","
-      + "\"id\": 501," + " \"firstName\": \"Barack\","
-      + " \"middleName\": \"Hussein\"," + " \"lastName\": \"Obama\","
-      + " \"birthDate\": \"04/08/1961\"," + "\"gender\": \"MALE\""
-      + "}";
+  final static String PERSON_AS_JSON_REPLACE =
+      "{" + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 501,"
+          + " \"firstName\": \"Barack\"," + " \"middleName\": \"Hussein\","
+          + " \"lastName\": \"Obama\"," + " \"birthDate\": \"04/08/1961\"," + "\"gender\": \"MALE\""
+          + "}";
 
   private static final String PERSON_LIST_AS_JSON = "[" + "{"
       + "\"@type\": \"org.apache.geode.rest.internal.web.controllers.Person\"," + "\"id\": 3,"

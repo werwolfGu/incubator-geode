@@ -97,15 +97,15 @@ public class DistributedLockServiceDUnitTest extends JUnit4DistributedTestCase {
   @Override
   public final void preTearDown() throws Exception {
     Invoke.invokeInEveryVM(() -> destroyAllDLockServices());
-//    invokeInEveryVMAndController(DistributedLockServiceDUnitTest.class,
-//                    "remoteDumpAllDLockServices"); 
-                    
-    //InternalDistributedLockService.destroyAll();
-    
-//     // Disconnects the DistributedSystem in every VM - since
-//     // each test randomly chooses whether shared memory is used
-//     disconnectAllFromDS();
-    
+    // invokeInEveryVMAndController(DistributedLockServiceDUnitTest.class,
+    // "remoteDumpAllDLockServices");
+
+    // InternalDistributedLockService.destroyAll();
+
+    // // Disconnects the DistributedSystem in every VM - since
+    // // each test randomly chooses whether shared memory is used
+    // disconnectAllFromDS();
+
     this.lockGrantor = null;
   }
 

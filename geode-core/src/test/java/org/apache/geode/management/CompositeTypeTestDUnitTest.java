@@ -33,7 +33,7 @@ import org.apache.geode.test.dunit.VM;
 import org.apache.geode.test.junit.categories.DistributedTest;
 
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class CompositeTypeTestDUnitTest implements Serializable {
 
   @Manager
@@ -46,7 +46,7 @@ public class CompositeTypeTestDUnitTest implements Serializable {
   public ManagementTestRule managementTestRule = ManagementTestRule.builder().start(true).build();
 
   @Test
-  public void testCompositeTypeGetters() throws Exception{
+  public void testCompositeTypeGetters() throws Exception {
     registerMBeanWithCompositeTypeGetters(this.memberVM);
 
     String memberName = MBeanJMXAdapter.makeCompliantName(getMemberId(this.memberVM));
@@ -65,14 +65,17 @@ public class CompositeTypeTestDUnitTest implements Serializable {
     });
   }
 
-  private void verifyMBeanWithCompositeTypeGetters(final VM managerVM, final String memberId) throws Exception {
+  private void verifyMBeanWithCompositeTypeGetters(final VM managerVM, final String memberId)
+      throws Exception {
     managerVM.invoke("verifyMBeanWithCompositeTypeGetters", () -> {
       SystemManagementService service = this.managementTestRule.getSystemManagementService();
-      ObjectName objectName = new ObjectName("GemFire:service=custom,type=composite,member=" + memberId);
+      ObjectName objectName =
+          new ObjectName("GemFire:service=custom,type=composite,member=" + memberId);
 
       await().until(() -> service.getMBeanInstance(objectName, CompositeTestMXBean.class) != null);
 
-      CompositeTestMXBean compositeTestMXBean = service.getMBeanInstance(objectName, CompositeTestMXBean.class);
+      CompositeTestMXBean compositeTestMXBean =
+          service.getMBeanInstance(objectName, CompositeTestMXBean.class);
       assertThat(compositeTestMXBean).isNotNull();
 
       CompositeStats listCompositeStatsData = compositeTestMXBean.listCompositeStats();
@@ -90,7 +93,8 @@ public class CompositeTypeTestDUnitTest implements Serializable {
   }
 
   private String getMemberId(final VM memberVM) {
-    return memberVM.invoke("getMemberId", () -> this.managementTestRule.getDistributedMember().getId());
+    return memberVM.invoke("getMemberId",
+        () -> this.managementTestRule.getDistributedMember().getId());
   }
 
   private ConditionFactory await() {

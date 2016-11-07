@@ -63,14 +63,15 @@ import org.apache.geode.test.junit.categories.DistributedTest;
  * This is for testing client IDs
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class TestClientIdsDUnitTest implements Serializable {
 
   private static final String KEY1 = "KEY1";
   private static final String KEY2 = "KEY2";
   private static final String VALUE1 = "client-KEY1";
   private static final String VALUE2 = "client-KEY2";
-  private static final String REGION_NAME = TestClientIdsDUnitTest.class.getSimpleName() + "_Region";
+  private static final String REGION_NAME =
+      TestClientIdsDUnitTest.class.getSimpleName() + "_Region";
 
   @Manager
   private VM managerVM;
@@ -95,14 +96,16 @@ public class TestClientIdsDUnitTest implements Serializable {
 
     int port = this.serverVM.invoke(() -> createServerCache());
 
-    this.client1VM.invoke(() -> createClientCache(getServerHostName(this.serverVM.getHost()), port));
-    this.client2VM.invoke(() -> createClientCache(getServerHostName(this.serverVM.getHost()), port));
+    this.client1VM
+        .invoke(() -> createClientCache(getServerHostName(this.serverVM.getHost()), port));
+    this.client2VM
+        .invoke(() -> createClientCache(getServerHostName(this.serverVM.getHost()), port));
 
     DistributedMember serverMember = this.managementTestRule.getDistributedMember(this.serverVM);
     DistributedMember client1Member = this.managementTestRule.getDistributedMember(this.client1VM);
     DistributedMember client2Member = this.managementTestRule.getDistributedMember(this.client2VM);
 
-//    this.managerVM.invoke(() -> verifyClientIds(serverMember, port));
+    // this.managerVM.invoke(() -> verifyClientIds(serverMember, port));
     this.managerVM.invoke(() -> {
       CacheServerMXBean cacheServerMXBean = awaitCacheServerMXBean(serverMember, port);
       await().until(() -> {
@@ -136,24 +139,19 @@ public class TestClientIdsDUnitTest implements Serializable {
   private void createClientCache(final String host, final int serverPort) {
     ClientCache cache = this.managementTestRule.getClientCache();
 
-    PoolImpl pool = (PoolImpl) PoolManager.createFactory()
-                                          .addServer(host, serverPort)
-                                          .setSubscriptionEnabled(false)
-                                          .setThreadLocalConnections(true)
-                                          .setMinConnections(1)
-                                          .setReadTimeout(20000)
-                                          .setPingInterval(10000)
-                                          .setRetryAttempts(1)
-                                          .setSubscriptionEnabled(true)
-                                          .setStatisticInterval(1000)
-                                          .create(getClass().getSimpleName());
+    PoolImpl pool = (PoolImpl) PoolManager.createFactory().addServer(host, serverPort)
+        .setSubscriptionEnabled(false).setThreadLocalConnections(true).setMinConnections(1)
+        .setReadTimeout(20000).setPingInterval(10000).setRetryAttempts(1)
+        .setSubscriptionEnabled(true).setStatisticInterval(1000).create(getClass().getSimpleName());
 
-    ClientRegionFactory factory = cache.createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY);
+    ClientRegionFactory factory =
+        cache.createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY);
     factory.setPoolName(pool.getName());
     factory.create(REGION_NAME);
   }
 
-  private void verifyClientIds(final DistributedMember serverMember, final int serverPort) throws Exception {
+  private void verifyClientIds(final DistributedMember serverMember, final int serverPort)
+      throws Exception {
     CacheServerMXBean cacheServerMXBean = awaitCacheServerMXBean(serverMember, serverPort);
     await().until(() -> {
       try {
@@ -165,11 +163,13 @@ public class TestClientIdsDUnitTest implements Serializable {
     assertThat(cacheServerMXBean.getClientIds()).hasSize(2); // TODO
   }
 
-  private CacheServerMXBean awaitCacheServerMXBean(final DistributedMember serverMember, final int port) {
+  private CacheServerMXBean awaitCacheServerMXBean(final DistributedMember serverMember,
+      final int port) {
     SystemManagementService service = this.managementTestRule.getSystemManagementService();
     ObjectName objectName = service.getCacheServerMBeanName(port, serverMember);
 
-    await().until(() -> assertThat(service.getMBeanProxy(objectName, CacheServerMXBean.class)).isNotNull());
+    await().until(
+        () -> assertThat(service.getMBeanProxy(objectName, CacheServerMXBean.class)).isNotNull());
 
     return service.getMBeanProxy(objectName, CacheServerMXBean.class);
   }

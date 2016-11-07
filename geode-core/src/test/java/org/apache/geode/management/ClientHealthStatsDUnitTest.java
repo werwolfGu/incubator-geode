@@ -58,7 +58,7 @@ import org.apache.geode.test.junit.categories.DistributedTest;
  * Client health stats check
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class ClientHealthStatsDUnitTest implements Serializable {
 
   private static final int NUMBER_PUTS = 100;
@@ -68,7 +68,8 @@ public class ClientHealthStatsDUnitTest implements Serializable {
   private static final String VALUE1 = "VALUE1";
   private static final String VALUE2 = "VALUE2";
 
-  private static final String REGION_NAME = ClientHealthStatsDUnitTest.class.getSimpleName() + "_Region";
+  private static final String REGION_NAME =
+      ClientHealthStatsDUnitTest.class.getSimpleName() + "_Region";
 
   // client1VM and client2VM VM fields
   private static ClientCache clientCache;
@@ -174,19 +175,28 @@ public class ClientHealthStatsDUnitTest implements Serializable {
   public void testStatsMatchWithSize() throws Exception {
     int port = this.serverVM.invoke(() -> createServerCache()); // start a serverVM
 
-    this.client1VM.invoke(() -> createClientCache(this.hostName, port, 1, true)); // create durable client1VM, with durable RI
+    this.client1VM.invoke(() -> createClientCache(this.hostName, port, 1, true)); // create durable
+                                                                                  // client1VM, with
+                                                                                  // durable RI
 
-    this.serverVM.invoke(() -> doPuts()); // do puts on serverVM from three different threads, pause after 500 puts each.
+    this.serverVM.invoke(() -> doPuts()); // do puts on serverVM from three different threads, pause
+                                          // after 500 puts each.
 
     this.client1VM.invoke(() -> clientCache.close(true)); // close durable client1VM
 
-    this.serverVM.invoke(() -> await().atMost(2, MINUTES).until(() -> cacheClientProxyHasBeenPause()));
+    this.serverVM
+        .invoke(() -> await().atMost(2, MINUTES).until(() -> cacheClientProxyHasBeenPause()));
 
     this.serverVM.invoke(() -> resumePuts()); // resume puts on serverVM, add another 100.
 
-    this.client1VM.invoke(() -> createClientCache(this.hostName, port, 1, true)); // start durable client1VM
+    this.client1VM.invoke(() -> createClientCache(this.hostName, port, 1, true)); // start durable
+                                                                                  // client1VM
 
-    this.client1VM.invoke(() -> await().atMost(1, MINUTES).until(() -> lastKeyReceived)); // wait for full queue dispatch
+    this.client1VM.invoke(() -> await().atMost(1, MINUTES).until(() -> lastKeyReceived)); // wait
+                                                                                          // for
+                                                                                          // full
+                                                                                          // queue
+                                                                                          // dispatch
 
     this.serverVM.invoke(() -> verifyStats(port)); // verify the stats
   }
@@ -196,11 +206,12 @@ public class ClientHealthStatsDUnitTest implements Serializable {
    */
   private boolean cacheClientProxyHasBeenPause() {
     CacheClientNotifier clientNotifier = CacheClientNotifier.getInstance(); // TODO
-    //CacheClientNotifier clientNotifier = ((CacheServerImpl)this.managementTestRule.getCache().getCacheServers().get(0)).getAcceptor().getCacheClientNotifier();
+    // CacheClientNotifier clientNotifier =
+    // ((CacheServerImpl)this.managementTestRule.getCache().getCacheServers().get(0)).getAcceptor().getCacheClientNotifier();
 
     Collection<CacheClientProxy> clientProxies = clientNotifier.getClientProxies();
 
-    for (CacheClientProxy clientProxy: clientProxies) {
+    for (CacheClientProxy clientProxy : clientProxies) {
       if (clientProxy.isPaused()) {
         return true;
       }
@@ -214,7 +225,8 @@ public class ClientHealthStatsDUnitTest implements Serializable {
   private int createServerCache() throws Exception {
     Cache cache = this.managementTestRule.getCache();
 
-    RegionFactory<String, String> regionFactory = cache.createRegionFactory(RegionShortcut.REPLICATE);
+    RegionFactory<String, String> regionFactory =
+        cache.createRegionFactory(RegionShortcut.REPLICATE);
     regionFactory.setConcurrencyChecksEnabled(false);
     regionFactory.create(REGION_NAME);
 
@@ -227,10 +239,8 @@ public class ClientHealthStatsDUnitTest implements Serializable {
   /**
    * Invoked in client1VM and client2VM
    */
-  private void createClientCache(final String hostName,
-                                 final Integer port,
-                                 final int clientNum,
-                                 final boolean subscriptionEnabled) throws Exception {
+  private void createClientCache(final String hostName, final Integer port, final int clientNum,
+      final boolean subscriptionEnabled) throws Exception {
     Properties props = new Properties();
     props.setProperty(STATISTIC_SAMPLING_ENABLED, "true");
 
@@ -247,7 +257,8 @@ public class ClientHealthStatsDUnitTest implements Serializable {
     cacheFactory.addPoolServer(hostName, port);
     clientCache = cacheFactory.create();
 
-    ClientRegionFactory<String, String> regionFactory = clientCache.createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY);
+    ClientRegionFactory<String, String> regionFactory =
+        clientCache.createClientRegionFactory(ClientRegionShortcut.CACHING_PROXY);
     regionFactory.setConcurrencyChecksEnabled(false);
 
     regionFactory.addCacheListener(new CacheListenerAdapter<String, String>() {
@@ -325,7 +336,8 @@ public class ClientHealthStatsDUnitTest implements Serializable {
   /**
    * Invoked in managerVM
    */
-  private void verifyClientStats(final DistributedMember serverMember, final int serverPort, final int numSubscriptions) throws Exception {
+  private void verifyClientStats(final DistributedMember serverMember, final int serverPort,
+      final int numSubscriptions) throws Exception {
     ManagementService service = this.managementTestRule.getManagementService();
     CacheServerMXBean cacheServerMXBean = awaitCacheServerMXBean(serverMember, serverPort);
 
@@ -350,7 +362,7 @@ public class ClientHealthStatsDUnitTest implements Serializable {
    * Invoked in client1VM and client2VM
    */
   private void put() throws Exception {
-    Cache cache = (Cache)clientCache;
+    Cache cache = (Cache) clientCache;
     Region<String, String> region = cache.getRegion(Region.SEPARATOR + REGION_NAME);
 
     region.put(KEY1, VALUE1);
@@ -382,14 +394,16 @@ public class ClientHealthStatsDUnitTest implements Serializable {
     assertThat(clientProxy.getQueueSizeStat()).isEqualTo(clientProxy.getQueueSize());
 
     ClientQueueDetail queueDetails = serverBean.showClientQueueDetails()[0];
-    assertThat(clientProxy.getQueueSizeStat()).isEqualTo((int)queueDetails.getQueueSize());
+    assertThat(clientProxy.getQueueSizeStat()).isEqualTo((int) queueDetails.getQueueSize());
   }
 
-  private CacheServerMXBean awaitCacheServerMXBean(final DistributedMember serverMember, final int port) {
+  private CacheServerMXBean awaitCacheServerMXBean(final DistributedMember serverMember,
+      final int port) {
     SystemManagementService service = this.managementTestRule.getSystemManagementService();
     ObjectName objectName = service.getCacheServerMBeanName(port, serverMember);
 
-    await().until(() -> assertThat(service.getMBeanProxy(objectName, CacheServerMXBean.class)).isNotNull());
+    await().until(
+        () -> assertThat(service.getMBeanProxy(objectName, CacheServerMXBean.class)).isNotNull());
 
     return service.getMBeanProxy(objectName, CacheServerMXBean.class);
   }

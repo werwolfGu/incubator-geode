@@ -58,22 +58,26 @@ public class DistributedSystemStatsDUnitTest {
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       assertNotNull(cache);
 
-      SystemManagementService service = (SystemManagementService) ManagementService.getManagementService(cache);
+      SystemManagementService service =
+          (SystemManagementService) ManagementService.getManagementService(cache);
       DistributedSystemMXBean distributedSystemMXBean = service.getDistributedSystemMXBean();
       assertNotNull(distributedSystemMXBean);
 
-      Set<DistributedMember> otherMemberSet = cache.getDistributionManager().getOtherNormalDistributionManagerIds();
+      Set<DistributedMember> otherMemberSet =
+          cache.getDistributionManager().getOtherNormalDistributionManagerIds();
       assertEquals(3, otherMemberSet.size());
 
       for (DistributedMember member : otherMemberSet) {
         ObjectName memberMXBeanName = service.getMemberMBeanName(member);
-        await().atMost(2, TimeUnit.MINUTES).until(() -> assertTrue(ManagementFactory.getPlatformMBeanServer().isRegistered(memberMXBeanName)));
+        await().atMost(2, TimeUnit.MINUTES).until(() -> assertTrue(
+            ManagementFactory.getPlatformMBeanServer().isRegistered(memberMXBeanName)));
 
         MemberMXBean memberMXBean = service.getMBeanProxy(memberMXBeanName, MemberMXBean.class);
         assertNotNull(memberMXBean);
 
         final long lastRefreshTime = service.getLastUpdateTime(memberMXBeanName);
-        await().atMost(1, TimeUnit.MINUTES).until(() -> assertTrue(service.getLastUpdateTime(memberMXBeanName) > lastRefreshTime));
+        await().atMost(1, TimeUnit.MINUTES)
+            .until(() -> assertTrue(service.getLastUpdateTime(memberMXBeanName) > lastRefreshTime));
       }
     });
   }

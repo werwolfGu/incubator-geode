@@ -51,7 +51,8 @@ import org.apache.geode.test.junit.categories.DistributedTest;
 @SuppressWarnings("serial")
 public class TestSubscriptionsDUnitTest extends ManagementTestBase {
 
-  private static final String REGION_NAME = TestSubscriptionsDUnitTest.class.getSimpleName() + "_Region";
+  private static final String REGION_NAME =
+      TestSubscriptionsDUnitTest.class.getSimpleName() + "_Region";
 
   private static final String KEY1 = "k1";
   private static final String KEY2 = "k2";
@@ -137,17 +138,11 @@ public class TestSubscriptionsDUnitTest extends ManagementTestBase {
 
     Cache cache = createCache(props);
 
-    PoolImpl p = (PoolImpl) PoolManager.createFactory()
-                                       .addServer(host, port1)
-                                       .setSubscriptionEnabled(true)
-                                       .setThreadLocalConnections(true)
-                                       .setMinConnections(1)
-                                       .setReadTimeout(20000)
-                                       .setPingInterval(10000)
-                                       .setRetryAttempts(1)
-                                       .setSubscriptionEnabled(true)
-                                       .setStatisticInterval(1000)
-                                       .create("TestSubscriptionsDUnitTest");
+    PoolImpl p =
+        (PoolImpl) PoolManager.createFactory().addServer(host, port1).setSubscriptionEnabled(true)
+            .setThreadLocalConnections(true).setMinConnections(1).setReadTimeout(20000)
+            .setPingInterval(10000).setRetryAttempts(1).setSubscriptionEnabled(true)
+            .setStatisticInterval(1000).create("TestSubscriptionsDUnitTest");
 
     AttributesFactory factory = new AttributesFactory();
     factory.setScope(Scope.DISTRIBUTED_ACK);
@@ -168,15 +163,18 @@ public class TestSubscriptionsDUnitTest extends ManagementTestBase {
         public boolean done() {
           ManagementService service = ManagementService.getExistingManagementService(cache);
           DistributedSystemMXBean distributedSystemMXBean = service.getDistributedSystemMXBean();
-          return distributedSystemMXBean != null & distributedSystemMXBean.getNumSubscriptions() > 1;
+          return distributedSystemMXBean != null
+              & distributedSystemMXBean.getNumSubscriptions() > 1;
         }
+
         @Override
         public String description() {
           return "TestSubscriptionsDUnitTest wait for getDistributedSystemMXBean to complete and get results";
         }
       }, 2 * 60 * 1000, 3000, true);
 
-      DistributedSystemMXBean distributedSystemMXBean = ManagementService.getExistingManagementService(cache).getDistributedSystemMXBean();
+      DistributedSystemMXBean distributedSystemMXBean =
+          ManagementService.getExistingManagementService(cache).getDistributedSystemMXBean();
       assertNotNull(distributedSystemMXBean);
       assertEquals(2, distributedSystemMXBean.getNumSubscriptions());
     });

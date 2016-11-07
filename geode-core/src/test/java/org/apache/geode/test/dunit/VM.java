@@ -92,11 +92,11 @@ public class VM implements Serializable {
    * Returns the process id of this {@code VM}.
    */
   public int getPid() {
-//    try {
-      return invoke(() -> ProcessUtils.identifyPid());
-//    } catch (PidUnavailableException e) {
-//      return this.pid;
-//    }
+    // try {
+    return invoke(() -> ProcessUtils.identifyPid());
+    // } catch (PidUnavailableException e) {
+    // return this.pid;
+    // }
   }
 
   /**

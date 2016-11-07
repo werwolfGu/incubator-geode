@@ -54,14 +54,14 @@ import org.apache.geode.test.junit.categories.DistributedTest;
 import org.apache.geode.test.junit.rules.serializable.SerializableTemporaryFolder;
 
 /**
- * Test cases to cover all test cases which pertains to disk from Management
- * layer
+ * Test cases to cover all test cases which pertains to disk from Management layer
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class DiskManagementDUnitTest implements Serializable {
 
-  private static final String REGION_NAME = DiskManagementDUnitTest.class.getSimpleName() + "_region";
+  private static final String REGION_NAME =
+      DiskManagementDUnitTest.class.getSimpleName() + "_region";
 
   private File diskDir;
 
@@ -83,8 +83,8 @@ public class DiskManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Tests Disk Compaction from a MemberMXBean which is at cache level. All the
-   * disks which belong to the cache should be compacted.
+   * Tests Disk Compaction from a MemberMXBean which is at cache level. All the disks which belong
+   * to the cache should be compacted.
    */
   @Test
   public void testDiskCompact() throws Exception {
@@ -99,8 +99,8 @@ public class DiskManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Tests Disk Compaction from a MemberMXBean which is at cache level. All the
-   * disks which belong to the cache should be compacted.
+   * Tests Disk Compaction from a MemberMXBean which is at cache level. All the disks which belong
+   * to the cache should be compacted.
    */
   @Test
   public void testDiskCompactRemote() throws Exception {
@@ -137,8 +137,7 @@ public class DiskManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Checks the test case of missing disks and revoking them through MemberMXBean
-   * interfaces
+   * Checks the test case of missing disks and revoking them through MemberMXBean interfaces
    */
   @Test
   public void testMissingMembers() throws Exception {
@@ -166,14 +165,12 @@ public class DiskManagementDUnitTest implements Serializable {
 
     AsyncInvocation creatingPersistentRegionAsync = createPersistentRegionAsync(memberVM1);
 
-    memberVM1.invoke(() ->
-      await().until(() -> {
-        GemFireCacheImpl cache = (GemFireCacheImpl) this.managementTestRule.getCache();
-        PersistentMemberManager persistentMemberManager = cache.getPersistentMemberManager();
-        Map<String, Set<PersistentMemberID>> regions = persistentMemberManager.getWaitingRegions();
-        return !regions.isEmpty();
-      })
-    );
+    memberVM1.invoke(() -> await().until(() -> {
+      GemFireCacheImpl cache = (GemFireCacheImpl) this.managementTestRule.getCache();
+      PersistentMemberManager persistentMemberManager = cache.getPersistentMemberManager();
+      Map<String, Set<PersistentMemberID>> regions = persistentMemberManager.getWaitingRegions();
+      return !regions.isEmpty();
+    }));
 
     assertThat(creatingPersistentRegionAsync.isAlive()).isTrue();
 
@@ -346,7 +343,8 @@ public class DiskManagementDUnitTest implements Serializable {
     });
   }
 
-  private void createPersistentRegion(final VM memberVM) throws InterruptedException, ExecutionException, TimeoutException {
+  private void createPersistentRegion(final VM memberVM)
+      throws InterruptedException, ExecutionException, TimeoutException {
     await(createPersistentRegionAsync(memberVM));
   }
 
@@ -357,7 +355,7 @@ public class DiskManagementDUnitTest implements Serializable {
       Cache cache = this.managementTestRule.getCache();
 
       DiskStoreFactory diskStoreFactory = cache.createDiskStoreFactory();
-      diskStoreFactory.setDiskDirs(new File[] { dir });
+      diskStoreFactory.setDiskDirs(new File[] {dir});
       diskStoreFactory.setMaxOplogSize(1);
       diskStoreFactory.setAllowForceCompaction(true);
       diskStoreFactory.setAutoCompact(false);
@@ -392,11 +390,13 @@ public class DiskManagementDUnitTest implements Serializable {
   private MemberMXBean awaitMemberMXBeanProxy(final DistributedMember member) {
     SystemManagementService service = this.managementTestRule.getSystemManagementService();
     ObjectName objectName = service.getMemberMBeanName(member);
-    await().until(() -> assertThat(service.getMBeanProxy(objectName, MemberMXBean.class)).isNotNull());
+    await()
+        .until(() -> assertThat(service.getMBeanProxy(objectName, MemberMXBean.class)).isNotNull());
     return service.getMBeanProxy(objectName, MemberMXBean.class);
   }
 
-  private void await(final AsyncInvocation createPersistentRegionAsync) throws InterruptedException, ExecutionException, TimeoutException {
+  private void await(final AsyncInvocation createPersistentRegionAsync)
+      throws InterruptedException, ExecutionException, TimeoutException {
     createPersistentRegionAsync.await(2, MINUTES);
   }
 

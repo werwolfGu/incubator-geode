@@ -53,7 +53,7 @@ import org.apache.geode.test.junit.rules.serializable.SerializableTestName;
  * Distributed tests for managing {@code Locator} with {@link LocatorMXBean}.
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class LocatorManagementDUnitTest implements Serializable {
 
   private static final int MAX_WAIT_MILLIS = 120 * 1000;
@@ -80,8 +80,8 @@ public class LocatorManagementDUnitTest implements Serializable {
 
   @Before
   public void before() throws Exception {
-//    this.managerVM = managingNode;
-//    this.membersVM = getManagedNodeList().toArray(new VM[getManagedNodeList().size()]);
+    // this.managerVM = managingNode;
+    // this.membersVM = getManagedNodeList().toArray(new VM[getManagedNodeList().size()]);
     this.locatorVM = this.membersVM[0];
     this.hostName = getServerHostName(getHost(0));
     this.port = getRandomAvailableTCPPort();
@@ -112,13 +112,14 @@ public class LocatorManagementDUnitTest implements Serializable {
     this.managementTestRule.createManager(this.managerVM, props, false);
     this.managementTestRule.startManager(this.managerVM);
 
-    verifyRemoteLocatorMXBeanProxy(this.managerVM, this.managementTestRule.getDistributedMember(this.locatorVM));
+    verifyRemoteLocatorMXBeanProxy(this.managerVM,
+        this.managementTestRule.getDistributedMember(this.locatorVM));
   }
 
   @Test
   public void testPeerLocationWithPortZero() throws Exception {
     this.port = startLocator(this.locatorVM, true, ZERO);
-    //this.locatorVM.invoke(() -> this.managementTestRule.getCache());
+    // this.locatorVM.invoke(() -> this.managementTestRule.getCache());
 
     this.locatorVM.invoke(() -> assertHasCache());
 
@@ -135,7 +136,8 @@ public class LocatorManagementDUnitTest implements Serializable {
     this.managementTestRule.createManager(this.managerVM, props, false);
     this.managementTestRule.startManager(this.managerVM);
 
-    verifyRemoteLocatorMXBeanProxy(this.managerVM, this.managementTestRule.getDistributedMember(this.locatorVM));
+    verifyRemoteLocatorMXBeanProxy(this.managerVM,
+        this.managementTestRule.getDistributedMember(this.locatorVM));
   }
 
   private void assertHasCache() {
@@ -219,8 +221,7 @@ public class LocatorManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Starts a locator with given configuration.
-   * If DS is already started it will use the same DS
+   * Starts a locator with given configuration. If DS is already started it will use the same DS
    */
   private int startLocator(final VM locatorVM, final boolean isPeer, final int port) {
     return locatorVM.invoke("startLocator", () -> {
@@ -231,8 +232,10 @@ public class LocatorManagementDUnitTest implements Serializable {
       properties.setProperty(LOCATORS, "");
 
       InetAddress bindAddress = InetAddress.getByName(this.hostName);
-      File logFile = this.temporaryFolder.newFile(testName.getMethodName() + "-locator-" + port + ".log");
-      Locator locator = Locator.startLocatorAndDS(port, logFile, bindAddress, properties, isPeer, true, null);
+      File logFile =
+          this.temporaryFolder.newFile(testName.getMethodName() + "-locator-" + port + ".log");
+      Locator locator =
+          Locator.startLocatorAndDS(port, logFile, bindAddress, properties, isPeer, true, null);
 
       assertThat(InternalLocator.hasLocator()).isTrue();
 
@@ -249,7 +252,7 @@ public class LocatorManagementDUnitTest implements Serializable {
 
   private void verifyLocalLocatorMXBean(final VM locatorVM, final int port, final boolean isPeer) {
     locatorVM.invoke("verifyLocalLocatorMXBean", () -> {
-      //ManagementService service = this.managementTestRule.getExistingManagementService();
+      // ManagementService service = this.managementTestRule.getExistingManagementService();
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       ManagementService service = ManagementService.getExistingManagementService(cache);
       assertThat(service).isNotNull();
@@ -258,16 +261,17 @@ public class LocatorManagementDUnitTest implements Serializable {
       assertThat(locatorMXBean).isNotNull();
       assertThat(locatorMXBean.getPort()).isEqualTo(port);
 
-      //        LogWriterUtils.getLogWriter().info("Log of Locator" + bean.viewLog());
-      //        LogWriterUtils.getLogWriter().info("BindAddress" + bean.getBindAddress());
+      // LogWriterUtils.getLogWriter().info("Log of Locator" + bean.viewLog());
+      // LogWriterUtils.getLogWriter().info("BindAddress" + bean.getBindAddress());
 
       assertThat(locatorMXBean.isPeerLocator()).isEqualTo(isPeer);
     });
   }
 
-  private void verifyRemoteLocatorMXBeanProxy(final VM managerVM, final DistributedMember locatorMember) {
+  private void verifyRemoteLocatorMXBeanProxy(final VM managerVM,
+      final DistributedMember locatorMember) {
     managerVM.invoke("verifyRemoteLocatorMXBeanProxy", () -> {
-      //ManagementService service = this.managementTestRule.getExistingManagementService();
+      // ManagementService service = this.managementTestRule.getExistingManagementService();
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       ManagementService service = ManagementService.getExistingManagementService(cache);
       assertThat(service).isNotNull();
@@ -276,14 +280,14 @@ public class LocatorManagementDUnitTest implements Serializable {
       LocatorMXBean locatorMXBean = awaitLockServiceMXBeanProxy(locatorMember);
       assertThat(locatorMXBean).isNotNull();
 
-      //        LogWriterUtils.getLogWriter().info("Log of Locator" + bean.viewLog());
-      //        LogWriterUtils.getLogWriter().info("BindAddress" + bean.getBindAddress());
+      // LogWriterUtils.getLogWriter().info("Log of Locator" + bean.viewLog());
+      // LogWriterUtils.getLogWriter().info("BindAddress" + bean.getBindAddress());
     });
   }
 
   private void verifyListManagers(final VM locatorVM) {
     locatorVM.invoke("verifyListManagers", () -> {
-      //ManagementService service = this.managementTestRule.getExistingManagementService();
+      // ManagementService service = this.managementTestRule.getExistingManagementService();
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       ManagementService service = ManagementService.getExistingManagementService(cache);
       assertThat(service).isNotNull();
@@ -297,16 +301,17 @@ public class LocatorManagementDUnitTest implements Serializable {
 
   private void verifyListPotentialManagers(final VM locatorVM) {
     locatorVM.invoke("verifyListPotentialManagers", () -> {
-      //ManagementService service = this.managementTestRule.getExistingManagementService();
+      // ManagementService service = this.managementTestRule.getExistingManagementService();
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       ManagementService service = ManagementService.getExistingManagementService(cache);
       assertThat(service).isNotNull();
 
-      //LocatorMXBean locatorMXBean = service.getLocalLocatorMXBean();
+      // LocatorMXBean locatorMXBean = service.getLocalLocatorMXBean();
       LocatorMXBean locatorMXBean = awaitLockServiceMXBean();
       assertThat(locatorMXBean).isNotNull();
 
-      await("listPotentialManagers has size 3").until(() -> assertThat(locatorMXBean.listPotentialManagers()).hasSize(3));
+      await("listPotentialManagers has size 3")
+          .until(() -> assertThat(locatorMXBean.listPotentialManagers()).hasSize(3));
     });
   }
 
@@ -325,7 +330,8 @@ public class LocatorManagementDUnitTest implements Serializable {
     SystemManagementService service = this.managementTestRule.getSystemManagementService();
     ObjectName locatorMBeanName = service.getLocatorMBeanName(member);
 
-    await().until(() -> assertThat(service.getMBeanProxy(locatorMBeanName, LocatorMXBean.class)).isNotNull());
+    await().until(
+        () -> assertThat(service.getMBeanProxy(locatorMBeanName, LocatorMXBean.class)).isNotNull());
 
     return service.getMBeanProxy(locatorMBeanName, LocatorMXBean.class);
   }
@@ -342,7 +348,8 @@ public class LocatorManagementDUnitTest implements Serializable {
   }
 
   public static String getServerHostName(Host host) {
-    return System.getProperty(DistributionConfig.GEMFIRE_PREFIX + "server-bind-address") != null ?
-      System.getProperty(DistributionConfig.GEMFIRE_PREFIX + "server-bind-address") : host.getHostName();
+    return System.getProperty(DistributionConfig.GEMFIRE_PREFIX + "server-bind-address") != null
+        ? System.getProperty(DistributionConfig.GEMFIRE_PREFIX + "server-bind-address")
+        : host.getHostName();
   }
 }

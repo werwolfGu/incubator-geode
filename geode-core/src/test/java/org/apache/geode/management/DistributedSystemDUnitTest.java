@@ -64,15 +64,11 @@ import org.apache.geode.test.junit.categories.DistributedTest;
 /**
  * Distributed System management tests
  * <p>
- * a) For all the notifications
- * i) gemfire.distributedsystem.member.joined
- * ii) gemfire.distributedsystem.member.left
- * iii) gemfire.distributedsystem.member.suspect
- * iv ) All notifications emitted by member mbeans
- * vi) Alerts
+ * a) For all the notifications i) gemfire.distributedsystem.member.joined ii)
+ * gemfire.distributedsystem.member.left iii) gemfire.distributedsystem.member.suspect iv ) All
+ * notifications emitted by member mbeans vi) Alerts
  * <p>
- * b) Concurrently modify proxy list by removing member and accessing the
- * distributed system MBean
+ * b) Concurrently modify proxy list by removing member and accessing the distributed system MBean
  * <p>
  * c) Aggregate Operations like shutDownAll
  * <p>
@@ -81,7 +77,7 @@ import org.apache.geode.test.junit.categories.DistributedTest;
  * e ) Statistics
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class DistributedSystemDUnitTest implements Serializable {
 
   private static final Logger logger = LogService.getLogger();
@@ -145,9 +141,11 @@ public class DistributedSystemDUnitTest implements Serializable {
     addAlertListener(this.managerVM);
     verifyAlertCount(this.managerVM, 0, 0);
 
-    DistributedMember managerDistributedMember = this.managementTestRule.getDistributedMember(this.managerVM);
+    DistributedMember managerDistributedMember =
+        this.managementTestRule.getDistributedMember(this.managerVM);
 
-    // Before we start we need to ensure that the initial (implicit) SEVERE alert has propagated everywhere.
+    // Before we start we need to ensure that the initial (implicit) SEVERE alert has propagated
+    // everywhere.
     for (VM memberVM : this.memberVMs) {
       verifyAlertAppender(memberVM, managerDistributedMember, Alert.SEVERE);
     }
@@ -228,7 +226,8 @@ public class DistributedSystemDUnitTest implements Serializable {
 
       for (ObjectName objectName : distributedSystemMXBean.listMemberObjectNames()) {
         NotificationHubTestListener listener = new NotificationHubTestListener();
-        ManagementFactory.getPlatformMBeanServer().addNotificationListener(objectName, listener, null, null);
+        ManagementFactory.getPlatformMBeanServer().addNotificationListener(objectName, listener,
+            null, null);
         notificationListenerMap.put(objectName, listener);
       }
     });
@@ -239,26 +238,30 @@ public class DistributedSystemDUnitTest implements Serializable {
       memberVM.invoke("checkNotificationHubListenerCount", () -> {
         SystemManagementService service = this.managementTestRule.getSystemManagementService();
         NotificationHub notificationHub = service.getNotificationHub();
-        Map<ObjectName, NotificationHubListener> listenerMap = notificationHub.getListenerObjectMap();
+        Map<ObjectName, NotificationHubListener> listenerMap =
+            notificationHub.getListenerObjectMap();
         assertThat(listenerMap.keySet()).hasSize(1);
 
-        ObjectName memberMBeanName = MBeanJMXAdapter.getMemberMBeanName(this.managementTestRule.getDistributedMember());
+        ObjectName memberMBeanName =
+            MBeanJMXAdapter.getMemberMBeanName(this.managementTestRule.getDistributedMember());
         NotificationHubListener listener = listenerMap.get(memberMBeanName);
 
         /*
-         * Counter of listener should be 2 . One for default Listener which is
-         * added for each member mbean by distributed system mbean One for the
-         * added listener in test
+         * Counter of listener should be 2 . One for default Listener which is added for each member
+         * mbean by distributed system mbean One for the added listener in test
          */
         assertThat(listener.getNumCounter()).isEqualTo(2);
 
         // Raise some notifications
 
         NotificationBroadcasterSupport notifier = (MemberMBean) service.getMemberMXBean();
-        String memberSource = MBeanJMXAdapter.getMemberNameOrId(this.managementTestRule.getDistributedMember());
+        String memberSource =
+            MBeanJMXAdapter.getMemberNameOrId(this.managementTestRule.getDistributedMember());
 
         // Only a dummy notification , no actual region is created
-        Notification notification = new Notification(JMXNotificationType.REGION_CREATED, memberSource, SequenceNumber.next(), System.currentTimeMillis(), ManagementConstants.REGION_CREATED_PREFIX + "/test");
+        Notification notification = new Notification(JMXNotificationType.REGION_CREATED,
+            memberSource, SequenceNumber.next(), System.currentTimeMillis(),
+            ManagementConstants.REGION_CREATED_PREFIX + "/test");
         notifier.sendNotification(notification);
       });
     }
@@ -283,12 +286,13 @@ public class DistributedSystemDUnitTest implements Serializable {
         Map<ObjectName, NotificationHubListener> listenerObjectMap = hub.getListenerObjectMap();
         assertThat(listenerObjectMap.keySet().size()).isEqualTo(1);
 
-        ObjectName memberMBeanName = MBeanJMXAdapter.getMemberMBeanName(this.managementTestRule.getDistributedMember());
+        ObjectName memberMBeanName =
+            MBeanJMXAdapter.getMemberMBeanName(this.managementTestRule.getDistributedMember());
         NotificationHubListener listener = listenerObjectMap.get(memberMBeanName);
 
         /*
-         * Counter of listener should be 1 for the default Listener which is
-         * added for each member mbean by distributed system mbean.
+         * Counter of listener should be 1 for the default Listener which is added for each member
+         * mbean by distributed system mbean.
          */
         assertThat(listener.getNumCounter()).isEqualTo(1);
       });
@@ -303,9 +307,11 @@ public class DistributedSystemDUnitTest implements Serializable {
       for (ObjectName objectName : distributedSystemMXBean.listMemberObjectNames()) {
         NotificationHubTestListener listener = new NotificationHubTestListener();
         try {
-          ManagementFactory.getPlatformMBeanServer().removeNotificationListener(objectName, listener); // because new instance!!
+          ManagementFactory.getPlatformMBeanServer().removeNotificationListener(objectName,
+              listener); // because new instance!!
         } catch (ListenerNotFoundException e) {
-          // TODO: [old] apparently there is never a notification listener on any these mbeans at this point [fix this]
+          // TODO: [old] apparently there is never a notification listener on any these mbeans at
+          // this point [fix this]
           // fix this test so it doesn't hit these unexpected exceptions -- getLogWriter().error(e);
         }
       }
@@ -320,7 +326,9 @@ public class DistributedSystemDUnitTest implements Serializable {
 
         for (ObjectName objectName : notificationListenerMap.keySet()) {
           NotificationListener listener = notificationListenerMap.get(objectName);
-          assertThatThrownBy(() -> ManagementFactory.getPlatformMBeanServer().removeNotificationListener(objectName, listener)).isExactlyInstanceOf(ListenerNotFoundException.class);
+          assertThatThrownBy(() -> ManagementFactory.getPlatformMBeanServer()
+              .removeNotificationListener(objectName, listener))
+                  .isExactlyInstanceOf(ListenerNotFoundException.class);
         }
       });
     }
@@ -335,7 +343,8 @@ public class DistributedSystemDUnitTest implements Serializable {
     addAlertListener(this.managerVM);
     resetAlertCounts(this.managerVM);
 
-    DistributedMember managerDistributedMember = this.managementTestRule.getDistributedMember(this.managerVM);
+    DistributedMember managerDistributedMember =
+        this.managementTestRule.getDistributedMember(this.managerVM);
 
     generateWarningAlert(this.managerVM);
     generateSevereAlert(this.managerVM);
@@ -376,16 +385,23 @@ public class DistributedSystemDUnitTest implements Serializable {
     verifyAlertCount(this.managerVM, 0, 0);
   }
 
-  private void verifyAlertAppender(final VM memberVM, final DistributedMember member, final int alertLevel) {
-    memberVM.invoke("verifyAlertAppender", () -> await().until(() -> assertThat(AlertAppender.getInstance().hasAlertListener(member, alertLevel)).isTrue()));
+  private void verifyAlertAppender(final VM memberVM, final DistributedMember member,
+      final int alertLevel) {
+    memberVM.invoke("verifyAlertAppender",
+        () -> await().until(
+            () -> assertThat(AlertAppender.getInstance().hasAlertListener(member, alertLevel))
+                .isTrue()));
   }
 
-  private void verifyAlertCount(final VM managerVM, final int expectedSevereAlertCount, final int expectedWarningAlertCount) {
+  private void verifyAlertCount(final VM managerVM, final int expectedSevereAlertCount,
+      final int expectedWarningAlertCount) {
     managerVM.invoke("verifyAlertCount", () -> {
       AlertNotificationListener listener = AlertNotificationListener.getInstance();
 
-      await().until(() -> assertThat(listener.getSevereAlertCount()).isEqualTo(expectedSevereAlertCount));
-      await().until(() -> assertThat(listener.getWarningAlertCount()).isEqualTo(expectedWarningAlertCount));
+      await().until(
+          () -> assertThat(listener.getSevereAlertCount()).isEqualTo(expectedSevereAlertCount));
+      await().until(
+          () -> assertThat(listener.getWarningAlertCount()).isEqualTo(expectedWarningAlertCount));
     });
   }
 
@@ -399,7 +415,8 @@ public class DistributedSystemDUnitTest implements Serializable {
 
   private void generateWarningAlert(final VM anyVM) {
     anyVM.invoke("generateWarningAlert", () -> {
-      IgnoredException ignoredException = IgnoredException.addIgnoredException(WARNING_LEVEL_MESSAGE);
+      IgnoredException ignoredException =
+          IgnoredException.addIgnoredException(WARNING_LEVEL_MESSAGE);
       logger.warn(WARNING_LEVEL_MESSAGE);
       ignoredException.remove();
     });
@@ -414,7 +431,8 @@ public class DistributedSystemDUnitTest implements Serializable {
 
   private void generateSevereAlert(final VM anyVM) {
     anyVM.invoke("generateSevereAlert", () -> {
-      IgnoredException ignoredException = IgnoredException.addIgnoredException(SEVERE_LEVEL_MESSAGE);
+      IgnoredException ignoredException =
+          IgnoredException.addIgnoredException(SEVERE_LEVEL_MESSAGE);
       logger.fatal(SEVERE_LEVEL_MESSAGE);
       ignoredException.remove();
     });
@@ -425,9 +443,11 @@ public class DistributedSystemDUnitTest implements Serializable {
       AlertNotificationListener listener = AlertNotificationListener.getInstance();
       listener.resetCount();
 
-      NotificationFilter notificationFilter = (Notification notification) -> notification.getType().equals(JMXNotificationType.SYSTEM_ALERT);
+      NotificationFilter notificationFilter = (Notification notification) -> notification.getType()
+          .equals(JMXNotificationType.SYSTEM_ALERT);
 
-      ManagementFactory.getPlatformMBeanServer().addNotificationListener(MBeanJMXAdapter.getDistributedSystemName(), listener, notificationFilter, null);
+      ManagementFactory.getPlatformMBeanServer().addNotificationListener(
+          MBeanJMXAdapter.getDistributedSystemName(), listener, notificationFilter, null);
     });
   }
 
@@ -455,7 +475,8 @@ public class DistributedSystemDUnitTest implements Serializable {
       assertThat(distributedSystemMXBean).isNotNull();
 
       DistributedSystemNotificationListener listener = new DistributedSystemNotificationListener();
-      ManagementFactory.getPlatformMBeanServer().addNotificationListener(MBeanJMXAdapter.getDistributedSystemName(), listener, null, null);
+      ManagementFactory.getPlatformMBeanServer().addNotificationListener(
+          MBeanJMXAdapter.getDistributedSystemName(), listener, null, null);
     });
   }
 
@@ -474,7 +495,8 @@ public class DistributedSystemDUnitTest implements Serializable {
       ManagementService service = this.managementTestRule.getManagementService();
       DistributedSystemMXBean distributedSystemMXBean = service.getDistributedSystemMXBean();
 
-      await().until(() -> assertThat(distributedSystemMXBean.listMemberObjectNames()).hasSize(memberCount));
+      await().until(
+          () -> assertThat(distributedSystemMXBean.listMemberObjectNames()).hasSize(memberCount));
 
       String memberId = this.managementTestRule.getDistributedMember().getId();
       ObjectName thisMemberName = MBeanJMXAdapter.getMemberMBeanName(memberId);
@@ -508,16 +530,19 @@ public class DistributedSystemDUnitTest implements Serializable {
     }
 
     @Override
-    public synchronized void handleNotification(final Notification notification, final Object handback) {
+    public synchronized void handleNotification(final Notification notification,
+        final Object handback) {
       assertThat(notification).isNotNull();
 
       Map<String, String> notificationUserData = (Map<String, String>) notification.getUserData();
 
-      if (notificationUserData.get(JMXNotificationUserData.ALERT_LEVEL).equalsIgnoreCase("warning")) {
+      if (notificationUserData.get(JMXNotificationUserData.ALERT_LEVEL)
+          .equalsIgnoreCase("warning")) {
         assertThat(notification.getMessage()).isEqualTo(WARNING_LEVEL_MESSAGE);
         warningAlertCount++;
       }
-      if (notificationUserData.get(JMXNotificationUserData.ALERT_LEVEL).equalsIgnoreCase("severe")) {
+      if (notificationUserData.get(JMXNotificationUserData.ALERT_LEVEL)
+          .equalsIgnoreCase("severe")) {
         assertThat(notification.getMessage()).isEqualTo(SEVERE_LEVEL_MESSAGE);
         severeAlertCount++;
       }

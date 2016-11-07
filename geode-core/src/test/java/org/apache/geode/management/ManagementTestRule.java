@@ -1,18 +1,16 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more contributor license
+ * agreements. See the NOTICE file distributed with this work for additional information regarding
+ * copyright ownership. The ASF licenses this file to You under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance with the License. You may obtain a
+ * copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 package org.apache.geode.management;
 
@@ -69,8 +67,7 @@ public class ManagementTestRule implements MethodRule, Serializable {
   private VM[] members;
 
   protected ManagementTestRule(final Builder builder) {
-    this.helper = new JUnit4CacheTestCase() {
-    };
+    this.helper = new JUnit4CacheTestCase() {};
     this.managersCount = builder.managersCount;
     this.membersCount = builder.membersCount;
     this.start = builder.start;
@@ -166,10 +163,10 @@ public class ManagementTestRule implements MethodRule, Serializable {
   }
 
   public Cache getCache() {
-//    Cache cache = GemFireCacheImpl.getInstance();
-//    if (cache != null && !cache.isClosed()) {
-//      return cache;
-//    }
+    // Cache cache = GemFireCacheImpl.getInstance();
+    // if (cache != null && !cache.isClosed()) {
+    // return cache;
+    // }
     return this.helper.getCache();
   }
 
@@ -178,18 +175,18 @@ public class ManagementTestRule implements MethodRule, Serializable {
   }
 
   public boolean hasCache() {
-//    Cache cache = GemFireCacheImpl.getInstance();
-//    if (cache != null && !cache.isClosed()) {
-//      return true;
-//    }
+    // Cache cache = GemFireCacheImpl.getInstance();
+    // if (cache != null && !cache.isClosed()) {
+    // return true;
+    // }
     return this.helper.hasCache();
   }
 
   public Cache basicGetCache() {
-//    Cache cache = GemFireCacheImpl.getInstance();
-//    if (cache != null && !cache.isClosed()) {
-//      return cache;
-//    }
+    // Cache cache = GemFireCacheImpl.getInstance();
+    // if (cache != null && !cache.isClosed()) {
+    // return cache;
+    // }
     return this.helper.basicGetCache();
   }
 
@@ -239,7 +236,7 @@ public class ManagementTestRule implements MethodRule, Serializable {
   }
 
   private DM getDistributionManager() {
-    return ((GemFireCacheImpl)getCache()).getDistributionManager();
+    return ((GemFireCacheImpl) getCache()).getDistributionManager();
   }
 
   public void disconnectAllFromDS() {
@@ -249,7 +246,8 @@ public class ManagementTestRule implements MethodRule, Serializable {
     Invoke.invokeInEveryVM("disconnectFromDS", () -> JUnit4DistributedTestCase.disconnectFromDS());
   }
 
-  private void setPropertyIfNotSet(final Properties properties, final String key, final String value) {
+  private void setPropertyIfNotSet(final Properties properties, final String key,
+      final String value) {
     if (!properties.containsKey(key)) {
       properties.setProperty(key, value);
     }
@@ -349,11 +347,13 @@ public class ManagementTestRule implements MethodRule, Serializable {
 
   private void throwIfAlreadyAssigned(final Field field, final boolean alreadyAssigned) {
     if (alreadyAssigned) {
-      throw new IllegalStateException("Field " + field.getName() + " is already annotated with " + field.getAnnotations());
+      throw new IllegalStateException(
+          "Field " + field.getName() + " is already annotated with " + field.getAnnotations());
     }
   }
 
-  private void assignManagerField(final Object target, final Field field) throws IllegalAccessException {
+  private void assignManagerField(final Object target, final Field field)
+      throws IllegalAccessException {
     throwIfNotSameType(field, VM.class);
 
     field.setAccessible(true);
@@ -364,7 +364,8 @@ public class ManagementTestRule implements MethodRule, Serializable {
     }
   }
 
-  private void assignMemberField(final Object target, final Field field) throws IllegalAccessException {
+  private void assignMemberField(final Object target, final Field field)
+      throws IllegalAccessException {
     throwIfNotSameType(field, VM.class);
 
     field.setAccessible(true);
@@ -378,7 +379,8 @@ public class ManagementTestRule implements MethodRule, Serializable {
   private void throwIfNotSameType(final Field field, final Class clazz) {
     if (!field.getType().equals(clazz) && // non-array
         !field.getType().getComponentType().equals(clazz)) { // array
-      throw new IllegalArgumentException("Field " + field.getName() + " is not same type as " + clazz.getName());
+      throw new IllegalArgumentException(
+          "Field " + field.getName() + " is not same type as " + clazz.getName());
     }
   }
 
@@ -396,8 +398,7 @@ public class ManagementTestRule implements MethodRule, Serializable {
 
     private boolean managersFirst = true;
 
-    protected Builder() {
-    }
+    protected Builder() {}
 
     public Builder createManagers(final boolean value) {
       this.createManagers = value;

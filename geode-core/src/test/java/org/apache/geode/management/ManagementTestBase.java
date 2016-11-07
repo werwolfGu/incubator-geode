@@ -60,9 +60,9 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
 
   private static final int MAX_WAIT = 70 * 1000;
 
-//  protected static DistributedSystem ds;
+  // protected static DistributedSystem ds;
   protected static ManagementService managementService;
-//  protected static Cache cache;
+  // protected static Cache cache;
 
   /**
    * List containing all the Managed Node VM
@@ -80,7 +80,8 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
   protected static VM locatorVM;
 
   @Rule
-  public DistributedRestoreSystemProperties restoreSystemProperties = new DistributedRestoreSystemProperties();
+  public DistributedRestoreSystemProperties restoreSystemProperties =
+      new DistributedRestoreSystemProperties();
 
   @Override
   public final void postSetUp() throws Exception {
@@ -208,8 +209,10 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
     Wait.waitForCriterion(new WaitCriterion() {
       @Override
       public String description() {
-        return "Waiting for the proxy of " + objectName.getCanonicalName() + " to get propagated to Manager";
+        return "Waiting for the proxy of " + objectName.getCanonicalName()
+            + " to get propagated to Manager";
       }
+
       @Override
       public boolean done() {
         SystemManagementService service = (SystemManagementService) managementService;
@@ -228,12 +231,12 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
   protected void startManagingNode(final VM vm1) {
     vm1.invoke("Start Being Managing Node", () -> {
       Cache existingCache = GemFireCacheImpl.getInstance();
-      //    if (existingCache != null && !existingCache.isClosed()) {
+      // if (existingCache != null && !existingCache.isClosed()) {
       managementService = ManagementService.getManagementService(existingCache);
       SystemManagementService service = (SystemManagementService) managementService;
       service.createManager();
       service.startManager();
-      //    }
+      // }
     });
   }
 
@@ -266,7 +269,8 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
   /**
    * Creates a Distributed region
    */
-  protected void createDistributedRegion(final VM vm, final String regionName) throws InterruptedException {
+  protected void createDistributedRegion(final VM vm, final String regionName)
+      throws InterruptedException {
     AsyncInvocation future = createDistributedRegionAsync(vm, regionName);
     future.join(MAX_WAIT);
     if (future.isAlive()) {
@@ -294,7 +298,8 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
   /**
    * Creates a Sub region
    */
-  protected void createSubRegion(final VM vm, final String parentRegionPath, final String subregionName) throws Exception {
+  protected void createSubRegion(final VM vm, final String parentRegionPath,
+      final String subregionName) throws Exception {
     vm.invoke("Create Sub region", () -> {
       GemFireCacheImpl cache = GemFireCacheImpl.getInstance();
       SystemManagementService service = (SystemManagementService) getManagementService();
@@ -343,10 +348,12 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
       public String description() {
         return "Waiting All members to intimate DistributedSystemMBean";
       }
+
       @Override
       public boolean done() {
         if (bean.listMemberObjectNames() != null) {
-          LogWriterUtils.getLogWriter().info("Member Length " + bean.listMemberObjectNames().length);
+          LogWriterUtils.getLogWriter()
+              .info("Member Length " + bean.listMemberObjectNames().length);
         }
         if (bean.listMemberObjectNames().length >= expectedCount) {
           return true;
@@ -359,7 +366,8 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
     assertNotNull(bean.getManagerObjectName());
   }
 
-  protected static void waitForRefresh(final int expectedRefreshCount, final ObjectName objectName) {
+  protected static void waitForRefresh(final int expectedRefreshCount,
+      final ObjectName objectName) {
     final ManagementService service = getManagementService();
 
     Wait.waitForCriterion(new WaitCriterion() {
@@ -403,7 +411,8 @@ public abstract class ManagementTestBase extends JUnit4CacheTestCase {
   }
 
   protected <T> T getMBeanProxy(final ObjectName objectName, Class<T> interfaceClass) {
-    SystemManagementService service = (SystemManagementService)ManagementService.getManagementService(getCache());
+    SystemManagementService service =
+        (SystemManagementService) ManagementService.getManagementService(getCache());
     return service.getMBeanProxy(objectName, interfaceClass);
   }
 }

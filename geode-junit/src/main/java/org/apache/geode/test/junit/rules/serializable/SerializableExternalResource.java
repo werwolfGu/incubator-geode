@@ -23,7 +23,8 @@ import org.junit.runners.model.Statement;
 /**
  * Serializable subclass of {@link org.junit.rules.ExternalResource ExternalResource}.
  */
-public abstract class SerializableExternalResource extends ExternalResource implements SerializableTestRule {
+public abstract class SerializableExternalResource extends ExternalResource
+    implements SerializableTestRule {
 
   public Statement apply(Statement base, Description description) {
     return statement(base);

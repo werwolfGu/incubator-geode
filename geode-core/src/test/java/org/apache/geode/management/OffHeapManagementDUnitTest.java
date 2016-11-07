@@ -61,10 +61,7 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * Specified assertion operations.
    */
   private enum ASSERT_OP {
-    EQUAL,
-    GREATER_THAN,
-    GREATER_THAN_OR_EQUAL,
-    LESS_THAN
+    EQUAL, GREATER_THAN, GREATER_THAN_OR_EQUAL, LESS_THAN
   }
 
   /**
@@ -120,8 +117,9 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
   /**
    * A region entry value.
    */
-  private static final byte[] VALUE = "Proin lobortis enim vel sem congue ut condimentum leo rhoncus. In turpis lorem, rhoncus nec rutrum vel, sodales vitae lacus. Etiam nunc ligula, scelerisque id egestas vitae, gravida non enim. Donec ac ligula purus. Mauris gravida ligula sit amet mi ornare blandit. Aliquam at velit ac enim varius malesuada ut eu tortor. Quisque diam nisi, fermentum vel accumsan at, commodo et velit."
-    .getBytes();
+  private static final byte[] VALUE =
+      "Proin lobortis enim vel sem congue ut condimentum leo rhoncus. In turpis lorem, rhoncus nec rutrum vel, sodales vitae lacus. Etiam nunc ligula, scelerisque id egestas vitae, gravida non enim. Donec ac ligula purus. Mauris gravida ligula sit amet mi ornare blandit. Aliquam at velit ac enim varius malesuada ut eu tortor. Quisque diam nisi, fermentum vel accumsan at, commodo et velit."
+          .getBytes();
 
   /**
    * The expected size of the region entry value in off-heap memory.
@@ -131,7 +129,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
   /**
    * Listens for off-heap JMX notifications.
    */
-  private static final OffHeapNotificationListener notificationListener = new OffHeapNotificationListener();
+  private static final OffHeapNotificationListener notificationListener =
+      new OffHeapNotificationListener();
 
   /**
    * Local MBeanServer.
@@ -227,7 +226,7 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
       // Make sure our starting off heap stats are correct
       assertOffHeapMetricsOnVm(vm, TOTAL_MEMORY, 0, 0, 0);
 
-      // After allocating large chunk (equal to total memory) 
+      // After allocating large chunk (equal to total memory)
       // we should still have no fragmentation
       int largeChunk = (int) TOTAL_MEMORY - OffHeapStoredObject.HEADER_SIZE;
       doPutOnVm(vm, KEY, new byte[largeChunk], OFF_HEAP_REGION_NAME, false);
@@ -249,7 +248,7 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
       doPutOnVm(vm, KEY + "1", new byte[halfChunk], OFF_HEAP_REGION_NAME, false);
       doDestroyOnVm(vm, KEY + "0", OFF_HEAP_REGION_NAME);
 
-      // Allocate largeChunk to trigger compaction and fragmentation should be zero 
+      // Allocate largeChunk to trigger compaction and fragmentation should be zero
       // as all free memory is available as one fragment
       doPutOnVm(vm, KEY + "1", new byte[largeChunk], OFF_HEAP_REGION_NAME, true);
       assertFragmentationStatOnVm(vm, 0, ASSERT_OP.EQUAL);
@@ -470,7 +469,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param numAllocations the number of previous off-heap allocations
    * @param numDestroys the number of destroys to perform
    */
-  private void doFreeOffHeapMemoryOnVm(final VM vm, final int numAllocations, final int numDestroys) {
+  private void doFreeOffHeapMemoryOnVm(final VM vm, final int numAllocations,
+      final int numDestroys) {
     vm.invoke(new SerializableRunnable() {
       @Override
       public void run() {
@@ -547,7 +547,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param compactionTime total off heap compaction time.
    * @param op an assert operation.
    */
-  private void assertCompactionTimeStatOnVm(final VM vm, final long compactionTime, final ASSERT_OP op) {
+  private void assertCompactionTimeStatOnVm(final VM vm, final long compactionTime,
+      final ASSERT_OP op) {
     vm.invoke(() -> assertCompactionTimeStat(compactionTime, op));
   }
 
@@ -589,7 +590,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param fragmentation a fragmentation percentage
    * @param op an assertion operation
    */
-  private void assertFragmentationStatOnVm(final VM vm, final int fragmentation, final ASSERT_OP op) {
+  private void assertFragmentationStatOnVm(final VM vm, final int fragmentation,
+      final ASSERT_OP op) {
     vm.invoke(() -> assertFragmentationStat(fragmentation, op));
   }
 
@@ -695,11 +697,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param objects number of objects stored in off-heap memory.
    * @param fragmentation the fragmentation percentage.
    */
-  private void assertOffHeapMetricsOnVm(final VM vm,
-                                        final long freeMemory,
-                                        final long allocatedMemory,
-                                        final long objects,
-                                        final int fragmentation) {
+  private void assertOffHeapMetricsOnVm(final VM vm, final long freeMemory,
+      final long allocatedMemory, final long objects, final int fragmentation) {
     vm.invoke(() -> assertOffHeapMetrics(freeMemory, allocatedMemory, objects, fragmentation));
   }
 
@@ -711,7 +710,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param objects number of objects stored in off-heap memory.
    * @param fragmentation the fragmentation percentage.
    */
-  private void assertOffHeapMetrics(final long freeMemory, final long allocatedMemory, final long objects, final int fragmentation) {
+  private void assertOffHeapMetrics(final long freeMemory, final long allocatedMemory,
+      final long objects, final int fragmentation) {
     ManagementService service = ManagementService.getExistingManagementService(getCache());
     assertNotNull(service);
 
@@ -735,7 +735,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    *
    * @return true if successful.
    */
-  private boolean createOffHeapRegionOnVm(final VM vm, final String name, final DataPolicy dataPolicy) {
+  private boolean createOffHeapRegionOnVm(final VM vm, final String name,
+      final DataPolicy dataPolicy) {
     return vm.invoke(() -> null != createOffHeapRegion(name, dataPolicy));
   }
 
@@ -758,7 +759,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param management starts the ManagementService when true.
    * @param props distributed system properties.
    */
-  private void setSystemPropertiesOnVm(final VM vm, final boolean management, final Properties props) {
+  private void setSystemPropertiesOnVm(final VM vm, final boolean management,
+      final Properties props) {
     vm.invoke(() -> setSystemProperties(management, props));
   }
 
@@ -811,11 +813,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param value region entry value.
    * @param regionName a region name.
    */
-  private void doPutOnVm(final VM vm,
-                         final Object key,
-                         final Object value,
-                         final String regionName,
-                         final boolean expectException) {
+  private void doPutOnVm(final VM vm, final Object key, final Object value, final String regionName,
+      final boolean expectException) {
     vm.invoke(() -> doPut(key, value, regionName, expectException));
   }
 
@@ -826,7 +825,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param value region entry value.
    * @param regionName a region name.
    */
-  private void doPut(final Object key, final Object value, final String regionName, final boolean expectException) {
+  private void doPut(final Object key, final Object value, final String regionName,
+      final boolean expectException) {
     Region region = getCache().getRegion(regionName);
     assertNotNull(region);
 
@@ -876,10 +876,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param highThreshold the high threshold trigger.
    * @param lowThreshold the low threshold trigger.
    */
-  private void setupOffHeapMonitorOnVm(final VM vm,
-                                       final String attribute,
-                                       final long highThreshold,
-                                       final long lowThreshold) {
+  private void setupOffHeapMonitorOnVm(final VM vm, final String attribute,
+      final long highThreshold, final long lowThreshold) {
     vm.invoke(() -> setupOffHeapMonitor(attribute, highThreshold, lowThreshold));
   }
 
@@ -890,8 +888,10 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param highThreshold the high threshold trigger.
    * @param lowThreshold the low threshold trigger.
    */
-  private void setupOffHeapMonitor(final String attribute, final long highThreshold, final long lowThreshold) throws JMException {
-    ObjectName memberMBeanObjectName = MBeanJMXAdapter.getMemberMBeanName(InternalDistributedSystem.getConnectedInstance().getDistributedMember());
+  private void setupOffHeapMonitor(final String attribute, final long highThreshold,
+      final long lowThreshold) throws JMException {
+    ObjectName memberMBeanObjectName = MBeanJMXAdapter.getMemberMBeanName(
+        InternalDistributedSystem.getConnectedInstance().getDistributedMember());
     assertNotNull(memberMBeanObjectName);
 
     ObjectName offHeapMonitorName = new ObjectName("monitors:type=Gauge,attr=" + attribute);
@@ -920,11 +920,10 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    * @param interval the polling interval to check for notifications.
    * @param throwOnTimeout throws an exception on timeout if true.
    */
-  private void waitForNotificationListenerOnVm(final VM vm,
-                                               final long wait,
-                                               final long interval,
-                                               final boolean throwOnTimeout) {
-    vm.invoke(() -> await("Awaiting Notification Listener").atMost(wait, TimeUnit.MILLISECONDS).until(() -> assertTrue(notificationListener.getNotificationSize() > 0)));
+  private void waitForNotificationListenerOnVm(final VM vm, final long wait, final long interval,
+      final boolean throwOnTimeout) {
+    vm.invoke(() -> await("Awaiting Notification Listener").atMost(wait, TimeUnit.MILLISECONDS)
+        .until(() -> assertTrue(notificationListener.getNotificationSize() > 0)));
   }
 
   /**
@@ -941,7 +940,8 @@ public class OffHeapManagementDUnitTest extends JUnit4CacheTestCase {
    */
   private static class OffHeapNotificationListener implements NotificationListener {
 
-    List<Notification> notificationList = Collections.synchronizedList(new ArrayList<Notification>());
+    List<Notification> notificationList =
+        Collections.synchronizedList(new ArrayList<Notification>());
 
     @Override
     public void handleNotification(final Notification notification, final Object handback) {

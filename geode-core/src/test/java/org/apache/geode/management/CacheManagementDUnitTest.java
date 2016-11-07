@@ -64,14 +64,16 @@ import org.apache.geode.test.junit.rules.serializable.SerializableTestName;
  * This class checks and verifies various data and operations exposed through MemberMXBean
  * interface.
  * <p>
- * <p>Goal of the Test : MemberMBean gets created once cache is created. Data like
- * config data and stats are of proper value To check proper federation of
- * MemberMBean including remote ops and remote data access
  * <p>
- * <p>This test is a mess and needs to be rewritten.
+ * Goal of the Test : MemberMBean gets created once cache is created. Data like config data and
+ * stats are of proper value To check proper federation of MemberMBean including remote ops and
+ * remote data access
+ * <p>
+ * <p>
+ * This test is a mess and needs to be rewritten.
  */
 @Category(DistributedTest.class)
-@SuppressWarnings({ "serial", "unused" })
+@SuppressWarnings({"serial", "unused"})
 public class CacheManagementDUnitTest implements Serializable {
 
   /** used in memberVMs */
@@ -107,7 +109,8 @@ public class CacheManagementDUnitTest implements Serializable {
 
     Map<DistributedMember, DistributionConfig> configMap = new HashMap<>();
     for (VM memberVM : this.memberVMs) {
-      Map<DistributedMember, DistributionConfig> configMapMember = memberVM.invoke(() -> verifyConfigData());
+      Map<DistributedMember, DistributionConfig> configMapMember =
+          memberVM.invoke(() -> verifyConfigData());
       configMap.putAll(configMapMember);
     }
 
@@ -122,7 +125,8 @@ public class CacheManagementDUnitTest implements Serializable {
     int i = 1;
     for (VM memberVM : this.memberVMs) {
       Properties props = new Properties();
-      props.setProperty(LOG_FILE, this.temporaryFolder.newFile(this.testName.getMethodName() + "-VM" + i + ".log").getAbsolutePath());
+      props.setProperty(LOG_FILE, this.temporaryFolder
+          .newFile(this.testName.getMethodName() + "-VM" + i + ".log").getAbsolutePath());
       this.managementTestRule.createMember(memberVM, props);
       i++;
     }
@@ -160,8 +164,7 @@ public class CacheManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Creates and starts a managerVM.
-   * Multiple Managers
+   * Creates and starts a managerVM. Multiple Managers
    */
   @Test
   public void testManager() throws Exception {
@@ -184,8 +187,7 @@ public class CacheManagementDUnitTest implements Serializable {
   }
 
   /**
-   * Creates and starts a managerVM.
-   * Multiple Managers
+   * Creates and starts a managerVM. Multiple Managers
    */
   @Test
   public void testManagerShutdown() throws Exception {
@@ -196,7 +198,8 @@ public class CacheManagementDUnitTest implements Serializable {
     this.managementTestRule.createManager(this.managerVM, false);
     this.managementTestRule.startManager(this.managerVM);
 
-    verifyManagerStarted(this.managerVM, this.managementTestRule.getDistributedMember(this.memberVMs[0]));
+    verifyManagerStarted(this.managerVM,
+        this.managementTestRule.getDistributedMember(this.memberVMs[0]));
 
     this.managementTestRule.stopManager(this.managerVM);
     verifyManagerStopped(this.managerVM, this.memberVMs.length);
@@ -265,7 +268,8 @@ public class CacheManagementDUnitTest implements Serializable {
     attachListenerToDistributedSystemMXBean(this.managerVM);
 
     // Step : 3 : Verify Notification count, notification region sizes
-    verifyNotificationsAndRegionSize(this.memberVMs[0], this.memberVMs[1], this.memberVMs[2], this.managerVM);
+    verifyNotificationsAndRegionSize(this.memberVMs[0], this.memberVMs[1], this.memberVMs[2],
+        this.managerVM);
   }
 
   @Test
@@ -283,7 +287,8 @@ public class CacheManagementDUnitTest implements Serializable {
     this.managementTestRule.createMember(this.memberVMs[2]);
 
     // Step : 3 : Verify Notification count, notification region sizes
-    verifyNotificationsAndRegionSize(this.memberVMs[0], this.memberVMs[1], this.memberVMs[2], this.managerVM);
+    verifyNotificationsAndRegionSize(this.memberVMs[0], this.memberVMs[1], this.memberVMs[2],
+        this.managerVM);
   }
 
   @Test
@@ -318,7 +323,8 @@ public class CacheManagementDUnitTest implements Serializable {
         assertThat(objectNames.contains(memberMBeanName)).isTrue();
       }
 
-      Set<ObjectName> names = service.queryMBeanNames(this.managementTestRule.getDistributedMember());
+      Set<ObjectName> names =
+          service.queryMBeanNames(this.managementTestRule.getDistributedMember());
       ObjectName[] arrayOfNames = names.toArray(new ObjectName[names.size()]);
 
       assertThat(superSet).doesNotContain(arrayOfNames); // TODO: what value does this method have?
@@ -357,10 +363,11 @@ public class CacheManagementDUnitTest implements Serializable {
 
       ObjectName memberMBeanName = service.getMemberMBeanName(otherMember);
 
-      await().until(() -> assertThat(service.getMBeanProxy(memberMBeanName, MemberMXBean.class)).isNotNull());
+      await().until(
+          () -> assertThat(service.getMBeanProxy(memberMBeanName, MemberMXBean.class)).isNotNull());
       MemberMXBean memberMXBean = service.getMBeanProxy(memberMBeanName, MemberMXBean.class);
 
-      //Ensure Data getting federated from Managing node
+      // Ensure Data getting federated from Managing node
       long start = memberMXBean.getMemberUpTime();
       await().until(() -> assertThat(memberMXBean.getMemberUpTime()).isGreaterThan(start));
     });
@@ -382,7 +389,8 @@ public class CacheManagementDUnitTest implements Serializable {
       assertThat(otherMembers).hasSize(otherMembersCount);
 
       for (DistributedMember member : otherMembers) {
-        Set<ObjectName> proxyNames = service.getFederatingManager().getProxyFactory().findAllProxies(member);
+        Set<ObjectName> proxyNames =
+            service.getFederatingManager().getProxyFactory().findAllProxies(member);
         assertThat(proxyNames).isEmpty();
 
         ObjectName proxyMBeanName = service.getMemberMBeanName(member);
@@ -393,7 +401,8 @@ public class CacheManagementDUnitTest implements Serializable {
 
   private Map<DistributedMember, DistributionConfig> verifyConfigData() {
     ManagementService service = this.managementTestRule.getManagementService();
-    InternalDistributedSystem ids = (InternalDistributedSystem) this.managementTestRule.getCache().getDistributedSystem();
+    InternalDistributedSystem ids =
+        (InternalDistributedSystem) this.managementTestRule.getCache().getDistributedSystem();
     DistributionConfig config = ids.getConfig();
 
     MemberMXBean bean = service.getMemberMXBean();
@@ -409,7 +418,8 @@ public class CacheManagementDUnitTest implements Serializable {
    * This is to check whether the config data has been propagated to the Managing node properly or
    * not.
    */
-  private void verifyConfigDataRemote(final Map<DistributedMember, DistributionConfig> configMap) throws Exception {
+  private void verifyConfigDataRemote(final Map<DistributedMember, DistributionConfig> configMap)
+      throws Exception {
     Set<DistributedMember> otherMembers = this.managementTestRule.getOtherNormalMembers();
 
     for (DistributedMember member : otherMembers) {
@@ -424,7 +434,8 @@ public class CacheManagementDUnitTest implements Serializable {
   /**
    * Asserts that distribution config and gemfireProperty composite types hold the same values
    */
-  private void verifyGemFirePropertiesData(final DistributionConfig config, final GemFireProperties data) {
+  private void verifyGemFirePropertiesData(final DistributionConfig config,
+      final GemFireProperties data) {
     assertThat(data.getMemberName()).isEqualTo(config.getName());
 
     // **TODO **
@@ -434,19 +445,23 @@ public class CacheManagementDUnitTest implements Serializable {
     assertThat(data.getMcastAddress()).isEqualTo(config.getMcastAddress().getHostAddress());
     assertThat(data.getBindAddress()).isEqualTo(config.getBindAddress());
     assertThat(data.getTcpPort()).isEqualTo(config.getTcpPort());
-    assertThat(removeVMDir(data.getCacheXMLFile())).isEqualTo(removeVMDir(config.getCacheXmlFile().getAbsolutePath()));
+    assertThat(removeVMDir(data.getCacheXMLFile()))
+        .isEqualTo(removeVMDir(config.getCacheXmlFile().getAbsolutePath()));
 
     // **TODO **
     assertThat(data.getMcastTTL()).isEqualTo(config.getMcastTtl());
     assertThat(data.getServerBindAddress()).isEqualTo(config.getServerBindAddress());
     assertThat(data.getLocators()).isEqualTo(config.getLocators());
 
-    //The start locator may contain a directory
-    assertThat(removeVMDir(data.getStartLocator())).isEqualTo(removeVMDir(config.getStartLocator()));
-    assertThat(removeVMDir(data.getLogFile())).isEqualTo(removeVMDir(config.getLogFile().getAbsolutePath()));
+    // The start locator may contain a directory
+    assertThat(removeVMDir(data.getStartLocator()))
+        .isEqualTo(removeVMDir(config.getStartLocator()));
+    assertThat(removeVMDir(data.getLogFile()))
+        .isEqualTo(removeVMDir(config.getLogFile().getAbsolutePath()));
     assertThat(data.getLogLevel()).isEqualTo(config.getLogLevel());
     assertThat(data.isStatisticSamplingEnabled()).isEqualTo(config.getStatisticSamplingEnabled());
-    assertThat(removeVMDir(data.getStatisticArchiveFile())).isEqualTo(removeVMDir(config.getStatisticArchiveFile().getAbsolutePath()));
+    assertThat(removeVMDir(data.getStatisticArchiveFile()))
+        .isEqualTo(removeVMDir(config.getStatisticArchiveFile().getAbsolutePath()));
 
     // ** TODO **
     String includeFile = null;
@@ -460,20 +475,25 @@ public class CacheManagementDUnitTest implements Serializable {
 
     assertThat(data.getClusterSSLCiphers()).isEqualTo(config.getClusterSSLCiphers());
     assertThat(data.getClusterSSLProtocols()).isEqualTo(config.getClusterSSLProtocols());
-    assertThat(data.isClusterSSLRequireAuthentication()).isEqualTo(config.getClusterSSLRequireAuthentication());
+    assertThat(data.isClusterSSLRequireAuthentication())
+        .isEqualTo(config.getClusterSSLRequireAuthentication());
     assertThat(data.getSocketLeaseTime()).isEqualTo(config.getSocketLeaseTime());
     assertThat(data.getSocketBufferSize()).isEqualTo(config.getSocketBufferSize());
     assertThat(data.getMcastSendBufferSize()).isEqualTo(config.getMcastSendBufferSize());
     assertThat(data.getMcastRecvBufferSize()).isEqualTo(config.getMcastRecvBufferSize());
-    assertThat(data.getMcastByteAllowance()).isEqualTo(config.getMcastFlowControl().getByteAllowance());
-    assertThat(data.getMcastRechargeThreshold()).isEqualTo(config.getMcastFlowControl().getRechargeThreshold());
-    assertThat(data.getMcastRechargeBlockMs()).isEqualTo(config.getMcastFlowControl().getRechargeBlockMs());
+    assertThat(data.getMcastByteAllowance())
+        .isEqualTo(config.getMcastFlowControl().getByteAllowance());
+    assertThat(data.getMcastRechargeThreshold())
+        .isEqualTo(config.getMcastFlowControl().getRechargeThreshold());
+    assertThat(data.getMcastRechargeBlockMs())
+        .isEqualTo(config.getMcastFlowControl().getRechargeBlockMs());
     assertThat(data.getUdpFragmentSize()).isEqualTo(config.getUdpFragmentSize());
     assertThat(data.getUdpSendBufferSize()).isEqualTo(config.getUdpSendBufferSize());
     assertThat(data.getUdpRecvBufferSize()).isEqualTo(config.getUdpRecvBufferSize());
     assertThat(data.isDisableTcp()).isEqualTo(config.getDisableTcp());
     assertThat(data.isEnableTimeStatistics()).isEqualTo(config.getEnableTimeStatistics());
-    assertThat(data.isEnableNetworkPartitionDetection()).isEqualTo(config.getEnableNetworkPartitionDetection());
+    assertThat(data.isEnableNetworkPartitionDetection())
+        .isEqualTo(config.getEnableNetworkPartitionDetection());
     assertThat(data.getMemberTimeout()).isEqualTo(config.getMemberTimeout());
 
     assertThat(data.getMembershipPortRange()).containsExactly(config.getMembershipPortRange());
@@ -488,15 +508,19 @@ public class CacheManagementDUnitTest implements Serializable {
     assertThat(data.getDurableClientId()).isEqualTo(config.getDurableClientId());
     assertThat(data.getDurableClientTimeout()).isEqualTo(config.getDurableClientTimeout());
     assertThat(data.getSecurityClientAuthInit()).isEqualTo(config.getSecurityClientAuthInit());
-    assertThat(data.getSecurityClientAuthenticator()).isEqualTo(config.getSecurityClientAuthenticator());
+    assertThat(data.getSecurityClientAuthenticator())
+        .isEqualTo(config.getSecurityClientAuthenticator());
     assertThat(data.getSecurityClientDHAlgo()).isEqualTo(config.getSecurityClientDHAlgo());
     assertThat(data.getSecurityPeerAuthInit()).isEqualTo(config.getSecurityPeerAuthInit());
-    assertThat(data.getSecurityClientAuthenticator()).isEqualTo(config.getSecurityPeerAuthenticator());
+    assertThat(data.getSecurityClientAuthenticator())
+        .isEqualTo(config.getSecurityPeerAuthenticator());
     assertThat(data.getSecurityClientAccessor()).isEqualTo(config.getSecurityClientAccessor());
     assertThat(data.getSecurityClientAccessorPP()).isEqualTo(config.getSecurityClientAccessorPP());
     assertThat(data.getSecurityLogLevel()).isEqualTo(config.getSecurityLogLevel());
-    assertThat(removeVMDir(data.getSecurityLogFile())).isEqualTo(removeVMDir(config.getSecurityLogFile().getAbsolutePath()));
-    assertThat(data.getSecurityPeerMembershipTimeout()).isEqualTo(config.getSecurityPeerMembershipTimeout());
+    assertThat(removeVMDir(data.getSecurityLogFile()))
+        .isEqualTo(removeVMDir(config.getSecurityLogFile().getAbsolutePath()));
+    assertThat(data.getSecurityPeerMembershipTimeout())
+        .isEqualTo(config.getSecurityPeerMembershipTimeout());
     assertThat(data.isRemoveUnresponsiveClient()).isEqualTo(config.getRemoveUnresponsiveClient());
     assertThat(data.isDeltaPropagation()).isEqualTo(config.getDeltaPropagation());
     assertThat(data.getRedundancyZone()).isEqualTo(config.getRedundancyZone());
@@ -557,8 +581,10 @@ public class CacheManagementDUnitTest implements Serializable {
   }
 
   private void verifyExpectedMembers(final int otherMembersCount) {
-    String alias = "awaiting " + this.managementTestRule.getOtherNormalMembers() + " to have size " + otherMembersCount;
-    await(alias).until(() -> assertThat(this.managementTestRule.getOtherNormalMembers()).hasSize(otherMembersCount));
+    String alias = "awaiting " + this.managementTestRule.getOtherNormalMembers() + " to have size "
+        + otherMembersCount;
+    await(alias).until(() -> assertThat(this.managementTestRule.getOtherNormalMembers())
+        .hasSize(otherMembersCount));
   }
 
   private void invokeRemoteMemberMXBeanOps() throws Exception {
@@ -574,9 +600,9 @@ public class CacheManagementDUnitTest implements Serializable {
 
       // TODO: need assertions
 
-      //("<ExpectedString> JVMMetrics is " + metrics.toString() + "</ExpectedString> ");
-      //("<ExpectedString> OSMetrics is " + metrics.toString() + "</ExpectedString> ");
-      //("<ExpectedString> Boolean Data Check " + bean.isManager() + "</ExpectedString> ");
+      // ("<ExpectedString> JVMMetrics is " + metrics.toString() + "</ExpectedString> ");
+      // ("<ExpectedString> OSMetrics is " + metrics.toString() + "</ExpectedString> ");
+      // ("<ExpectedString> Boolean Data Check " + bean.isManager() + "</ExpectedString> ");
     }
   }
 
@@ -591,11 +617,13 @@ public class CacheManagementDUnitTest implements Serializable {
         }
       };
 
-      ManagementFactory.getPlatformMBeanServer().addNotificationListener(MBeanJMXAdapter.getDistributedSystemName(), listener, null, null);
+      ManagementFactory.getPlatformMBeanServer().addNotificationListener(
+          MBeanJMXAdapter.getDistributedSystemName(), listener, null, null);
     });
   }
 
-  private void verifyNotificationsAndRegionSize(final VM memberVM1, final VM memberVM2, final VM memberVM3, final VM managerVM) {
+  private void verifyNotificationsAndRegionSize(final VM memberVM1, final VM memberVM2,
+      final VM memberVM3, final VM managerVM) {
     DistributedMember member1 = this.managementTestRule.getDistributedMember(memberVM1);
     DistributedMember member2 = this.managementTestRule.getDistributedMember(memberVM2);
     DistributedMember member3 = this.managementTestRule.getDistributedMember(memberVM3);
@@ -628,15 +656,18 @@ public class CacheManagementDUnitTest implements Serializable {
 
   private void createNotificationRegion(final String memberId) {
     SystemManagementService service = this.managementTestRule.getSystemManagementService();
-    Map<ObjectName, NotificationHubListener> notificationHubListenerMap = service.getNotificationHub().getListenerObjectMap();
+    Map<ObjectName, NotificationHubListener> notificationHubListenerMap =
+        service.getNotificationHub().getListenerObjectMap();
 
     await().until(() -> assertThat(notificationHubListenerMap.size()).isEqualTo(1));
 
-    RegionFactory regionFactory = this.managementTestRule.getCache().createRegionFactory(RegionShortcut.REPLICATE);
+    RegionFactory regionFactory =
+        this.managementTestRule.getCache().createRegionFactory(RegionShortcut.REPLICATE);
     for (int i = 1; i <= 15; i++) {
       regionFactory.create(NOTIFICATION_REGION_NAME + i);
     }
-    Region region = this.managementTestRule.getCache().getRegion(ManagementConstants.NOTIFICATION_REGION + "_" + memberId);
+    Region region = this.managementTestRule.getCache()
+        .getRegion(ManagementConstants.NOTIFICATION_REGION + "_" + memberId);
 
     assertThat(region).isEmpty();
   }
@@ -646,7 +677,8 @@ public class CacheManagementDUnitTest implements Serializable {
     ObjectName objectName = service.getMemberMBeanName(member);
 
     String alias = "awaiting MemberMXBean proxy for " + member;
-    await(alias).until(() -> assertThat(service.getMBeanProxy(objectName, MemberMXBean.class)).isNotNull());
+    await(alias)
+        .until(() -> assertThat(service.getMBeanProxy(objectName, MemberMXBean.class)).isNotNull());
 
     return service.getMBeanProxy(objectName, MemberMXBean.class);
   }
