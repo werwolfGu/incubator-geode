@@ -17,7 +17,7 @@
 FROM geode/base:0.1
 MAINTAINER Geode Community <dev@geode.incubator.apache.org>
 
-LABEL Vendor="Apache Geode (incubating)"
+LABEL Vendor="Apache Geode"
 LABEL version=unstable
 
 # download JDK 8
